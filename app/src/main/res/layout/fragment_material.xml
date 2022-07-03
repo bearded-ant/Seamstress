@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/tv_material_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Шифон"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btn_edit_material"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="редактировать"
+        app:layout_constraintStart_toEndOf="@id/tv_material_name"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_material_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="шелковый"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_edit_material" />
+
+    <TextView
+        android:id="@+id/tv_material_units"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="погонный метр"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_material_type" />
+
+    <TextView
+        android:id="@+id/tv_material_prise"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="800 руб"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_material_units" />
+
+    <ImageView
+        android:id="@+id/iv_material_photo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/shifon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_material_prise" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

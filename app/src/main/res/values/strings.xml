@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Seamstress</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="outfit_fragment_label">Outfit Fragment</string>
+    <string name="first_fragment_button_blueprints_text">Готовые эскизы</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Кукушкина Варвара Кирилловна</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="first_fragment_phone">+7(123)456 78 90</string>
+    <string name="first_fragment_address">Сэн-Мартен, ул. Попугайчиковая, 8</string>
+    <string name="first_fragment_button_sizes_text">размеры</string>
+    <string name="first_fragment_button_outfits_text">Готовые наряды</string>
+    <string name="first_fragment_button_new_blueprints_text">новый эскиз</string>
+    <string name="first_fragment_button_new_sizes_text">новый замер</string>
+
+    <string name="btn_clients_text">клиенты</string>
+    <string name="btn_add_client_text">новый клиент</string>
+    <string name="btn_clothes_text">одежда</string>
+    <string name="btn_add_clothes_text">новое изделие</string>
+    <string name="btn_material_text">материалы</string>
+    <string name="btn_add_material_text">новый материал</string>
+    <string name="item_client_list_photo">item_client_list_photo</string>
+    <string name="add_client_btn">add_client_btn</string>
+    <string name="item_dress_list_photo">item_dress_list_photo</string>
+</resources>

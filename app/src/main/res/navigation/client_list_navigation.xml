@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/client_list_navigation"
+    app:startDestination="@id/clientListFragment">
+
+    <fragment
+        android:id="@+id/clientListFragment"
+        android:name="com.example.seamstress.ui.clients.listFragment.ClientListFragment"
+        android:label="ClientListFragment" >
+        <action
+            android:id="@+id/action_clientListFragment_to_clientFragment"
+            app:destination="@id/clientFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/clientFragment"
+        android:name="com.example.seamstress.ui.clients.mainFragment.ClientFragment"
+        android:label="ClientFragment" >
+        <action
+            android:id="@+id/action_clientFragment_to_clientListFragment"
+            app:destination="@id/clientListFragment" />
+        <argument
+            android:name="clientEntity"
+            app:argType="com.example.seamstress.domain.client.Client" />
+    </fragment>
+</navigation>

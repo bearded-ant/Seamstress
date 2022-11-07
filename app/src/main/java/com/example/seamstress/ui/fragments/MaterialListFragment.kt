@@ -1,4 +1,4 @@
-package com.example.seamstress.ui
+package com.example.seamstress.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.seamstress.R
 
-class ReadyToWearFragment: Fragment() {
+class MaterialListFragment: Fragment() {
     companion object {
-        fun newInstance(): ReadyToWearFragment = ReadyToWearFragment()
+        fun newInstance(): MaterialListFragment = MaterialListFragment()
     }
 
     override fun onCreateView(
@@ -17,6 +17,6 @@ class ReadyToWearFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return inflater.inflate(R.layout.fragment_ready_to_wear, container, false)
+        return inflater.inflate(R.layout.fragment_material_list, container, false)
     }
 }

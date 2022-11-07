@@ -1,4 +1,4 @@
-package com.example.seamstress.ui
+package com.example.seamstress.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater

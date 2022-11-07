@@ -1,4 +1,4 @@
-package com.example.seamstress.ui
+package com.example.seamstress.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.seamstress.R
 
-class NewClientFragment: Fragment() {
+class ClothesListFragment: Fragment() {
     companion object {
-        fun newInstance(): NewClientFragment = NewClientFragment()
+        fun newInstance(): ClothesListFragment = ClothesListFragment()
     }
 
     override fun onCreateView(
@@ -17,6 +17,6 @@ class NewClientFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return inflater.inflate(R.layout.fragment_new_client, container, false)
+        return inflater.inflate(R.layout.fragment_dress_list, container, false)
     }
 }

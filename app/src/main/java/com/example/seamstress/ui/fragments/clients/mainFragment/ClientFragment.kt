@@ -1,4 +1,4 @@
-package com.example.seamstress.ui.clients.mainFragment
+package com.example.seamstress.ui.fragments.clients.mainFragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -29,12 +29,12 @@ class ClientFragment : Fragment() {
 //todo на писать проверку на наличие аргумента?
         val safeArgs = ClientFragmentArgs.fromBundle(arguments!!)
 
-        val client = safeArgs.clientEntity
+        val client = safeArgs.clientEntityId
 
-        binding.itemClient.itemClientPhoto.setImageResource(client.img)
-        binding.itemClient.itemClientName.text = client.name
-        binding.itemClient.itemClientPhone.text = client.phone
-        binding.itemClient.itemClientBalance.text = client.balance.toString()
+//        binding.itemClient.itemClientPhoto.setImageResource(client.img)
+//        binding.itemClient.itemClientName.text = client.name
+//        binding.itemClient.itemClientPhone.text = client.phone
+//        binding.itemClient.itemClientBalance.text = client.balance.toString()
 
         return binding.root
 

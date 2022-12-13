@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/clientListFragment"
-        android:name="com.example.seamstress.ui.clients.listFragment.ClientListFragment"
+        android:name="com.example.seamstress.ui.fragments.clients.listFragment.ClientListFragment"
         android:label="ClientListFragment" >
         <action
             android:id="@+id/action_clientListFragment_to_clientFragment"
@@ -14,13 +14,13 @@
     </fragment>
     <fragment
         android:id="@+id/clientFragment"
-        android:name="com.example.seamstress.ui.clients.mainFragment.ClientFragment"
+        android:name="com.example.seamstress.ui.fragments.clients.mainFragment.ClientFragment"
         android:label="ClientFragment" >
         <action
             android:id="@+id/action_clientFragment_to_clientListFragment"
             app:destination="@id/clientListFragment" />
         <argument
-            android:name="clientEntity"
-            app:argType="com.example.seamstress.domain.client.Client" />
+            android:name="clientEntityId"
+            app:argType="integer" />
     </fragment>
 </navigation>

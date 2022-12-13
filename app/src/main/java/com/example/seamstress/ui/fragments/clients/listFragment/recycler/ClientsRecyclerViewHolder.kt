@@ -1,4 +1,4 @@
-package com.example.seamstress.ui.clients.listFragment.recycler
+package com.example.seamstress.ui.fragments.clients.listFragment.recycler
 
 import android.view.View
 import android.widget.ImageView
@@ -6,11 +6,10 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.seamstress.R
-import com.example.seamstress.domain.client.Client
+import com.example.seamstress.domain.client.Clients
 
 class ClientsRecyclerViewHolder(
-    itemView: View,
-    private val listener: ClientsClickListener
+    itemView: View
 ) : RecyclerView.ViewHolder(itemView) {
 
     private val clientName = itemView.findViewById<TextView>(R.id.item_client_list_name)
@@ -19,14 +18,10 @@ class ClientsRecyclerViewHolder(
     private val clientImg = itemView.findViewById<ImageView>(R.id.item_client_list_photo)
     private val clientCard = itemView.findViewById<CardView>(R.id.item_client_list_card)
 
-    fun bindValues(clientEntity: Client) {
-        clientName.text = clientEntity.name
-        clientBalance.text = clientEntity.balance.toString()
-        clientPhone.text = clientEntity.phone
-        clientImg.setImageResource(clientEntity.img)
-
-        clientCard.setOnClickListener {
-            listener.onClintCardClick(clientEntity, adapterPosition)
-        }
+    fun bindValues(clientsEntity: Clients) {
+        clientName.text = clientsEntity.name
+        clientBalance.text = clientsEntity.balance.toString()
+        clientPhone.text = clientsEntity.phone
+        clientImg.setImageResource(R.drawable.ic_baseline_add_a_photo_24)
     }
 }

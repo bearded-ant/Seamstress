@@ -1,13 +1,14 @@
 package com.example.seamstress.domain.client
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-@Parcelize
-data class Client(
+@Entity
+data class Clients(
+    @PrimaryKey(autoGenerate = true)
     val id: Int,
     val name: String,
     val phone: String?,
     val img: Int,
     val balance: Float = 0F
-) : Parcelable
+)

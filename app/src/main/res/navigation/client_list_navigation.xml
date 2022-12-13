@@ -7,7 +7,7 @@
     <fragment
         android:id="@+id/clientListFragment"
         android:name="com.example.seamstress.ui.fragments.clients.listFragment.ClientListFragment"
-        android:label="ClientListFragment" >
+        android:label="All Clients" >
         <action
             android:id="@+id/action_clientListFragment_to_clientFragment"
             app:destination="@id/clientFragment" />
@@ -15,7 +15,7 @@
     <fragment
         android:id="@+id/clientFragment"
         android:name="com.example.seamstress.ui.fragments.clients.mainFragment.ClientFragment"
-        android:label="ClientFragment" >
+        android:label="Client" >
         <action
             android:id="@+id/action_clientFragment_to_clientListFragment"
             app:destination="@id/clientListFragment" />

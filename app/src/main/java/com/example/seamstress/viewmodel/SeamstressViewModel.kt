@@ -3,6 +3,7 @@ package com.example.seamstress.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.seamstress.data.SeamstressRepository
 import com.example.seamstress.domain.SeamstressDataBase
@@ -21,9 +22,13 @@ class SeamstressViewModel(application: Application) : AndroidViewModel(applicati
         getAllClients = repository.getAll
     }
 
+    private var _selectByIdClientLiveData = MutableLiveData<Clients>()
+    val selectByIdClientLiveData: LiveData<Clients> = _selectByIdClientLiveData
+
     fun selectClientById(id: Int) {
         viewModelScope.launch {
-            repository.selectById(id)
+            val response = repository.selectById(id)
+            _selectByIdClientLiveData.postValue(response)
         }
     }
 

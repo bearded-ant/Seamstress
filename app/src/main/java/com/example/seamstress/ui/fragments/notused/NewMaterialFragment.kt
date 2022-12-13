@@ -1,4 +1,4 @@
-package com.example.seamstress.ui.fragments
+package com.example.seamstress.ui.fragments.notused
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.seamstress.R
 
-class MaterialFragment: Fragment() {
+class NewMaterialFragment: Fragment() {
     companion object {
-        fun newInstance(): MaterialFragment = MaterialFragment()
+        fun newInstance(): NewMaterialFragment = NewMaterialFragment()
     }
 
     override fun onCreateView(
@@ -17,6 +17,6 @@ class MaterialFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return inflater.inflate(R.layout.fragment_material, container, false)
+        return inflater.inflate(R.layout.fragment_new_material, container, false)
     }
 }

@@ -9,7 +9,8 @@ import com.example.seamstress.R
 import com.example.seamstress.domain.client.Clients
 
 class ClientsRecyclerViewHolder(
-    itemView: View
+    itemView: View,
+    private val cardClick: ClientsClickListener
 ) : RecyclerView.ViewHolder(itemView) {
 
     private val clientName = itemView.findViewById<TextView>(R.id.item_client_list_name)
@@ -23,5 +24,8 @@ class ClientsRecyclerViewHolder(
         clientBalance.text = clientsEntity.balance.toString()
         clientPhone.text = clientsEntity.phone
         clientImg.setImageResource(R.drawable.ic_baseline_add_a_photo_24)
+        clientCard.setOnClickListener {
+            cardClick.onClientCardClick(clientsEntity.id)
+        }
     }
 }

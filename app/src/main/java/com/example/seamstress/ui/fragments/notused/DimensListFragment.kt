@@ -1,4 +1,4 @@
-package com.example.seamstress.ui.fragments
+package com.example.seamstress.ui.fragments.notused
 
 import android.os.Bundle
 import android.view.LayoutInflater

@@ -10,6 +10,7 @@ class SeamstressRepository(private val clientsDao: ClientsDao) {
 
     suspend fun selectById(id: Int): Clients = clientsDao.selectById(id)
 
+
     suspend fun insert(clients: Clients) {
         clientsDao.insert(clients)
     }

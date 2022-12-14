@@ -10,10 +10,10 @@ interface ClientsDao {
     fun getAllClients(): LiveData<List<Clients>>
 
     @Query("select * from clients where id= :id")
-    suspend fun selectById(id: Int): Clients
+    suspend fun selectById(id: Long): Clients
 
     @Insert
-    suspend fun insert(clients: Clients)
+    suspend fun insert(clients: Clients): Long
 
     @Delete
     suspend fun delete(clients: Clients)

@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.navArgs
 import com.example.seamstress.R
 import com.example.seamstress.databinding.FragmentClientBinding
 import com.example.seamstress.domain.client.Clients
@@ -43,6 +42,11 @@ class ClientFragment : Fragment() {
 
         return binding.root
 
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun bindClientCard(client: Clients) {

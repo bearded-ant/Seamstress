@@ -2,7 +2,10 @@ package com.example.seamstress.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.findNavController
+import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.seamstress.R
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -10,10 +13,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
+        val navController = findNavController(R.id.fragmentContainerView)
+        setupActionBarWithNavController(navController)
+    }
 
-//        supportFragmentManager
-//            .beginTransaction()
-//            .replace(R.id.fragment_container, ClientListFragment.newInstance())
-//            .commit()
-//    }
-}}
+    override fun onSupportNavigateUp(): Boolean {
+        val navController = findNavController(R.id.fragmentContainerView)
+        return navController.navigateUp() || super.onSupportNavigateUp()
+    }
+}

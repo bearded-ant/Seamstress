@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package ="com.example.seamstress">
+    package="com.example.seamstress">
 
     <application
         android:name=".App"
@@ -13,9 +13,7 @@
         android:theme="@style/Theme.Seamstress">
         <activity
             android:name=".ui.MainActivity"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Seamstress.NoActionBar">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,5 +21,7 @@
             </intent-filter>
         </activity>
     </application>
-
 </manifest>
+
+    <!--            android:label="@string/app_name"-->
+    <!--            android:theme="@style/Theme.Seamstress.NoActionBar"-->

@@ -26,4 +26,10 @@
     <string name="item_client_list_photo">item_client_list_photo</string>
     <string name="add_client_btn">add_client_btn</string>
     <string name="item_dress_list_photo">item_dress_list_photo</string>
+    <string name="client_photo">client_photo</string>
+    <string name="save_btn">сохранить</string>
+    <string name="cancel_btn">отменить</string>
+    <string name="client_name">имя клиента</string>
+    <string name="client_phone_number">+7 987 654 32 10</string>
+    <string name="client_balance">баланс</string>
 </resources>

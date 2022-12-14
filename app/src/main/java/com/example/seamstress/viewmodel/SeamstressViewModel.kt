@@ -25,16 +25,20 @@ class SeamstressViewModel(application: Application) : AndroidViewModel(applicati
     private var _selectByIdClientLiveData = MutableLiveData<Clients>()
     val selectByIdClientLiveData: LiveData<Clients> = _selectByIdClientLiveData
 
-    fun selectClientById(id: Int) {
+    fun selectClientById(id: Long) {
         viewModelScope.launch {
             val response = repository.selectById(id)
             _selectByIdClientLiveData.postValue(response)
         }
     }
 
+
+    private var _newId = MutableLiveData<Long>()
+    val newIdLiveData: LiveData<Long> = _newId
     fun insert(client: Clients) {
         viewModelScope.launch {
-            repository.insert(client)
+            val newEntityId = repository.insert(client)
+            _newId.postValue(newEntityId)
         }
     }
 

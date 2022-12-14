@@ -8,12 +8,9 @@ class SeamstressRepository(private val clientsDao: ClientsDao) {
 
     val getAll: LiveData<List<Clients>> = clientsDao.getAllClients()
 
-    suspend fun selectById(id: Int): Clients = clientsDao.selectById(id)
+    suspend fun selectById(id: Long): Clients = clientsDao.selectById(id)
 
-
-    suspend fun insert(clients: Clients) {
-        clientsDao.insert(clients)
-    }
+    suspend fun insert(clients: Clients): Long = clientsDao.insert(clients)
 
     suspend fun delete(clients: Clients) {
         clientsDao.delete(clients)

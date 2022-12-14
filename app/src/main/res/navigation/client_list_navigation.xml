@@ -7,20 +7,37 @@
     <fragment
         android:id="@+id/clientListFragment"
         android:name="com.example.seamstress.ui.fragments.clients.listFragment.ClientListFragment"
-        android:label="All Clients" >
+        android:label="All Clients">
         <action
             android:id="@+id/action_clientListFragment_to_clientFragment"
             app:destination="@id/clientFragment" />
+        <action
+            android:id="@+id/action_clientListFragment_to_newClientFragment"
+            app:destination="@id/newClientFragment" />
     </fragment>
     <fragment
         android:id="@+id/clientFragment"
         android:name="com.example.seamstress.ui.fragments.clients.mainFragment.ClientFragment"
-        android:label="Client" >
+        android:label="Client">
         <action
             android:id="@+id/action_clientFragment_to_clientListFragment"
             app:destination="@id/clientListFragment" />
         <argument
             android:name="clientEntityId"
-            app:argType="integer" />
+            app:argType="long" />
+    </fragment>
+    <fragment
+        android:id="@+id/newClientFragment"
+        android:name="com.example.seamstress.ui.fragments.clients.add.NewClientFragment"
+        android:label="NewClientFragment">
+        <action
+            android:id="@+id/action_newClientFragment_to_clientListFragment"
+            app:destination="@id/clientListFragment" />
+        <action
+            android:id="@+id/action_newClientFragment_to_clientFragment"
+            app:destination="@id/clientFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/clientListFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 </navigation>

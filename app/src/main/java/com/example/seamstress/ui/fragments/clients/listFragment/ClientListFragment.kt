@@ -36,6 +36,10 @@ class ClientListFragment : Fragment(), ClientsClickListener {
         seamstressViewModel = ViewModelProvider(requireActivity())[SeamstressViewModel::class.java]
         seamstressViewModel.getAllClients.observe(requireActivity()) { initRecycler(it) }
 
+        binding.floatingActionButton.setOnClickListener {
+            findNavController().navigate(ClientListFragmentDirections.actionClientListFragmentToNewClientFragment())
+        }
+
         return binding.root
     }
 
@@ -53,7 +57,7 @@ class ClientListFragment : Fragment(), ClientsClickListener {
         _binding = null
     }
 
-    override fun onClientCardClick(id: Int) {
+    override fun onClientCardClick(id: Long) {
         val action =
             ClientListFragmentDirections.actionClientListFragmentToClientFragment(id)
         findNavController().navigate(action)

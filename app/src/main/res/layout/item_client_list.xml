@@ -28,7 +28,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="@dimen/medium_size">
+            android:padding="@dimen/medium_dp_size">
 
             <!-- Title, secondary and supporting text -->
             <TextView

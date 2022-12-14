@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.example.seamstress.R
 import com.example.seamstress.databinding.FragmentClientBinding
 import com.example.seamstress.domain.client.Clients
@@ -38,6 +39,11 @@ class ClientFragment : Fragment() {
         seamstressViewModel.selectClientById(clientId)
         seamstressViewModel.selectByIdClientLiveData.observe(requireActivity()){
             bindClientCard(it)
+        }
+
+        binding.floatingActionButton.setOnClickListener {
+            val action = ClientFragmentDirections.actionClientFragmentToUpdateClientFragment(clientId)
+            findNavController().navigate(action)
         }
 
         return binding.root

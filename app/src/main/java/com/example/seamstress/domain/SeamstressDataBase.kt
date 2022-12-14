@@ -4,12 +4,12 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.seamstress.domain.client.Clients
-import com.example.seamstress.domain.client.ClientsDao
+import com.example.seamstress.domain.client.Customers
+import com.example.seamstress.domain.client.CustomersDao
 
-@Database(entities = [Clients::class], version = 1, exportSchema = false)
+@Database(entities = [Customers::class], version = 1, exportSchema = false)
 abstract class SeamstressDataBase : RoomDatabase() {
-    abstract fun clientsDao(): ClientsDao
+    abstract fun customersDao(): CustomersDao
 
     companion object {
         // Singleton prevents multiple instances of database opening at the

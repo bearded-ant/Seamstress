@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/client_list_navigation"
+    app:startDestination="@id/customersListFragment">
+
+    <fragment
+        android:id="@+id/customersListFragment"
+        android:name="com.example.seamstress.ui.fragments.customer.list.CustomersListFragment"
+        android:label="Список клиентов">
+        <action
+            android:id="@+id/action_customerList_to_customerCard"
+            app:destination="@id/customerFragment" />
+        <action
+            android:id="@+id/action_customersList_to_addCustomer"
+            app:destination="@id/addCustomerFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/customerFragment"
+        android:name="com.example.seamstress.ui.fragments.customer.card.CustomerCardFragment"
+        android:label="Клиент">
+        <action
+            android:id="@+id/action_customerCard_to_customersList"
+            app:destination="@id/customersListFragment" />
+        <argument
+            android:name="customerEntityId"
+            app:argType="long" />
+        <action
+            android:id="@+id/action_customerCard_to_updateCustomer"
+            app:destination="@id/updateCustomerFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addCustomerFragment"
+        android:name="com.example.seamstress.ui.fragments.customer.add.AddCustomerFragment"
+        android:label="Новый клиент">
+        <action
+            android:id="@+id/action_addCustomer_to_customersList"
+            app:destination="@id/customersListFragment" />
+        <action
+            android:id="@+id/action_addCustomer_to_customerCard"
+            app:destination="@id/customerFragment"
+            app:popUpTo="@id/customersListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/updateCustomerFragment"
+        android:name="com.example.seamstress.ui.fragments.customer.update.UpdateCustomerFragment"
+        android:label="Редактирование">
+        <argument
+            android:name="customerEntityId"
+            app:argType="long" />
+        <action
+            android:id="@+id/action_updateCustomer_to_customerCard"
+            app:destination="@id/customerFragment"
+            app:popUpTo="@id/customersListFragment" />
+        <action
+            android:id="@+id/action_updateCustomer_to_customersList"
+            app:destination="@id/customersListFragment" />
+    </fragment>
+</navigation>

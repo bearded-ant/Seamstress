@@ -1,23 +1,23 @@
 package com.example.seamstress.data
 
 import androidx.lifecycle.LiveData
-import com.example.seamstress.domain.client.Clients
-import com.example.seamstress.domain.client.ClientsDao
+import com.example.seamstress.domain.client.Customers
+import com.example.seamstress.domain.client.CustomersDao
 
-class SeamstressRepository(private val clientsDao: ClientsDao) {
+class SeamstressRepository(private val customersDao: CustomersDao) {
 
-    val getAll: LiveData<List<Clients>> = clientsDao.getAllClients()
+    val getAll: LiveData<List<Customers>> = customersDao.getAllClients()
 
-    suspend fun selectById(id: Long): Clients = clientsDao.selectById(id)
+    suspend fun selectById(id: Long): Customers = customersDao.selectById(id)
 
-    suspend fun insert(clients: Clients): Long = clientsDao.insert(clients)
+    suspend fun insert(customers: Customers): Long = customersDao.insert(customers)
 
-    suspend fun delete(clients: Clients) {
-        clientsDao.delete(clients)
+    suspend fun delete(customers: Customers) {
+        customersDao.delete(customers)
     }
 
-    suspend fun update(clients: Clients) {
-        clientsDao.update(clients)
+    suspend fun update(customers: Customers) {
+        customersDao.update(customers)
     }
 
 }

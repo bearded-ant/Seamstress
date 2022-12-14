@@ -18,6 +18,6 @@ class NewClothesFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View {
         //TODO собрат ьаблон новой шмотки
-        return inflater.inflate(R.layout.fragment_new_client, container, false)
+        return inflater.inflate(R.layout.fragment_add_customer, container, false)
     }
 }

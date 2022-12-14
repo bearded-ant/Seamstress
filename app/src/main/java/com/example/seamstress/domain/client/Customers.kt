@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class Clients(
+data class Customers(
     @PrimaryKey(autoGenerate = true)
     val id: Long,
     val name: String,

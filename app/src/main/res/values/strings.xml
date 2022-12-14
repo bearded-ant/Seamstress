@@ -17,21 +17,21 @@
     <string name="first_fragment_button_new_blueprints_text">новый эскиз</string>
     <string name="first_fragment_button_new_sizes_text">новый замер</string>
 
-    <string name="btn_clients_text">клиенты</string>
-    <string name="btn_add_client_text">новый клиент</string>
+    <string name="btn_customers_text">клиенты</string>
+    <string name="btn_add_customer_text">новый клиент</string>
     <string name="btn_clothes_text">одежда</string>
     <string name="btn_add_clothes_text">новое изделие</string>
     <string name="btn_material_text">материалы</string>
     <string name="btn_add_material_text">новый материал</string>
-    <string name="item_client_list_photo">item_client_list_photo</string>
-    <string name="add_client_btn">add_client_btn</string>
+    <string name="item_customer_list_photo">item_customer_list_photo</string>
+    <string name="add_customer_btn">add_customer_btn</string>
     <string name="item_dress_list_photo">item_dress_list_photo</string>
-    <string name="client_photo">client_photo</string>
+    <string name="customer_photo">customer_photo</string>
     <string name="save_btn">сохранить</string>
     <string name="cancel_btn">отменить</string>
-    <string name="client_name">имя клиента</string>
-    <string name="client_phone_number">+7 987 654 32 10</string>
-    <string name="client_balance">баланс</string>
+    <string name="customer_name">имя клиента</string>
+    <string name="customer_phone_number">+7 987 654 32 10</string>
+    <string name="customer_balance">баланс</string>
     <string name="delete_btn">удалить</string>
-    <string name="edit_client_btn">edit client</string>
+    <string name="edit_customer_btn">edit customer</string>
 </resources>

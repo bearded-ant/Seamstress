@@ -1,9 +1,9 @@
 package com.example.seamstress.domain.measuredParameter
 
 data class MeasuredParameter(
-    var id: Int,
+    var id: Long,
     var name: String,
-    var abbreviation: String,
+    var shortName: String,
     var value: String?,
-    var comment: String?
+    var description: String?
 )

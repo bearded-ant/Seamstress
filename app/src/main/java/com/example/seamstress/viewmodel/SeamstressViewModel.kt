@@ -7,48 +7,48 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.seamstress.data.SeamstressRepository
 import com.example.seamstress.domain.SeamstressDataBase
-import com.example.seamstress.domain.client.Clients
-import com.example.seamstress.domain.client.ClientsDao
+import com.example.seamstress.domain.client.Customers
+import com.example.seamstress.domain.client.CustomersDao
 import kotlinx.coroutines.launch
 
 class SeamstressViewModel(application: Application) : AndroidViewModel(application) {
 
-    val getAllClients: LiveData<List<Clients>>
+    val getAllCustomers: LiveData<List<Customers>>
     private val repository: SeamstressRepository
 
     init {
-        val clientsDao: ClientsDao = SeamstressDataBase.getDatabase(application).clientsDao()
-        repository = SeamstressRepository(clientsDao)
-        getAllClients = repository.getAll
+        val customersDao: CustomersDao = SeamstressDataBase.getDatabase(application).customersDao()
+        repository = SeamstressRepository(customersDao)
+        getAllCustomers = repository.getAll
     }
 
-    private var _selectByIdClientLiveData = MutableLiveData<Clients>()
-    val selectByIdClientLiveData: LiveData<Clients> = _selectByIdClientLiveData
+    private var _selectByIdCustomerLiveData = MutableLiveData<Customers>()
+    val selectByIdCustomerLiveData: LiveData<Customers> = _selectByIdCustomerLiveData
 
-    fun selectClientById(id: Long) {
+    fun selectCustomerById(id: Long) {
         viewModelScope.launch {
             val response = repository.selectById(id)
-            _selectByIdClientLiveData.postValue(response)
+            _selectByIdCustomerLiveData.postValue(response)
         }
     }
 
 
     private var _newId = MutableLiveData<Long>()
     val newIdLiveData: LiveData<Long> = _newId
-    fun insert(client: Clients) {
+    fun insert(client: Customers) {
         viewModelScope.launch {
             val newEntityId = repository.insert(client)
             _newId.postValue(newEntityId)
         }
     }
 
-    fun delete(client: Clients) {
+    fun delete(client: Customers) {
         viewModelScope.launch {
             repository.delete(client)
         }
     }
 
-    fun update(client: Clients) {
+    fun update(client: Customers) {
         viewModelScope.launch {
             repository.update(client)
         }

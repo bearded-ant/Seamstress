@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -46,7 +47,8 @@ class UpdateClientFragment : Fragment() {
                     id = client.id,
                     name = binding.frUpdateClientName.text.toString(),
                     phone = binding.frUpdateClientPhone.text.toString(),
-                    img = R.drawable.ic_baseline_add_a_photo_24
+                    img = R.drawable.ic_baseline_add_a_photo_24,
+                    balance = binding.frUpdateClientBalance.text.toString().toFloat()
                 )
                 seamstressViewModel.update(updatedClient)
                 Toast.makeText(requireContext(), "success update", Toast.LENGTH_SHORT).show()
@@ -58,10 +60,18 @@ class UpdateClientFragment : Fragment() {
             }
 
             binding.frUpdateClientBtnDelete.setOnClickListener {
-                seamstressViewModel.delete(client)
+
+
+                val alertBuilder = AlertDialog.Builder(requireContext())
+                alertBuilder.setPositiveButton("Да") { _, _ ->
+                    seamstressViewModel.delete(client)
+                    findNavController().navigate(UpdateClientFragmentDirections.actionUpdateClientFragmentToClientListFragment())
+                }
+                alertBuilder.setNegativeButton("Нет") { _, _ -> }
+                alertBuilder.setTitle("Удалить клиента ${client.name}?")
+                alertBuilder.setMessage("Вы уверены, что хотите удалить клиента ${client.name}?")
+                alertBuilder.create().show()
                 Toast.makeText(requireContext(), "client deleted", Toast.LENGTH_SHORT).show()
-                //todo make alert dialog
-                findNavController().navigate(UpdateClientFragmentDirections.actionUpdateClientFragmentToClientListFragment())
             }
 
             binding.frUpdateClientBtnCancel.setOnClickListener {

@@ -50,7 +50,8 @@
             app:argType="long" />
         <action
             android:id="@+id/action_updateClientFragment_to_clientFragment"
-            app:destination="@id/clientFragment" />
+            app:destination="@id/clientFragment"
+            app:popUpTo="@id/clientListFragment" />
         <action
             android:id="@+id/action_updateClientFragment_to_clientListFragment"
             app:destination="@id/clientListFragment" />

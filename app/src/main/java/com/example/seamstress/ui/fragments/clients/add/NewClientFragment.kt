@@ -42,7 +42,8 @@ class NewClientFragment : Fragment() {
                 id = 0,
                 name = binding.frNewClientName.text.toString(),
                 phone = binding.frNewClientPhone.text.toString(),
-                img = R.drawable.ic_baseline_add_a_photo_24
+                img = R.drawable.ic_baseline_add_a_photo_24,
+                balance = binding.frNewClientBalance.text.toString().toFloat()
             )
             seamstressViewModel.insert(client)
             seamstressViewModel.newIdLiveData.observe(requireActivity()){

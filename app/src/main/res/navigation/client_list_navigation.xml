@@ -36,8 +36,6 @@
         <action
             android:id="@+id/action_newClientFragment_to_clientFragment"
             app:destination="@id/clientFragment"
-            app:launchSingleTop="true"
-            app:popUpTo="@id/clientListFragment"
-            app:popUpToInclusive="true" />
+            app:popUpTo="@id/clientListFragment" />
     </fragment>
 </navigation>

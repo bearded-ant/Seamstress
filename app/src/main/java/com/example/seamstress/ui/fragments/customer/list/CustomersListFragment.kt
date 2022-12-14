@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.seamstress.databinding.FragmentCustomersListBinding
-import com.example.seamstress.domain.client.Customers
+import com.example.seamstress.domain.customers.Customers
 import com.example.seamstress.ui.fragments.customer.list.recycler.CustomerClickListener
 import com.example.seamstress.ui.fragments.customer.list.recycler.CustomersRecyclerAdapter
 import com.example.seamstress.viewmodel.SeamstressViewModel

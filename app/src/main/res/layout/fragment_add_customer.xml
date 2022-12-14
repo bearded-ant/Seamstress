@@ -5,24 +5,25 @@
     android:layout_height="match_parent">
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/fr_update_client_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/small_dp_size"
-        app:cardCornerRadius="@dimen/small_dp_size">
+        app:cardCornerRadius="@dimen/small_dp_size"
+        android:id="@+id/item_customer_card">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <!-- Media -->
             <ImageView
-                android:id="@+id/fr_update_client_photo"
+                android:id="@+id/fr_new_customer_photo"
                 android:layout_width="match_parent"
                 android:layout_height="194dp"
-                android:contentDescription="@string/client_photo"
+                android:contentDescription="@string/customer_photo"
                 android:scaleType="fitCenter"
-                android:src="@drawable/ic_baseline_add_a_photo_24" />
+                android:src="@drawable/ic_baseline_add_a_photo_24"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -30,28 +31,29 @@
                 android:orientation="vertical"
                 android:padding="@dimen/medium_dp_size">
 
+                <!-- Title, secondary and supporting text -->
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/fr_update_client_name"
+                    android:id="@+id/fr_new_customer_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:hint="@string/client_name"
+                    android:hint="@string/customer_name"
                     android:textAppearance="?attr/textAppearanceHeadline6" />
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/fr_update_client_phone"
+                    android:id="@+id/fr_new_customer_phone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:hint="@string/client_phone_number"
+                    android:hint="@string/customer_phone_number"
 
                     android:textAppearance="?attr/textAppearanceBody2"
                     android:textColor="?android:attr/textColorSecondary" />
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/fr_update_client_balance"
+                    android:id="@+id/fr_new_customer_balance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/small_dp_size"
-                    android:hint="@string/client_balance"
+                    android:hint="@string/customer_balance"
                     android:textAppearance="?attr/textAppearanceBody2"
                     android:textColor="?android:attr/textColorSecondary" />
 
@@ -64,7 +66,7 @@
                 android:orientation="horizontal">
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/fr_update_client_btn_save"
+                    android:id="@+id/fr_new_customer_btn_save"
                     style="?attr/borderlessButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -72,18 +74,11 @@
                     android:text="@string/save_btn" />
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/fr_update_client_btn_cancel"
+                    android:id="@+id/fr_new_customer_btn_cancel"
                     style="?attr/borderlessButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/cancel_btn" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/fr_update_client_btn_delete"
-                    style="?attr/borderlessButtonStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/delete_btn" />
             </LinearLayout>
 
         </LinearLayout>

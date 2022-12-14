@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.seamstress.domain.client.Customers
-import com.example.seamstress.domain.client.CustomersDao
+import com.example.seamstress.domain.customers.Customers
+import com.example.seamstress.domain.customers.CustomersDao
 
 @Database(entities = [Customers::class], version = 1, exportSchema = false)
 abstract class SeamstressDataBase : RoomDatabase() {

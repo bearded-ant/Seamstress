@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/item_client_list_card"
+    android:id="@+id/item_customer_list_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/small_dp_size"
@@ -17,10 +17,10 @@
 
         <!-- Media -->
         <ImageView
-            android:id="@+id/item_client_list_photo"
+            android:id="@+id/item_customer_list_photo"
             android:layout_width="122dp"
             android:layout_height="match_parent"
-            android:contentDescription="@string/item_client_list_photo"
+            android:contentDescription="@string/item_customer_list_photo"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_baseline_add_a_photo_24" />
 
@@ -32,13 +32,13 @@
 
             <!-- Title, secondary and supporting text -->
             <TextView
-                android:id="@+id/item_client_list_name"
+                android:id="@+id/item_customer_list_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?attr/textAppearanceHeadline6" />
 
             <TextView
-                android:id="@+id/item_client_list_phone"
+                android:id="@+id/item_customer_list_phone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/small_dp_size"
@@ -46,7 +46,7 @@
                 android:textColor="?android:attr/textColorSecondary" />
 
             <TextView
-                android:id="@+id/item_client_list_balance"
+                android:id="@+id/item_customer_list_balance"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"

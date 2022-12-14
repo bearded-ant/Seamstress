@@ -6,7 +6,7 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.seamstress.R
-import com.example.seamstress.domain.client.Customers
+import com.example.seamstress.domain.customers.Customers
 
 class CustomerRecyclerViewHolder(
     itemView: View,

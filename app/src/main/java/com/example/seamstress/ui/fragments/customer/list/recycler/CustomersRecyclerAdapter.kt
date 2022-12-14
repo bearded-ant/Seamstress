@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.seamstress.R
-import com.example.seamstress.domain.client.Customers
+import com.example.seamstress.domain.customers.Customers
 
 class CustomersRecyclerAdapter(
     private val clients: List<Customers>,

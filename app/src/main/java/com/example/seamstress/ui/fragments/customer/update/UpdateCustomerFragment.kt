@@ -11,7 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.seamstress.R
 import com.example.seamstress.databinding.FragmentUpdateCustomerBinding
-import com.example.seamstress.domain.client.Customers
+import com.example.seamstress.domain.customers.Customers
 import com.example.seamstress.ui.fragments.customer.card.CustomerCardFragment
 import com.example.seamstress.viewmodel.SeamstressViewModel
 

@@ -7,8 +7,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.seamstress.data.SeamstressRepository
 import com.example.seamstress.domain.SeamstressDataBase
-import com.example.seamstress.domain.client.Customers
-import com.example.seamstress.domain.client.CustomersDao
+import com.example.seamstress.domain.customers.Customers
+import com.example.seamstress.domain.customers.CustomersDao
 import kotlinx.coroutines.launch
 
 class SeamstressViewModel(application: Application) : AndroidViewModel(application) {

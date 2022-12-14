@@ -1,8 +1,8 @@
 package com.example.seamstress.data
 
 import androidx.lifecycle.LiveData
-import com.example.seamstress.domain.client.Customers
-import com.example.seamstress.domain.client.CustomersDao
+import com.example.seamstress.domain.customers.Customers
+import com.example.seamstress.domain.customers.CustomersDao
 
 class SeamstressRepository(private val customersDao: CustomersDao) {
 

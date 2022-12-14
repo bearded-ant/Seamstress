@@ -1,4 +1,4 @@
-package com.example.seamstress.domain.client
+package com.example.seamstress.domain.customers
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

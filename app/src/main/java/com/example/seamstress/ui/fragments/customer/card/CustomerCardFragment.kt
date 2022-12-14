@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.seamstress.R
 import com.example.seamstress.databinding.FragmentCustomerCardBinding
-import com.example.seamstress.domain.client.Customers
+import com.example.seamstress.domain.customers.Customers
 import com.example.seamstress.viewmodel.SeamstressViewModel
 
 class CustomerCardFragment : Fragment() {

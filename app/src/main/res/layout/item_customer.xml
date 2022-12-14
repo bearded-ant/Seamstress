@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/small_dp_size"
     app:cardCornerRadius="@dimen/small_dp_size"
-    android:id="@+id/item_client_card">
+    android:id="@+id/item_customer_card">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,10 +14,10 @@
 
         <!-- Media -->
         <ImageView
-            android:id="@+id/item_client_photo"
+            android:id="@+id/item_customer_photo"
             android:layout_width="match_parent"
             android:layout_height="194dp"
-            android:contentDescription="item_client_photo"
+            android:contentDescription="item_customer_photo"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_baseline_add_a_photo_24"/>
 
@@ -29,14 +29,14 @@
 
             <!-- Title, secondary and supporting text -->
             <TextView
-                android:id="@+id/item_client_name"
+                android:id="@+id/item_customer_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="item_client_name"
+                android:text="item_customer_name"
                 android:textAppearance="?attr/textAppearanceHeadline6" />
 
             <TextView
-                android:id="@+id/item_client_phone"
+                android:id="@+id/item_customer_phone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/small_dp_size"
@@ -45,7 +45,7 @@
                 android:textColor="?android:attr/textColorSecondary" />
 
             <TextView
-                android:id="@+id/item_client_balance"
+                android:id="@+id/item_customer_balance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"

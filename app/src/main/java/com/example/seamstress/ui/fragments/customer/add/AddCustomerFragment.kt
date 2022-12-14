@@ -45,8 +45,8 @@ class AddCustomerFragment : Fragment() {
                 img = R.drawable.ic_baseline_add_a_photo_24,
                 balance = binding.frNewCustomerBalance.text.toString().toFloat()
             )
-            seamstressViewModel.insert(customer)
-            seamstressViewModel.newIdLiveData.observe(requireActivity()) {
+            seamstressViewModel.insertCustomer(customer)
+            seamstressViewModel.newCustomerIdLiveData.observe(requireActivity()) {
                 Toast.makeText(requireContext(), "$it", Toast.LENGTH_LONG).show()
                 findNavController().navigate(
                     AddCustomerFragmentDirections.actionAddCustomerToCustomerCard(it)

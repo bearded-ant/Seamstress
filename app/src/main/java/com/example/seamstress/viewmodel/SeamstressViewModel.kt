@@ -5,52 +5,106 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.seamstress.data.SeamstressRepository
+import com.example.seamstress.data.CustomersRepository
+import com.example.seamstress.data.MeasurementsRepository
+import com.example.seamstress.data.MetricsRepository
 import com.example.seamstress.domain.SeamstressDataBase
 import com.example.seamstress.domain.customers.Customers
 import com.example.seamstress.domain.customers.CustomersDao
+import com.example.seamstress.domain.measured.measurements.MeasuredParameter
+import com.example.seamstress.domain.measured.measurements.MeasuredParameterDao
+import com.example.seamstress.domain.measured.metric.Metric
+import com.example.seamstress.domain.measured.metric.MetricDao
 import kotlinx.coroutines.launch
 
 class SeamstressViewModel(application: Application) : AndroidViewModel(application) {
 
     val getAllCustomers: LiveData<List<Customers>>
-    private val repository: SeamstressRepository
+    private val customerRepo: CustomersRepository
+
+    val getAllMtrics: LiveData<List<Metric>>
+    private val metricsRepo: MetricsRepository
+
+    private val measurementsRepository: MeasurementsRepository
 
     init {
-        val customersDao: CustomersDao = SeamstressDataBase.getDatabase(application).customersDao()
-        repository = SeamstressRepository(customersDao)
-        getAllCustomers = repository.getAll
+        val db = SeamstressDataBase.getDatabase(application)
+
+        val customersDao: CustomersDao = db.customersDao()
+        customerRepo = CustomersRepository(customersDao)
+        getAllCustomers = customerRepo.getAllCustomers
+
+        val metricDao: MetricDao = db.metricDao()
+        metricsRepo = MetricsRepository(metricDao)
+        getAllMtrics = metricsRepo.getAllMetrics
+
+        val measuredParameterDao: MeasuredParameterDao = db.measurementsDao()
+        measurementsRepository = MeasurementsRepository(measuredParameterDao)
     }
 
     private var _selectByIdCustomerLiveData = MutableLiveData<Customers>()
     val selectByIdCustomerLiveData: LiveData<Customers> = _selectByIdCustomerLiveData
-
     fun selectCustomerById(id: Long) {
         viewModelScope.launch {
-            val response = repository.selectById(id)
+            val response = customerRepo.getCustomerById(id)
             _selectByIdCustomerLiveData.postValue(response)
         }
     }
 
-
-    private var _newId = MutableLiveData<Long>()
-    val newIdLiveData: LiveData<Long> = _newId
-    fun insert(client: Customers) {
+    private var _newCustomerId = MutableLiveData<Long>()
+    val newCustomerIdLiveData: LiveData<Long> = _newCustomerId
+    fun insertCustomer(client: Customers) {
         viewModelScope.launch {
-            val newEntityId = repository.insert(client)
-            _newId.postValue(newEntityId)
+            val newEntityId = customerRepo.insertCustomer(client)
+            _newCustomerId.postValue(newEntityId)
         }
     }
 
-    fun delete(client: Customers) {
+    fun deleteCustomer(client: Customers) {
         viewModelScope.launch {
-            repository.delete(client)
+            customerRepo.deleteCustomer(client)
         }
     }
 
-    fun update(client: Customers) {
+    fun updateCustomer(client: Customers) {
         viewModelScope.launch {
-            repository.update(client)
+            customerRepo.updateCustomer(client)
+        }
+    }
+
+    private var _getByIdMetricLiveData = MutableLiveData<Metric>()
+    val getByIdMetricLiveData: LiveData<Metric> = _getByIdMetricLiveData
+    fun getMetricById(id: Long) {
+        viewModelScope.launch {
+            val response = metricsRepo.getMetricById(id)
+            _getByIdMetricLiveData.postValue(response)
+        }
+    }
+
+    private var _getByIdMeasurementLiveData = MutableLiveData<List<MeasuredParameter>>()
+    val getByIdMeasurementLiveData: LiveData<List<MeasuredParameter>> = _getByIdMeasurementLiveData
+    fun getMeasurementByCustomerId(id: Long) {
+        viewModelScope.launch {
+            val response = measurementsRepository.getMeasurementsByCustomerId(id)
+            _getByIdMeasurementLiveData.postValue(response)
+        }
+    }
+
+    fun deleteMeasurement(measurement: MeasuredParameter) {
+        viewModelScope.launch {
+            measurementsRepository.deleteMeasurement(measurement)
+        }
+    }
+
+    fun updateMeasurement(measurement: MeasuredParameter) {
+        viewModelScope.launch {
+            measurementsRepository.updateMeasurement(measurement)
+        }
+    }
+
+    fun insertMeasurement(measurement: MeasuredParameter) {
+        viewModelScope.launch {
+            measurementsRepository.insertMeasurement(measurement)
         }
     }
 }

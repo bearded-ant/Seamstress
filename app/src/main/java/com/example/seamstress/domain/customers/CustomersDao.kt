@@ -7,17 +7,17 @@ import androidx.room.*
 interface CustomersDao {
 
     @Query("select * from customers")
-    fun getAllClients(): LiveData<List<Customers>>
+    fun getAllCustomers(): LiveData<List<Customers>>
 
     @Query("select * from customers where id= :id")
-    suspend fun selectById(id: Long): Customers
+    suspend fun getCustomerById(id: Long): Customers
 
     @Insert
-    suspend fun insert(customers: Customers): Long
+    suspend fun insertCustomer(customers: Customers): Long
 
     @Delete
-    suspend fun delete(customers: Customers)
+    suspend fun deleteCustomer(customers: Customers)
 
     @Update
-    suspend fun update(customers: Customers)
+    suspend fun updateCustomer(customers: Customers)
 }

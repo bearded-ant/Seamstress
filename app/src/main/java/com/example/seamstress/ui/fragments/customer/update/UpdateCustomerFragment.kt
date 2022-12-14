@@ -50,7 +50,7 @@ class UpdateCustomerFragment : Fragment() {
                     img = R.drawable.ic_baseline_add_a_photo_24,
                     balance = binding.frUpdateCustomerBalance.text.toString().toFloat()
                 )
-                seamstressViewModel.update(updatedCustomer)
+                seamstressViewModel.updateCustomer(updatedCustomer)
                 Toast.makeText(requireContext(), "success update", Toast.LENGTH_SHORT).show()
                 findNavController().navigate(
                     UpdateCustomerFragmentDirections.actionUpdateCustomerToCustomerCard(
@@ -64,7 +64,7 @@ class UpdateCustomerFragment : Fragment() {
 
                 val alertBuilder = AlertDialog.Builder(requireContext())
                 alertBuilder.setPositiveButton("Да") { _, _ ->
-                    seamstressViewModel.delete(customer)
+                    seamstressViewModel.deleteCustomer(customer)
                     findNavController().navigate(UpdateCustomerFragmentDirections.actionUpdateCustomerToCustomersList())
                 }
                 alertBuilder.setNegativeButton("Нет") { _, _ -> }

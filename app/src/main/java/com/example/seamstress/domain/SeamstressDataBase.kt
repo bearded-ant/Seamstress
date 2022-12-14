@@ -6,11 +6,12 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.seamstress.domain.customers.Customers
 import com.example.seamstress.domain.customers.CustomersDao
+import com.example.seamstress.domain.measured.measurements.MeasuredParameter
 import com.example.seamstress.domain.measured.measurements.MeasuredParameterDao
 import com.example.seamstress.domain.measured.metric.Metric
 import com.example.seamstress.domain.measured.metric.MetricDao
 
-@Database(entities = [Customers::class, Metric::class], version = 1, exportSchema = false)
+@Database(entities = [Customers::class, Metric::class, MeasuredParameter::class], version = 1, exportSchema = false)
 abstract class SeamstressDataBase : RoomDatabase() {
     abstract fun customersDao(): CustomersDao
     abstract fun metricDao(): MetricDao

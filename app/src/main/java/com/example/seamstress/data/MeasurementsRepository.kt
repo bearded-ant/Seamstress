@@ -1,22 +1,22 @@
 package com.example.seamstress.data
 
-import com.example.seamstress.domain.measured.measurements.MeasuredParameter
-import com.example.seamstress.domain.measured.measurements.MeasuredParameterDao
+import com.example.seamstress.domain.measured.measurements.Measurement
+import com.example.seamstress.domain.measured.measurements.MeasurementDao
 
-class MeasurementsRepository(private val measuredParameterDao: MeasuredParameterDao) {
+class MeasurementsRepository(private val measurementDao: MeasurementDao) {
 
-    suspend fun getMeasurementsByCustomerId(customerId: Long): List<MeasuredParameter> =
-        measuredParameterDao.getMeasurementsByCustomerId(customerId)
+    suspend fun getMeasurementsByCustomerId(customerId: Long): List<Measurement> =
+        measurementDao.getMeasurementsByCustomerId(customerId)
 
-    suspend fun updateMeasurement(measuredParameter: MeasuredParameter) {
-        measuredParameterDao.updateMeasurements(measuredParameter)
+    suspend fun updateMeasurement(measurement: Measurement) {
+        measurementDao.updateMeasurements(measurement)
     }
 
-    suspend fun insertMeasurement(measuredParameter: MeasuredParameter) {
-        measuredParameterDao.insertMeasurements(measuredParameter)
+    suspend fun insertMeasurement(measurement: Measurement) {
+        measurementDao.insertMeasurements(measurement)
     }
 
-    suspend fun deleteMeasurement(measuredParameter: MeasuredParameter) {
-        measuredParameterDao.deleteMeasurements(measuredParameter)
+    suspend fun deleteMeasurement(measurement: Measurement) {
+        measurementDao.deleteMeasurements(measurement)
     }
 }

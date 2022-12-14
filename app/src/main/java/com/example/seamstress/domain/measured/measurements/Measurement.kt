@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "measurements")
-data class MeasuredParameter(
+data class Measurement(
     @PrimaryKey(autoGenerate = true)
     val id: Long,
     val name: String,

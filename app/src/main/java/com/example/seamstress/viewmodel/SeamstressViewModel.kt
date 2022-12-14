@@ -11,8 +11,8 @@ import com.example.seamstress.data.MetricsRepository
 import com.example.seamstress.domain.SeamstressDataBase
 import com.example.seamstress.domain.customers.Customers
 import com.example.seamstress.domain.customers.CustomersDao
-import com.example.seamstress.domain.measured.measurements.MeasuredParameter
-import com.example.seamstress.domain.measured.measurements.MeasuredParameterDao
+import com.example.seamstress.domain.measured.measurements.Measurement
+import com.example.seamstress.domain.measured.measurements.MeasurementDao
 import com.example.seamstress.domain.measured.metric.Metric
 import com.example.seamstress.domain.measured.metric.MetricDao
 import kotlinx.coroutines.launch
@@ -38,8 +38,8 @@ class SeamstressViewModel(application: Application) : AndroidViewModel(applicati
         metricsRepo = MetricsRepository(metricDao)
         getAllMtrics = metricsRepo.getAllMetrics
 
-        val measuredParameterDao: MeasuredParameterDao = db.measurementsDao()
-        measurementsRepository = MeasurementsRepository(measuredParameterDao)
+        val measurementDao: MeasurementDao = db.measurementsDao()
+        measurementsRepository = MeasurementsRepository(measurementDao)
     }
 
     private var _selectByIdCustomerLiveData = MutableLiveData<Customers>()
@@ -81,8 +81,8 @@ class SeamstressViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    private var _getByIdMeasurementLiveData = MutableLiveData<List<MeasuredParameter>>()
-    val getByIdMeasurementLiveData: LiveData<List<MeasuredParameter>> = _getByIdMeasurementLiveData
+    private var _getByIdMeasurementLiveData = MutableLiveData<List<Measurement>>()
+    val getByIdMeasurementLiveData: LiveData<List<Measurement>> = _getByIdMeasurementLiveData
     fun getMeasurementByCustomerId(id: Long) {
         viewModelScope.launch {
             val response = measurementsRepository.getMeasurementsByCustomerId(id)
@@ -90,19 +90,19 @@ class SeamstressViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    fun deleteMeasurement(measurement: MeasuredParameter) {
+    fun deleteMeasurement(measurement: Measurement) {
         viewModelScope.launch {
             measurementsRepository.deleteMeasurement(measurement)
         }
     }
 
-    fun updateMeasurement(measurement: MeasuredParameter) {
+    fun updateMeasurement(measurement: Measurement) {
         viewModelScope.launch {
             measurementsRepository.updateMeasurement(measurement)
         }
     }
 
-    fun insertMeasurement(measurement: MeasuredParameter) {
+    fun insertMeasurement(measurement: Measurement) {
         viewModelScope.launch {
             measurementsRepository.insertMeasurement(measurement)
         }

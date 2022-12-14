@@ -22,7 +22,7 @@ class SeamstressViewModel(application: Application) : AndroidViewModel(applicati
     val getAllCustomers: LiveData<List<Customers>>
     private val customerRepo: CustomersRepository
 
-    val getAllMtrics: LiveData<List<Metric>>
+    val getAllMetrics: LiveData<List<Metric>>
     private val metricsRepo: MetricsRepository
 
     private val measurementsRepository: MeasurementsRepository
@@ -36,7 +36,7 @@ class SeamstressViewModel(application: Application) : AndroidViewModel(applicati
 
         val metricDao: MetricDao = db.metricDao()
         metricsRepo = MetricsRepository(metricDao)
-        getAllMtrics = metricsRepo.getAllMetrics
+        getAllMetrics = metricsRepo.getAllMetrics
 
         val measurementDao: MeasurementDao = db.measurementsDao()
         measurementsRepository = MeasurementsRepository(measurementDao)

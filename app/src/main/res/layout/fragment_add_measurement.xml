@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical">
+
+<com.google.android.material.card.MaterialCardView
+    android:id="@+id/fr_add_measurement_card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/small_dp_size"
+    app:cardCornerRadius="@dimen/small_dp_size">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/medium_dp_size">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/fr_add_measurement_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="название замера"
+                android:textAppearance="?attr/textAppearanceHeadline6" />
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/fr_add_measurement_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="какой-то тип"
+                android:textAppearance="?attr/textAppearanceBody2"
+                android:textColor="?android:attr/textColorSecondary" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/small_dp_size"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/fr_add_measurement_btn_save"
+                style="?attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/small_dp_size"
+                android:text="@string/save_btn" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/fr_add_measurement_btn_cancel"
+                style="?attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/cancel_btn" />
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
+
+<androidx.recyclerview.widget.RecyclerView
+    android:id="@+id/fr_add_measurement_recycler"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/medium_dp_size" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>

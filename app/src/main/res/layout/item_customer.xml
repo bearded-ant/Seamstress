@@ -63,6 +63,7 @@
             android:orientation="horizontal">
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/item_customer_btn_add_measurement"
                 style="?attr/borderlessButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -70,6 +71,7 @@
                 android:text="снять мерки" />
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/item_customer_btn_add_dress"
                 style="?attr/borderlessButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

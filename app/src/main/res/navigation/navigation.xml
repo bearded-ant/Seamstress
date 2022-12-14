@@ -28,6 +28,9 @@
         <action
             android:id="@+id/action_customerCard_to_updateCustomer"
             app:destination="@id/updateCustomerFragment" />
+        <action
+            android:id="@+id/action_customerCard_to_addMeasurement"
+            app:destination="@id/addMeasurementFragment" />
     </fragment>
     <fragment
         android:id="@+id/addCustomerFragment"
@@ -55,5 +58,13 @@
         <action
             android:id="@+id/action_updateCustomer_to_customersList"
             app:destination="@id/customersListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addMeasurementFragment"
+        android:name="com.example.seamstress.ui.fragments.measurement.add.AddMeasurementFragment"
+        android:label="Новый замер" >
+        <action
+            android:id="@+id/action_addMeasurement_to_customerCard"
+            app:destination="@id/customerFragment" />
     </fragment>
 </navigation>

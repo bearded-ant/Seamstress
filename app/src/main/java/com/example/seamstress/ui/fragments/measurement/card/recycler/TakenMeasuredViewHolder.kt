@@ -1,9 +1,8 @@
-package com.example.seamstress.ui.fragments.measurement.card
+package com.example.seamstress.ui.fragments.measurement.card.recycler
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.example.seamstress.R
-import com.example.seamstress.domain.measured.metric.Metric
 import com.example.seamstress.domain.measured.taken.TakenMeasurement
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.textview.MaterialTextView

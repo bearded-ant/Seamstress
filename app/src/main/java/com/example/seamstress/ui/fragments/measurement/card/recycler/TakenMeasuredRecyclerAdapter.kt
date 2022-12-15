@@ -1,4 +1,4 @@
-package com.example.seamstress.ui.fragments.measurement.card
+package com.example.seamstress.ui.fragments.measurement.card.recycler
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

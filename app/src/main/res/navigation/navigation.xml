@@ -82,7 +82,7 @@
             app:destination="@id/customerFragment"
             app:popUpTo="@id/customerFragment" />
         <argument
-            android:name="measurementId"
-            app:argType="long" />
+            android:name="measurement"
+            app:argType="com.example.seamstress.domain.measured.measurements.Measurement" />
     </fragment>
 </navigation>

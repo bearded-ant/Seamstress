@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.seamstress.databinding.FragmentCardMeasurementBinding
 import com.example.seamstress.domain.measured.taken.TakenMeasurement
+import com.example.seamstress.ui.fragments.measurement.card.recycler.TakenMeasuredRecyclerAdapter
 import com.example.seamstress.viewmodel.TakenMeasurementsViewModel
 
 
@@ -31,16 +32,18 @@ class CardMeasurementFragment : Fragment() {
         _binding = FragmentCardMeasurementBinding.inflate(layoutInflater)
 
         val safeArgs = CardMeasurementFragmentArgs.fromBundle(requireArguments())
-        val measurementId = safeArgs.measurementId
+        val measurement = safeArgs.measurement
 
-        takenMeasurementViewModel = ViewModelProvider(requireActivity())[TakenMeasurementsViewModel::class.java]
-        takenMeasurementViewModel.getMeasurementByCustomerId(measurementId)
-        takenMeasurementViewModel.measurementLiveData.observe(viewLifecycleOwner){
+        takenMeasurementViewModel =
+            ViewModelProvider(requireActivity())[TakenMeasurementsViewModel::class.java]
+        takenMeasurementViewModel.getMeasurementByCustomerId(measurement.id)
+        takenMeasurementViewModel.measurementLiveData.observe(viewLifecycleOwner) {
             initTakenRecycler(it)
         }
 
-        binding.frCardMeasurementName.text = "text ept!"
-
+        binding.frCardMeasurementName.text = measurement.name
+        binding.frCardMeasurementType.text = measurement.dressType
+        binding.frCardMeasurementDate.text = measurement.dateCreation
 
         return binding.root
     }

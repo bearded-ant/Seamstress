@@ -9,10 +9,10 @@ data class Measurement(
     @PrimaryKey(autoGenerate = true)
     val id: Long,
     val name: String,
-    @ColumnInfo(name = "create_date")
-    val createDate: Long,
+    @ColumnInfo(name = "date_creation")
+    val dateCreation: String,
     @ColumnInfo(name = "dress_type")
-    val dressType: Long,
+    val dressType: String,
     @ColumnInfo(name = "customer_id")
     val customerId:Long
 )

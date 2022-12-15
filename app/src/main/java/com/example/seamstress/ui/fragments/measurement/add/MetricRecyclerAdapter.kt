@@ -6,16 +6,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.seamstress.R
 import com.example.seamstress.domain.measured.metric.Metric
 
-class MeasurementRecyclerAdapter(
+class MetricRecyclerAdapter(
     private val metrics: List<Metric>
-) : RecyclerView.Adapter<MeasurementRecyclerHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MeasurementRecyclerHolder {
+) : RecyclerView.Adapter<MetricViewHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MetricViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.item_metrics_list, parent, false)
-        return MeasurementRecyclerHolder(view)
+        return MetricViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: MeasurementRecyclerHolder, position: Int) {
+    override fun onBindViewHolder(holder: MetricViewHolder, position: Int) {
         holder.binding(metrics[position])
     }
 

@@ -7,7 +7,7 @@ import com.example.seamstress.domain.measured.metric.Metric
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
-class MeasurementRecyclerHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class MetricViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val textLayout =
         itemView.findViewById<TextInputLayout>(R.id.item_metric_list_text_layout)
     private val inputText =

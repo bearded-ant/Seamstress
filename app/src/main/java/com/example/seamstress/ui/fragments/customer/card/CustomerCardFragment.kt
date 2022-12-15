@@ -7,9 +7,13 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.seamstress.R
 import com.example.seamstress.databinding.FragmentCardCustomerBinding
 import com.example.seamstress.domain.customers.Customers
+import com.example.seamstress.domain.measured.measurements.Measurement
+import com.example.seamstress.ui.fragments.customer.card.recycler.MeasurementRecyclerAdapter
+import com.example.seamstress.viewmodel.MeasurementsViewModel
 import com.example.seamstress.viewmodel.SeamstressViewModel
 
 class CustomerCardFragment : Fragment() {
@@ -18,6 +22,7 @@ class CustomerCardFragment : Fragment() {
     }
 
     private lateinit var seamstressViewModel: SeamstressViewModel
+    private lateinit var measurementsViewModel: MeasurementsViewModel
 
     private var _binding: FragmentCardCustomerBinding? = null
     private val binding
@@ -41,6 +46,13 @@ class CustomerCardFragment : Fragment() {
             bindCustomerCard(it)
         }
 
+        measurementsViewModel = ViewModelProvider(this)[MeasurementsViewModel::class.java]
+
+        measurementsViewModel.getMeasurementByCustomerId(customerId)
+        measurementsViewModel.measurementLiveData.observe(viewLifecycleOwner) {
+            initMeasurementsRecycler(it)
+        }
+
         binding.floatingActionButton.setOnClickListener {
             val action =
                 CustomerCardFragmentDirections.actionCustomerCardToUpdateCustomer(customerId)
@@ -53,6 +65,14 @@ class CustomerCardFragment : Fragment() {
 
         return binding.root
 
+    }
+
+    private fun initMeasurementsRecycler(measurements: List<Measurement>) {
+        val measurementsRecycler = binding.frCardCustomerRecyclerMeasurements
+        measurementsRecycler.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        val adapter = MeasurementRecyclerAdapter(measurements)
+        measurementsRecycler.adapter = adapter
     }
 
     override fun onDestroyView() {

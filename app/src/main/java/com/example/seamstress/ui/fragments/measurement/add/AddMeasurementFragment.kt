@@ -35,7 +35,7 @@ class AddMeasurementFragment : Fragment() {
             val recycler = binding.frAddMeasurementRecycler
             recycler.layoutManager =
                 LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-            val adapter = MeasurementRecyclerAdapter(it)
+            val adapter = MetricRecyclerAdapter(it)
             recycler.adapter = adapter
 
         }

@@ -82,7 +82,7 @@
             app:destination="@id/customerFragment"
             app:popUpTo="@id/customerFragment" />
         <argument
-            android:name="customerId"
+            android:name="measurementId"
             app:argType="long" />
     </fragment>
 </navigation>

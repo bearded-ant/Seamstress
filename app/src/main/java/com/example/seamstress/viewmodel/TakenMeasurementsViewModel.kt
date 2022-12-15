@@ -25,9 +25,9 @@ class TakenMeasurementsViewModel(application: Application) : AndroidViewModel(ap
     private var _getTakenMesLiveData = MutableLiveData<List<TakenMeasurement>>()
     val measurementLiveData: LiveData<List<TakenMeasurement>> = _getTakenMesLiveData
 
-    fun getMeasurementByCustomerId(id: Long) {
+    fun getMeasurementByCustomerId(measurementId: Long) {
         viewModelScope.launch {
-            val response = taketnRepository.getTakenMeasById(id)
+            val response = taketnRepository.getTakenMeasById(measurementId)
             _getTakenMesLiveData.postValue(response)
         }
     }

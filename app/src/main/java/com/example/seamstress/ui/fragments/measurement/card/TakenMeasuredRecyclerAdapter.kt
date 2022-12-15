@@ -11,7 +11,7 @@ class TakenMeasuredRecyclerAdapter(
 ) : RecyclerView.Adapter<TakenMeasuredViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TakenMeasuredViewHolder {
         val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.item_metrics_list, parent, false)
+            LayoutInflater.from(parent.context).inflate(R.layout.item_list_measured_metrics, parent, false)
         return TakenMeasuredViewHolder(view)
     }
 

@@ -19,7 +19,7 @@ class MeasurementViewHolder(itemView: View) :RecyclerView.ViewHolder(itemView) {
         type.text = measurement.dressType.toString()
         name.text = measurement.name
         card.setOnClickListener {
-            click.onMeasureItemClick(measurement.customerId)
+            click.onMeasureItemClick(measurement.id)
         }
     }
 }

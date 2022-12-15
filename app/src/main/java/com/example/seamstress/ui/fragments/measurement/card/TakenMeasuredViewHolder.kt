@@ -15,7 +15,7 @@ class TakenMeasuredViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView
         itemView.findViewById<MaterialTextView>(R.id.item_list_measured_metric_text_view)
 
     fun binding(taken: TakenMeasurement) {
-        textLayout.helperText = taken.measuredId.toString()
+        textLayout.helperText = taken.metricId.toString()
         textView.text = taken.value.toString()
     }
 }

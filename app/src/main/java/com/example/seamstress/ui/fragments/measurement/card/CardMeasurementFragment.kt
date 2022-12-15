@@ -31,11 +31,12 @@ class CardMeasurementFragment : Fragment() {
         _binding = FragmentCardMeasurementBinding.inflate(layoutInflater)
 
         val safeArgs = CardMeasurementFragmentArgs.fromBundle(requireArguments())
-        val customerId = safeArgs.customerId
-        takenMeasurementViewModel = ViewModelProvider(requireActivity())[TakenMeasurementsViewModel::class.java]
-        takenMeasurementViewModel.getMeasurementByCustomerId(customerId)
-        takenMeasurementViewModel.measurementLiveData.observe(viewLifecycleOwner){
+        val measurementId = safeArgs.measurementId
 
+        takenMeasurementViewModel = ViewModelProvider(requireActivity())[TakenMeasurementsViewModel::class.java]
+        takenMeasurementViewModel.getMeasurementByCustomerId(measurementId)
+        takenMeasurementViewModel.measurementLiveData.observe(viewLifecycleOwner){
+            initTakenRecycler(it)
         }
 
         binding.frCardMeasurementName.text = "text ept!"

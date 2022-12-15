@@ -88,8 +88,8 @@ class CustomerCardFragment : Fragment(), MeasurementItemClickListener {
         binding.itemCustomer.itemCustomerBalance.text = customer.balance.toString()
     }
 
-    override fun onMeasureItemClick(customerId: Long) {
-        val action = CustomerCardFragmentDirections.actionCustomerCardToMeasurementCard(customerId)
+    override fun onMeasureItemClick(measurementId: Long) {
+        val action = CustomerCardFragmentDirections.actionCustomerCardToMeasurementCard(measurementId)
         findNavController().navigate(action)
     }
 }

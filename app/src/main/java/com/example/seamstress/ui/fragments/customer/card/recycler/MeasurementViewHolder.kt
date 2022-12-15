@@ -13,10 +13,13 @@ class MeasurementViewHolder(itemView: View) :RecyclerView.ViewHolder(itemView) {
     private val type = itemView.findViewById<TextView>(R.id.item_list_measurement_type)
     private val name = itemView.findViewById<TextView>(R.id.item_list_measurement_name)
 
-    fun bindingCardValues(measurement:Measurement) {
+    fun bindingCardValues(measurement:Measurement, click:MeasurementItemClickListener) {
         date.text = measurement.dateCreation
         //todo что делать? надо как-то собирать данные с разных таблиц
         type.text = measurement.dressType.toString()
         name.text = measurement.name
+        card.setOnClickListener {
+            click.onMeasureItemClick(measurement.customerId)
+        }
     }
 }

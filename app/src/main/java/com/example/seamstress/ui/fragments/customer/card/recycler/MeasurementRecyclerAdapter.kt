@@ -7,6 +7,7 @@ import com.example.seamstress.R
 import com.example.seamstress.domain.measured.measurements.Measurement
 
 class MeasurementRecyclerAdapter(
+    private val click: MeasurementItemClickListener,
     private val measurement: List<Measurement>
 ) :
     RecyclerView.Adapter<MeasurementViewHolder>() {
@@ -18,7 +19,7 @@ class MeasurementRecyclerAdapter(
     }
 
     override fun onBindViewHolder(holder: MeasurementViewHolder, position: Int) {
-        holder.bindingCardValues(measurement[position])
+        holder.bindingCardValues(measurement[position], click)
     }
 
     override fun getItemCount(): Int = measurement.size

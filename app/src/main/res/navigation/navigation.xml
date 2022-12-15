@@ -31,6 +31,9 @@
         <action
             android:id="@+id/action_customerCard_to_addMeasurement"
             app:destination="@id/addMeasurementFragment" />
+        <action
+            android:id="@+id/action_customerCard_to_measurementCard"
+            app:destination="@id/cardMeasurementFragment" />
     </fragment>
     <fragment
         android:id="@+id/addCustomerFragment"
@@ -66,5 +69,20 @@
         <action
             android:id="@+id/action_addMeasurement_to_customerCard"
             app:destination="@id/customerFragment" />
+        <action
+            android:id="@+id/action_addMeasurement_to_cardMeasurement"
+            app:destination="@id/cardMeasurementFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/cardMeasurementFragment"
+        android:name="com.example.seamstress.ui.fragments.measurement.card.CardMeasurementFragment"
+        android:label="Мерки" >
+        <action
+            android:id="@+id/action_cardMeasurement_to_cardCustomer"
+            app:destination="@id/customerFragment"
+            app:popUpTo="@id/customerFragment" />
+        <argument
+            android:name="customerId"
+            app:argType="long" />
     </fragment>
 </navigation>

@@ -12,11 +12,12 @@ import com.example.seamstress.R
 import com.example.seamstress.databinding.FragmentCardCustomerBinding
 import com.example.seamstress.domain.customers.Customers
 import com.example.seamstress.domain.measured.measurements.Measurement
+import com.example.seamstress.ui.fragments.customer.card.recycler.MeasurementItemClickListener
 import com.example.seamstress.ui.fragments.customer.card.recycler.MeasurementRecyclerAdapter
 import com.example.seamstress.viewmodel.MeasurementsViewModel
 import com.example.seamstress.viewmodel.SeamstressViewModel
 
-class CustomerCardFragment : Fragment() {
+class CustomerCardFragment : Fragment(), MeasurementItemClickListener {
     companion object {
         fun newInstance(): CustomerCardFragment = CustomerCardFragment()
     }
@@ -71,7 +72,7 @@ class CustomerCardFragment : Fragment() {
         val measurementsRecycler = binding.frCardCustomerRecyclerMeasurements
         measurementsRecycler.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        val adapter = MeasurementRecyclerAdapter(measurements)
+        val adapter = MeasurementRecyclerAdapter(this, measurements)
         measurementsRecycler.adapter = adapter
     }
 
@@ -85,5 +86,10 @@ class CustomerCardFragment : Fragment() {
         binding.itemCustomer.itemCustomerName.text = customer.name
         binding.itemCustomer.itemCustomerPhone.text = customer.phone
         binding.itemCustomer.itemCustomerBalance.text = customer.balance.toString()
+    }
+
+    override fun onMeasureItemClick(customerId: Long) {
+        val action = CustomerCardFragmentDirections.actionCustomerCardToMeasurementCard(customerId)
+        findNavController().navigate(action)
     }
 }

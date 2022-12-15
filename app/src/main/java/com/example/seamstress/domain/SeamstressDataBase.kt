@@ -10,12 +10,15 @@ import com.example.seamstress.domain.measured.measurements.Measurement
 import com.example.seamstress.domain.measured.measurements.MeasurementDao
 import com.example.seamstress.domain.measured.metric.Metric
 import com.example.seamstress.domain.measured.metric.MetricDao
+import com.example.seamstress.domain.measured.taken.TakenMeasurement
+import com.example.seamstress.domain.measured.taken.TakenMeasurementDao
 
-@Database(entities = [Customers::class, Metric::class, Measurement::class], version = 1, exportSchema = false)
+@Database(entities = [Customers::class, Metric::class, Measurement::class, TakenMeasurement::class], version = 1, exportSchema = false)
 abstract class SeamstressDataBase : RoomDatabase() {
     abstract fun customersDao(): CustomersDao
     abstract fun metricDao(): MetricDao
     abstract fun measurementsDao(): MeasurementDao
+    abstract fun takenMeasurementsDao(): TakenMeasurementDao
 
     companion object {
         // Singleton prevents multiple instances of database opening at the

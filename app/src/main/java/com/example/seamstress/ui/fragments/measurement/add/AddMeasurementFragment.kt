@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.seamstress.databinding.FragmentAddMeasurementBinding
+import com.example.seamstress.viewmodel.MetricViewModel
 import com.example.seamstress.viewmodel.SeamstressViewModel
 
 
@@ -16,7 +17,7 @@ class AddMeasurementFragment : Fragment() {
         fun newInstance(): AddMeasurementFragment = AddMeasurementFragment()
     }
 
-    private lateinit var seamstressViewModel: SeamstressViewModel
+    private lateinit var metricViewModel: MetricViewModel
 
     private var _binding: FragmentAddMeasurementBinding? = null
     private val binding
@@ -29,8 +30,8 @@ class AddMeasurementFragment : Fragment() {
     ): View {
         _binding = FragmentAddMeasurementBinding.inflate(layoutInflater)
 
-        seamstressViewModel = ViewModelProvider(requireActivity())[SeamstressViewModel::class.java]
-        seamstressViewModel.getAllMetrics.observe(requireActivity()) {
+        metricViewModel = ViewModelProvider(requireActivity())[MetricViewModel::class.java]
+        metricViewModel.getAllMetrics.observe(requireActivity()) {
 
             val recycler = binding.frAddMeasurementRecycler
             recycler.layoutManager =

@@ -41,6 +41,7 @@ class CardMeasurementFragment : Fragment() {
             initTakenRecycler(it)
         }
 
+
         binding.frCardMeasurementName.text = measurement.name
         binding.frCardMeasurementType.text = measurement.dressType
         binding.frCardMeasurementDate.text = measurement.dateCreation

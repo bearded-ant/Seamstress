@@ -13,7 +13,7 @@ class CustomersRecyclerAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomerRecyclerViewHolder {
         val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.item_customer_list, parent, false)
+            LayoutInflater.from(parent.context).inflate(R.layout.item_list_customer, parent, false)
         return CustomerRecyclerViewHolder(view, cardClick)
     }
 

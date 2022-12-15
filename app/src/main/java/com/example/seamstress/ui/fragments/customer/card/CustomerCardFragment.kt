@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.seamstress.R
-import com.example.seamstress.databinding.FragmentCustomerCardBinding
+import com.example.seamstress.databinding.FragmentCardCustomerBinding
 import com.example.seamstress.domain.customers.Customers
 import com.example.seamstress.viewmodel.SeamstressViewModel
 
@@ -19,7 +19,7 @@ class CustomerCardFragment : Fragment() {
 
     private lateinit var seamstressViewModel: SeamstressViewModel
 
-    private var _binding: FragmentCustomerCardBinding? = null
+    private var _binding: FragmentCardCustomerBinding? = null
     private val binding
         get() = _binding!!
 
@@ -29,7 +29,7 @@ class CustomerCardFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        _binding = FragmentCustomerCardBinding.inflate(layoutInflater)
+        _binding = FragmentCardCustomerBinding.inflate(layoutInflater)
 
 //todo на писать проверку на наличие аргумента?
         val safeArgs = CustomerCardFragmentArgs.fromBundle(requireArguments())

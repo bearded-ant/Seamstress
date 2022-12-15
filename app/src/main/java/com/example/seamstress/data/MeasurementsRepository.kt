@@ -8,6 +8,9 @@ class MeasurementsRepository(private val measurementDao: MeasurementDao) {
     suspend fun getMeasurementsByCustomerId(customerId: Long): List<Measurement> =
         measurementDao.getMeasurementsByCustomerId(customerId)
 
+    suspend fun getMeasurementsById(id: Long): Measurement =
+        measurementDao.getMeasurementsById(id)
+
     suspend fun updateMeasurement(measurement: Measurement) {
         measurementDao.updateMeasurements(measurement)
     }

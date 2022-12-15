@@ -32,6 +32,16 @@ class MeasurementsViewModel(application: Application) : AndroidViewModel(applica
         }
     }
 
+    private var _getMeasurementLiveDataById = MutableLiveData<Measurement>()
+    val measurementByIdLiveData: LiveData<Measurement> = _getMeasurementLiveDataById
+
+    fun getMeasurementById(id: Long) {
+        viewModelScope.launch {
+            val response = measurementsRepository.getMeasurementsById(id)
+            _getMeasurementLiveDataById.postValue(response)
+        }
+    }
+
     fun deleteMeasurement(measurement: Measurement) {
         viewModelScope.launch {
             measurementsRepository.deleteMeasurement(measurement)

@@ -49,8 +49,7 @@ class CustomerCardFragment : Fragment(), MeasurementItemClickListener {
         }
 
         val measurementsViewModel = ViewModelProvider(this)[MeasurementsViewModel::class.java]
-        measurementsViewModel.getMeasurementByCustomerId(customerId)
-        measurementsViewModel.measurementsByCustomerLiveData.observe(viewLifecycleOwner) {
+        measurementsViewModel.measurementsByCustomer(customerId).observe(viewLifecycleOwner) {
             initMeasurementsRecycler(it)
         }
 

@@ -1,5 +1,6 @@
 package com.example.seamstress.domain.measured.measurements
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -20,7 +21,7 @@ abstract class MeasurementDao {
         order by m.id desc
         """
     )
-    abstract suspend fun getMeasurementsByCustomerId(customerId: Long): List<MeasurementRow>
+    abstract fun getMeasurementsByCustomerId(customerId: Long): LiveData<List<MeasurementRow>>
 
     @Query(
         """

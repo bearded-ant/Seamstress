@@ -55,16 +55,9 @@ class MeasurementsViewModel(application: Application) : AndroidViewModel(applica
         }
     }
 
-    private val _measurementsByCustomerLiveData = MutableLiveData<List<MeasurementRow>>()
-    val measurementsByCustomerLiveData: LiveData<List<MeasurementRow>> =
-        _measurementsByCustomerLiveData
-
-    fun getMeasurementByCustomerId(id: Long) {
-        viewModelScope.launch {
-            val response = measurementsRepository.getMeasurementsByCustomerId(id)
-            _measurementsByCustomerLiveData.postValue(response)
-        }
-    }
+    /** Замеры клиента из Room: список обновляется сам после записи. */
+    fun measurementsByCustomer(customerId: Long): LiveData<List<MeasurementRow>> =
+        measurementsRepository.getMeasurementsByCustomerId(customerId)
 
     private val _measurementByIdLiveData = MutableLiveData<MeasurementRow?>()
     val measurementByIdLiveData: LiveData<MeasurementRow?> = _measurementByIdLiveData

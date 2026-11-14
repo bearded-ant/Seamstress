@@ -13,7 +13,7 @@ class MeasurementsRepository(
     private val takenMeasurementDao: TakenMeasurementDao
 ) {
 
-    suspend fun getMeasurementsByCustomerId(customerId: Long): List<MeasurementRow> =
+    fun getMeasurementsByCustomerId(customerId: Long): LiveData<List<MeasurementRow>> =
         measurementDao.getMeasurementsByCustomerId(customerId)
 
     suspend fun getMeasurementById(id: Long): MeasurementRow? =

@@ -24,16 +24,16 @@ app/src/main/java/com/example/seamstress/
 app/src/main/res/navigation/navigation.xml  # граф навигации, старт — customersListFragment
 ```
 
-## Модель данных (Room, БД `seamstress_db`, version 1, exportSchema = false)
-- `Customers(id, name, phone?, img, balance)`.
+## Модель данных (Room, БД `seamstress_db`, version 2, exportSchema = false)
+- `Customers(id, name, phone?, img, balance: Long)` — баланс в целых рублях, 0…1 000 000 000.
 - `Measurement(id, name, date_creation, dress_type, customer_id)` — обычная data-класс, не Parcelable; в граф передаётся только `measurementId: Long`, карточка достаёт замер из БД.
 - `Metric(id, type_id, short_name, name, description?)` — справочник метрик.
 - `TakenMeasurement(id, metric_id, measured_id, customer_id, value)`.
-- БД создаётся через `createFromAsset("pre_seamstress")` — предзаполненная база в `app/src/main/assets/pre_seamstress`. При изменении схемы нужна миграция И обновление ассета.
+- БД создаётся через `createFromAsset("pre_seamstress")` — предзаполненная база в `app/src/main/assets/pre_seamstress`. При изменении схемы нужна миграция И обновление ассета; сейчас версия поднята с `fallbackToDestructiveMigration(true)`, поэтому старая база на устройстве пересоздаётся пустой.
 
 ## Конвенции кода
-- ViewBinding: `Fragment<Name>Binding`, поле `_binding` + getter `binding`, обнуление в `onDestroy`.
-- Фрагменты получают ViewModel через `ViewModelProvider(requireActivity())[XViewModel::class.java]` — ViewModel шарятся на уровне Activity.
+- ViewBinding: `Fragment<Name>Binding`, поле `_binding` + getter `binding`, обнуление в `onDestroyView`.
+- Фрагменты получают ViewModel через `ViewModelProvider(this)[XViewModel::class.java]` — свой экземпляр на экран; наблюдение только через `viewLifecycleOwner`, подписки и обработчики — в `onViewCreated`.
 - Навигация только через Safe Args (`XFragmentDirections.action...`); id аргументов — в `navigation.xml`.
 - RecyclerView: отдельные классы `*RecyclerAdapter`, `*ViewHolder`, `*ClickListener` в подпакете `recycler/`.
 - Репозитории — классы с suspend-методами, вызываются из `viewModelScope.launch`.

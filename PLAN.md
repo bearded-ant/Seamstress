@@ -38,6 +38,7 @@
    в `onViewCreated`, наблюдение только через `viewLifecycleOwner`. ViewModel — свой на каждый
    экран (`ViewModelProvider(this)`): Activity-scoped вариант из `AGENTS.md` отменён, потому что
    общий `selectByIdCustomerLiveData` отдавал в экран редактирования данные другого клиента.
+   `AGENTS.md` приведён в соответствие.
    *Готово, когда:* нет `requireActivity()` в роли `LifecycleOwner`, поворот не плодит экраны.
 
 - [ ] **Безопасное чтение**

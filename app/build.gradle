@@ -1,62 +1,58 @@
 plugins {
     id 'com.android.application'
-    id 'kotlin-android'
-    id 'kotlin-kapt'
     id 'androidx.navigation.safeargs.kotlin'
-    id 'kotlin-parcelize'
+    id 'com.google.devtools.ksp'
 }
 
 android {
-    compileSdkVersion 33
-    buildToolsVersion "30.0.3"
+    namespace 'com.example.seamstress'
+    compileSdk = 37
 
     defaultConfig {
-        applicationId "com.example.seamstress"
-        minSdkVersion 26
-        targetSdkVersion 33
-        versionCode 1
-        versionName "1.0"
+        applicationId = "com.example.seamstress"
+        minSdk = 26
+        targetSdk = 37
+        versionCode = 1
+        versionName = "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            minifyEnabled = false
         }
     }
+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
+
     buildFeatures {
-        viewBinding true
+        viewBinding = true
     }
-    namespace 'com.example.seamstress'
 }
 
 dependencies {
-
-    implementation 'androidx.core:core-ktx:1.8.0'
-    implementation 'androidx.appcompat:appcompat:1.4.2'
-    implementation 'com.google.android.material:material:1.6.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.core:core-ktx:1.19.1'
+    implementation 'androidx.appcompat:appcompat:1.8.0'
+    implementation 'com.google.android.material:material:1.14.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.2'
 
     //navigation
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.4.2'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.4.2'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.10.2'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.10.2'
 
     //room
-    implementation "androidx.room:room-runtime:2.4.3"
-    implementation "androidx.room:room-ktx:2.4.3"
-    kapt "androidx.room:room-compiler:2.4.3"
+    implementation "androidx.room:room-runtime:2.8.5"
+    implementation "androidx.room:room-ktx:2.8.5"
+    ksp "androidx.room:room-compiler:2.8.5"
 
     //liveData
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.5.1"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.11.0"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.11.0"
 
+    //coroutines
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0"
 }

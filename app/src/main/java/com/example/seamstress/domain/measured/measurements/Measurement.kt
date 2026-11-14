@@ -1,12 +1,9 @@
 package com.example.seamstress.domain.measured.measurements
 
-import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import kotlinx.android.parcel.Parcelize
 
-@Parcelize
 @Entity(tableName = "measurements")
 data class Measurement(
     @PrimaryKey(autoGenerate = true)
@@ -18,4 +15,4 @@ data class Measurement(
     val dressType: String,
     @ColumnInfo(name = "customer_id")
     val customerId:Long
-):Parcelable
+)

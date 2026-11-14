@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.seamstress.databinding.FragmentCardMeasurementBinding
 import com.example.seamstress.domain.measured.taken.TakenMeasurement
 import com.example.seamstress.ui.fragments.measurement.card.recycler.TakenMeasuredRecyclerAdapter
+import com.example.seamstress.viewmodel.MeasurementsViewModel
 import com.example.seamstress.viewmodel.TakenMeasurementsViewModel
 
 
@@ -19,6 +20,7 @@ class CardMeasurementFragment : Fragment() {
     }
 
     private lateinit var takenMeasurementViewModel: TakenMeasurementsViewModel
+    private lateinit var measurementsViewModel: MeasurementsViewModel
 
     private var _binding: FragmentCardMeasurementBinding? = null
     private val binding
@@ -32,19 +34,23 @@ class CardMeasurementFragment : Fragment() {
         _binding = FragmentCardMeasurementBinding.inflate(layoutInflater)
 
         val safeArgs = CardMeasurementFragmentArgs.fromBundle(requireArguments())
-        val measurement = safeArgs.measurement
+        val measurementId = safeArgs.measurementId
+
+        measurementsViewModel =
+            ViewModelProvider(requireActivity())[MeasurementsViewModel::class.java]
+        measurementsViewModel.getMeasurementById(measurementId)
+        measurementsViewModel.measurementByIdLiveData.observe(viewLifecycleOwner) { measurement ->
+            binding.frCardMeasurementName.text = measurement.name
+            binding.frCardMeasurementType.text = measurement.dressType
+            binding.frCardMeasurementDate.text = measurement.dateCreation
+        }
 
         takenMeasurementViewModel =
             ViewModelProvider(requireActivity())[TakenMeasurementsViewModel::class.java]
-        takenMeasurementViewModel.getMeasurementByCustomerId(measurement.id)
+        takenMeasurementViewModel.getMeasurementByCustomerId(measurementId)
         takenMeasurementViewModel.measurementLiveData.observe(viewLifecycleOwner) {
             initTakenRecycler(it)
         }
-
-
-        binding.frCardMeasurementName.text = measurement.name
-        binding.frCardMeasurementType.text = measurement.dressType
-        binding.frCardMeasurementDate.text = measurement.dateCreation
 
         return binding.root
     }

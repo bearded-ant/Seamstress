@@ -89,7 +89,8 @@ class CustomerCardFragment : Fragment(), MeasurementItemClickListener {
     }
 
     override fun onMeasureItemClick(measurement: Measurement) {
-        val action = CustomerCardFragmentDirections.actionCustomerCardToMeasurementCard(measurement)
+        val action =
+            CustomerCardFragmentDirections.actionCustomerCardToMeasurementCard(measurement.id)
         findNavController().navigate(action)
     }
 }

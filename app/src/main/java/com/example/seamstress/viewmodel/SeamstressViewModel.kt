@@ -9,6 +9,9 @@ import com.example.seamstress.data.CustomersRepository
 import com.example.seamstress.domain.SeamstressDataBase
 import com.example.seamstress.domain.customers.Customers
 import com.example.seamstress.domain.customers.CustomersDao
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class SeamstressViewModel(application: Application) : AndroidViewModel(application) {
@@ -33,12 +36,13 @@ class SeamstressViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    private var _newCustomerId = MutableLiveData<Long>()
-    val newCustomerIdLiveData: LiveData<Long> = _newCustomerId
+    private val _newCustomerId = Channel<Long>(Channel.BUFFERED)
+    val newCustomerId: Flow<Long> = _newCustomerId.receiveAsFlow()
+
     fun insertCustomer(client: Customers) {
         viewModelScope.launch {
             val newEntityId = customerRepo.insertCustomer(client)
-            _newCustomerId.postValue(newEntityId)
+            _newCustomerId.send(newEntityId)
         }
     }
 

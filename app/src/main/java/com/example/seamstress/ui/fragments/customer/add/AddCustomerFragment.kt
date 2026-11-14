@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.seamstress.R
 import com.example.seamstress.databinding.FragmentAddCustomerBinding
@@ -14,6 +15,7 @@ import com.example.seamstress.domain.customers.Customers
 import com.example.seamstress.ui.fragments.customer.card.CustomerCardFragment
 import com.example.seamstress.ui.fragments.customer.parseBalance
 import com.example.seamstress.viewmodel.SeamstressViewModel
+import kotlinx.coroutines.launch
 
 class AddCustomerFragment : Fragment() {
     companion object {
@@ -59,15 +61,21 @@ class AddCustomerFragment : Fragment() {
                 balance = balance
             )
             seamstressViewModel.insertCustomer(customer)
-            seamstressViewModel.newCustomerIdLiveData.observe(requireActivity()) {
-                Toast.makeText(requireContext(), "$it", Toast.LENGTH_LONG).show()
-                findNavController().navigate(
-                    AddCustomerFragmentDirections.actionAddCustomerToCustomerCard(it)
-                )
-            }
         }
 
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewLifecycleOwner.lifecycleScope.launch {
+            seamstressViewModel.newCustomerId.collect { newCustomerId ->
+                Toast.makeText(requireContext(), "$newCustomerId", Toast.LENGTH_LONG).show()
+                findNavController().navigate(
+                    AddCustomerFragmentDirections.actionAddCustomerToCustomerCard(newCustomerId)
+                )
+            }
+        }
     }
 
     override fun onDestroyView() {

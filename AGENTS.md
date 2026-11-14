@@ -18,17 +18,18 @@ app/src/main/java/com/example/seamstress/
 ├── domain/                 # Room-сущности и DAO + SeamstressDataBase
 │   ├── customers/  dress/  measured/{measurements,metric,taken}/
 ├── ui/MainActivity.kt      # единственная Activity, NavHost
-├── ui/fragments/<feature>/ # customer/{list,card,add,update}, measurement/{add,card}
+├── ui/fragments/<feature>/ # customer/{list,card,add,update}, measurement/{add,card}, settings/
 │   └── notused/            # заброшенные экраны (одежда, материалы) — не трогать без запроса
 └── viewmodel/              # AndroidViewModel, по одному на сущность
 app/src/main/res/navigation/navigation.xml  # граф навигации, старт — customersListFragment
 ```
 
-## Модель данных (Room, БД `seamstress_db`, version 2, exportSchema = false)
+## Модель данных (Room, БД `seamstress_db`, version 3, exportSchema = false)
 - `Customers(id, name, phone?, img, balance: Long)` — баланс в целых рублях, 0…1 000 000 000.
-- `Measurement(id, name, date_creation, dress_type, customer_id)` — обычная data-класс, не Parcelable; в граф передаётся только `measurementId: Long`, карточка достаёт замер из БД.
+- `Measurement(id, name, date_creation, class_id, customer_id)` — обычная data-класс, не Parcelable; в граф передаётся только `measurementId: Long`, карточка достаёт замер из БД. Название класса — JOIN с `dress_classes`.
+- `DressClass(id, name)` — класс изделия; `DressClassMetric(class_id, metric_id, position)` — метрики класса с порядком снятия.
 - `Metric(id, type_id, short_name, name, description?)` — справочник метрик.
-- `TakenMeasurement(id, metric_id, measured_id, customer_id, value)`.
+- `TakenMeasurement(id, metric_id, measured_id, customer_id, value: Float)` — пишется вместе с замером в `MeasurementDao.insertMeasurementWithTaken` (`@Transaction`).
 - БД создаётся через `createFromAsset("pre_seamstress")` — предзаполненная база в `app/src/main/assets/pre_seamstress`. При изменении схемы нужна миграция И обновление ассета; сейчас версия поднята с `fallbackToDestructiveMigration(true)`, поэтому старая база на устройстве пересоздаётся пустой.
 
 ## Конвенции кода

@@ -10,5 +10,5 @@ data class Customers(
     val name: String,
     val phone: String?,
     val img: Int,
-    val balance: Float = 0F
+    val balance: Long = 0L
 )

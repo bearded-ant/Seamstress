@@ -30,10 +30,11 @@
     <string name="save_btn">сохранить</string>
     <string name="cancel_btn">отменить</string>
     <string name="customer_name">имя клиента</string>
-    <string name="customer_phone_number">+7 987 654 32 10</string>
+    <string name="customer_phone_number">89987654321</string>
     <string name="customer_balance">баланс</string>
     <string name="error_customer_name_empty">Укажите имя клиента</string>
-    <string name="error_customer_balance_invalid">Баланс должен быть числом</string>
+    <string name="error_customer_phone_invalid">В номере должно быть 11 цифр</string>
+    <string name="error_customer_balance_invalid">Баланс — целое число от 0 до 1 000 000 000</string>
     <string name="delete_btn">удалить</string>
     <string name="edit_customer_btn">edit customer</string>
 </resources>

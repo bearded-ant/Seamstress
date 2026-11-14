@@ -13,7 +13,7 @@ import com.example.seamstress.domain.measured.metric.MetricDao
 import com.example.seamstress.domain.measured.taken.TakenMeasurement
 import com.example.seamstress.domain.measured.taken.TakenMeasurementDao
 
-@Database(entities = [Customers::class, Metric::class, Measurement::class, TakenMeasurement::class], version = 1, exportSchema = false)
+@Database(entities = [Customers::class, Metric::class, Measurement::class, TakenMeasurement::class], version = 2, exportSchema = false)
 abstract class SeamstressDataBase : RoomDatabase() {
     abstract fun customersDao(): CustomersDao
     abstract fun metricDao(): MetricDao
@@ -36,6 +36,7 @@ abstract class SeamstressDataBase : RoomDatabase() {
                     "seamstress_db"
                 )
                     .createFromAsset("pre_seamstress")
+                    .fallbackToDestructiveMigration(true)
                     .build()
                 INSTANCE = instance
                 // return instance

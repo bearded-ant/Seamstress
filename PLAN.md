@@ -11,15 +11,19 @@
       (`parseBalance`, `toFloatOrNull`, `inputType`, блокировка кнопки, пустой телефон → null).
 - [x] Этап 1, п.2: `newCustomerId` — `Channel` + `Flow` вместо `MutableLiveData`,
       подписка в `onViewCreated` на `viewLifecycleOwner.lifecycleScope`.
+- [x] Поворот экрана отключён: `android:screenOrientation="portrait"` у `MainActivity`.
+- [x] Баланс переведён на `Long` (целые рубли, лимит 1 000 000 000), колонка в ассете —
+      `INTEGER`, телефоны в ассете приведены к 11 цифрам. БД поднята до `version = 2`
+      с `fallbackToDestructiveMigration(true)`.
 
 ## Этап 1. Исправления (стабильность)
 
 Порядок — сверху вниз, каждый пункт самодостаточен.
 
 - [x] **Ввод и двойное нажатие**
-   `AddCustomerFragment.kt:46`, `UpdateCustomerFragment.kt:51`: парсить баланс через
-   `toFloatOrNull() ?: 0f`, `inputType="numberDecimal"`, проверка пустого имени;
-   блокировать кнопку «Сохранить» до ответа базы.
+   Баланс — целое число рублей `0..1 000 000 000` (`Long`, колонка INTEGER), телефон — ровно
+   11 цифр, имя не пустое; блокировка кнопки «Сохранить» до ответа базы. Строки полей
+   ограничены цифровым вводом (`inputType="number"`, `maxLength`).
    *Готово, когда:* пустой баланс сохраняется как 0, двойной тап даёт один переход.
 
 - [x] **Одноразовые события для навигации**

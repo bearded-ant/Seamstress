@@ -14,6 +14,7 @@ import com.example.seamstress.databinding.FragmentAddCustomerBinding
 import com.example.seamstress.domain.customers.Customers
 import com.example.seamstress.ui.fragments.customer.card.CustomerCardFragment
 import com.example.seamstress.ui.fragments.customer.parseBalance
+import com.example.seamstress.ui.fragments.customer.parsePhone
 import com.example.seamstress.viewmodel.SeamstressViewModel
 import kotlinx.coroutines.launch
 
@@ -42,10 +43,14 @@ class AddCustomerFragment : Fragment() {
         }
         binding.frNewCustomerBtnSave.setOnClickListener {
             val name = binding.frNewCustomerName.text?.toString()?.trim().orEmpty()
-            val phone = binding.frNewCustomerPhone.text?.toString()?.trim().orEmpty()
+            val phone = parsePhone(binding.frNewCustomerPhone.text?.toString())
             val balance = parseBalance(binding.frNewCustomerBalance.text?.toString())
             if (name.isEmpty()) {
                 binding.frNewCustomerName.error = getString(R.string.error_customer_name_empty)
+                return@setOnClickListener
+            }
+            if (phone == null) {
+                binding.frNewCustomerPhone.error = getString(R.string.error_customer_phone_invalid)
                 return@setOnClickListener
             }
             if (balance == null) {

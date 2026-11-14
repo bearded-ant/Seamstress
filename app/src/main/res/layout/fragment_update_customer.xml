@@ -32,6 +32,7 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/fr_update_customer_name"
+                    android:inputType="textPersonName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:hint="@string/customer_name"
@@ -39,6 +40,7 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/fr_update_customer_phone"
+                    android:inputType="phone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:hint="@string/customer_phone_number"
@@ -48,6 +50,7 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/fr_update_customer_balance"
+                    android:inputType="numberDecimal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/small_dp_size"

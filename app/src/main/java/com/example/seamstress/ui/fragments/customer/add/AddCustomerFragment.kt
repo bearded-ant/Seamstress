@@ -12,6 +12,7 @@ import com.example.seamstress.R
 import com.example.seamstress.databinding.FragmentAddCustomerBinding
 import com.example.seamstress.domain.customers.Customers
 import com.example.seamstress.ui.fragments.customer.card.CustomerCardFragment
+import com.example.seamstress.ui.fragments.customer.parseBalance
 import com.example.seamstress.viewmodel.SeamstressViewModel
 
 class AddCustomerFragment : Fragment() {
@@ -38,12 +39,24 @@ class AddCustomerFragment : Fragment() {
             findNavController().navigate(AddCustomerFragmentDirections.actionAddCustomerToCustomersList())
         }
         binding.frNewCustomerBtnSave.setOnClickListener {
+            val name = binding.frNewCustomerName.text?.toString()?.trim().orEmpty()
+            val phone = binding.frNewCustomerPhone.text?.toString()?.trim().orEmpty()
+            val balance = parseBalance(binding.frNewCustomerBalance.text?.toString())
+            if (name.isEmpty()) {
+                binding.frNewCustomerName.error = getString(R.string.error_customer_name_empty)
+                return@setOnClickListener
+            }
+            if (balance == null) {
+                binding.frNewCustomerBalance.error = getString(R.string.error_customer_balance_invalid)
+                return@setOnClickListener
+            }
+            binding.frNewCustomerBtnSave.isEnabled = false
             val customer = Customers(
                 id = 0,
-                name = binding.frNewCustomerName.text.toString(),
-                phone = binding.frNewCustomerPhone.text.toString(),
+                name = name,
+                phone = phone.ifEmpty { null },
                 img = R.drawable.ic_baseline_add_a_photo_24,
-                balance = binding.frNewCustomerBalance.text.toString().toFloat()
+                balance = balance
             )
             seamstressViewModel.insertCustomer(customer)
             seamstressViewModel.newCustomerIdLiveData.observe(requireActivity()) {

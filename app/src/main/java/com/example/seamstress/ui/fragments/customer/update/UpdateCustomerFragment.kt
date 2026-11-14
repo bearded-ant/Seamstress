@@ -13,6 +13,7 @@ import com.example.seamstress.R
 import com.example.seamstress.databinding.FragmentUpdateCustomerBinding
 import com.example.seamstress.domain.customers.Customers
 import com.example.seamstress.ui.fragments.customer.card.CustomerCardFragment
+import com.example.seamstress.ui.fragments.customer.parseBalance
 import com.example.seamstress.viewmodel.SeamstressViewModel
 
 class UpdateCustomerFragment : Fragment() {
@@ -43,12 +44,25 @@ class UpdateCustomerFragment : Fragment() {
             bindCustomerCard(customer)
 
             binding.frUpdateCustomerBtnSave.setOnClickListener {
+                val name = binding.frUpdateCustomerName.text?.toString()?.trim().orEmpty()
+                val phone = binding.frUpdateCustomerPhone.text?.toString()?.trim().orEmpty()
+                val balance = parseBalance(binding.frUpdateCustomerBalance.text?.toString())
+                if (name.isEmpty()) {
+                    binding.frUpdateCustomerName.error = getString(R.string.error_customer_name_empty)
+                    return@setOnClickListener
+                }
+                if (balance == null) {
+                    binding.frUpdateCustomerBalance.error =
+                        getString(R.string.error_customer_balance_invalid)
+                    return@setOnClickListener
+                }
+                binding.frUpdateCustomerBtnSave.isEnabled = false
                 val updatedCustomer = Customers(
                     id = customer.id,
-                    name = binding.frUpdateCustomerName.text.toString(),
-                    phone = binding.frUpdateCustomerPhone.text.toString(),
+                    name = name,
+                    phone = phone.ifEmpty { null },
                     img = R.drawable.ic_baseline_add_a_photo_24,
-                    balance = binding.frUpdateCustomerBalance.text.toString().toFloat()
+                    balance = balance
                 )
                 seamstressViewModel.updateCustomer(updatedCustomer)
                 Toast.makeText(requireContext(), "success update", Toast.LENGTH_SHORT).show()

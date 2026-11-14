@@ -32,6 +32,8 @@
     <string name="customer_name">имя клиента</string>
     <string name="customer_phone_number">+7 987 654 32 10</string>
     <string name="customer_balance">баланс</string>
+    <string name="error_customer_name_empty">Укажите имя клиента</string>
+    <string name="error_customer_balance_invalid">Баланс должен быть числом</string>
     <string name="delete_btn">удалить</string>
     <string name="edit_customer_btn">edit customer</string>
 </resources>

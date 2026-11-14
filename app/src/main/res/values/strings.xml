@@ -35,6 +35,9 @@
     <string name="error_customer_name_empty">Укажите имя клиента</string>
     <string name="error_customer_phone_invalid">В номере должно быть 11 цифр</string>
     <string name="error_customer_balance_invalid">Баланс — целое число от 0 до 1 000 000 000</string>
+    <string name="measurement_name_hint">Название замера</string>
+    <string name="measurement_type_hint">Тип изделия</string>
+    <string name="metrics_empty">Справочник мерок пуст</string>
     <string name="delete_btn">удалить</string>
     <string name="edit_customer_btn">edit customer</string>
 </resources>

@@ -101,15 +101,19 @@
 и Safe Args. Среды хватает: `compileSdk 37` + AGP 9.5.1 — это требования Compose 1.12+.
 Миграция по экрану, проект собирается и работает на каждом шаге.
 
-- [ ] **Шаг 0. Инфраструктура**
-  `androidx.compose:compose-bom` (1.12+), `material3`, `activity-compose`, `navigation-compose`,
-  `ui-tooling` (debug); плагин `org.jetbrains.kotlin.plugin.compose` версии Kotlin внутри AGP,
+- [x] **Шаг 0. Инфраструктура**
+  `androidx.compose:compose-bom:2025.09.00` (эпоха Kotlin 2.2.10, чтобы метаданные совпали),
+  `ui`, `ui-tooling-preview`, `material3`, `runtime-livedata`, `ui-tooling` (debug);
+  плагин `org.jetbrains.kotlin.plugin.compose:2.2.10` — ровно столько несёт AGP 9.5.1,
   `buildFeatures { compose = true }`. XML-экраны продолжают работать.
-  *Готово, когда:* проект собирается, пустой `@Preview` рендерится в Android Studio.
+  *Готово, когда:* проект собирается — `assembleDebug` прошёл.
 
-- [ ] **Шаг 1. Пилот — «Новый замер»**
-  Экран не реализован, переписывать нечего: делаем сразу на Compose в `ComposeView` внутри
-  существующего фрагмента. Там же обкатать тему Material3, текстовые поля, клавиатуру.
+- [x] **Шаг 1. Пилот — «Новый замер»**
+  `AddMeasurementScreen` на Compose внутри `ComposeView`, тема `SeamstressTheme` (Material3),
+  поля имени и типа, список мерок из справочника, `@Preview`. Удалены
+  `fragment_add_measurement.xml`, `item_metrics_list.xml`, `MetricRecyclerAdapter`,
+  `MetricViewHolder`. «Отменить» возвращает назад; сохранение — заглушка-тост до этапа 1, п.7
+  (для записи нужен `customerId` во входных аргументах и `insert` с возвратом id).
   *Готово, когда:* экран работает и навигация остаётся прежней, XML этого экрана удалён.
 
 - [ ] **Шаг 2. Список клиентов и карточка клиента**

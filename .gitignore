@@ -1,0 +1,29 @@
+# Gradle
+.gradle/
+build/
+
+# Локальная конфигурация
+local.properties
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Kotlin
+.kotlin/
+
+# Артефакты
+*.apk
+*.aab
+*.jks
+*.keystore
+
+# Sidecar-файлы SQLite рядом с ассетом БД
+app/src/main/assets/*-wal
+app/src/main/assets/*-shm
+
+# OS
+.DS_Store

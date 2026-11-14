@@ -168,10 +168,11 @@ const SCREENS = [
   {
     key: "list",
     title: "CustomersListFragment",
+    desc: "список клиентов",
     tech: "xml",
     start: true,
     badge: "СТАРТ",
-    x: 60, y: 560, h: 250,
+    x: 60, y: 560, h: 270,
     lines: [
       "ViewModel: SeamstressViewModel",
       "getAllCustomers: LiveData",
@@ -183,8 +184,9 @@ const SCREENS = [
   {
     key: "add",
     title: "AddCustomerFragment",
+    desc: "новый клиент",
     tech: "xml",
-    x: 560, y: 140, h: 210,
+    x: 560, y: 140, h: 240,
     lines: [
       "ViewModel: SeamstressViewModel",
       "Channel<Long> newCustomerId",
@@ -196,8 +198,9 @@ const SCREENS = [
   {
     key: "card",
     title: "CustomerCardFragment",
+    desc: "карточка клиента",
     tech: "xml",
-    x: 560, y: 560, h: 250,
+    x: 560, y: 560, h: 270,
     lines: [
       "SeamstressViewModel",
       "+ MeasurementsViewModel",
@@ -209,8 +212,9 @@ const SCREENS = [
   {
     key: "settings",
     title: "SettingsFragment",
+    desc: "настройки",
     tech: "compose",
-    x: 560, y: 1020, h: 150,
+    x: 560, y: 1020, h: 190,
     lines: [
       "ViewModel: нет",
       "SettingsScreen(onMetricsClick)",
@@ -220,8 +224,9 @@ const SCREENS = [
   {
     key: "update",
     title: "UpdateCustomerFragment",
+    desc: "редактирование клиента",
     tech: "xml",
-    x: 1060, y: 140, h: 210,
+    x: 1060, y: 140, h: 215,
     lines: [
       "SeamstressViewModel",
       "customer?, customerId",
@@ -232,8 +237,9 @@ const SCREENS = [
   {
     key: "addmeas",
     title: "AddMeasurementFragment",
+    desc: "новый замер",
     tech: "compose",
-    x: 1060, y: 520, h: 210,
+    x: 1060, y: 520, h: 240,
     lines: [
       "MeasurementsViewModel",
       "saving: mutableStateOf",
@@ -245,8 +251,9 @@ const SCREENS = [
   {
     key: "meas",
     title: "CardMeasurementFragment",
+    desc: "карточка замера",
     tech: "xml",
-    x: 1060, y: 800, h: 190,
+    x: 1060, y: 800, h: 215,
     lines: [
       "MeasurementsViewModel",
       "+ TakenMeasurementsViewModel",
@@ -257,8 +264,9 @@ const SCREENS = [
   {
     key: "metrics",
     title: "MetricsReferenceFragment",
+    desc: "справочник мерок",
     tech: "compose",
-    x: 1060, y: 1020, h: 170,
+    x: 1060, y: 1020, h: 190,
     lines: [
       "MetricViewModel",
       "getAllMetrics → observeAsState",
@@ -293,7 +301,7 @@ const EDGES = [
   },
   {
     name: "новый клиент → карточка",
-    pts: [[720, 350], [720, 560]],
+    pts: [[720, 380], [720, 560]],
     label: "Save → insert, popUpTo", lx: 735, ly: 470,
   },
   {
@@ -478,6 +486,9 @@ function screenCard(s) {
   head.appendChild(tx(s.title, { size: 15, weight: "bold", width: 200 }));
   head.appendChild(techChip(s.tech));
   c.appendChild(head);
+  if (s.desc) {
+    c.appendChild(tx(s.desc, { size: 13, color: C.faint, width: CARD_W - 40 }));
+  }
   c.appendChild(rule(CARD_W - 40));
   cardBody(c, s.lines);
   if (s.badge) {

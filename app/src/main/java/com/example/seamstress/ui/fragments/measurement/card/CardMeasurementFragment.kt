@@ -19,9 +19,6 @@ class CardMeasurementFragment : Fragment() {
         fun newInstance(): CardMeasurementFragment = CardMeasurementFragment()
     }
 
-    private lateinit var takenMeasurementViewModel: TakenMeasurementsViewModel
-    private lateinit var measurementsViewModel: MeasurementsViewModel
-
     private var _binding: FragmentCardMeasurementBinding? = null
     private val binding
         get() = _binding!!
@@ -32,12 +29,15 @@ class CardMeasurementFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentCardMeasurementBinding.inflate(layoutInflater)
+        return binding.root
+    }
 
-        val safeArgs = CardMeasurementFragmentArgs.fromBundle(requireArguments())
-        val measurementId = safeArgs.measurementId
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        measurementsViewModel =
-            ViewModelProvider(requireActivity())[MeasurementsViewModel::class.java]
+        val measurementId = CardMeasurementFragmentArgs.fromBundle(requireArguments()).measurementId
+
+        val measurementsViewModel = ViewModelProvider(this)[MeasurementsViewModel::class.java]
         measurementsViewModel.getMeasurementById(measurementId)
         measurementsViewModel.measurementByIdLiveData.observe(viewLifecycleOwner) { measurement ->
             binding.frCardMeasurementName.text = measurement.name
@@ -45,27 +45,23 @@ class CardMeasurementFragment : Fragment() {
             binding.frCardMeasurementDate.text = measurement.dateCreation
         }
 
-        takenMeasurementViewModel =
-            ViewModelProvider(requireActivity())[TakenMeasurementsViewModel::class.java]
+        val takenMeasurementViewModel =
+            ViewModelProvider(this)[TakenMeasurementsViewModel::class.java]
         takenMeasurementViewModel.getMeasurementByCustomerId(measurementId)
         takenMeasurementViewModel.measurementLiveData.observe(viewLifecycleOwner) {
             initTakenRecycler(it)
         }
 
-        return binding.root
+        binding.frCardMeasurementRecycler.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         _binding = null
     }
 
     private fun initTakenRecycler(taken: List<TakenMeasurement>) {
-        val takenRecycler = binding.frCardMeasurementRecycler
-        val takenRecyclerAdapter = TakenMeasuredRecyclerAdapter(taken)
-
-        takenRecycler.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        takenRecycler.adapter = takenRecyclerAdapter
+        binding.frCardMeasurementRecycler.adapter = TakenMeasuredRecyclerAdapter(taken)
     }
 }

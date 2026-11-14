@@ -36,8 +36,6 @@ class AddCustomerFragment : Fragment() {
     ): View {
         _binding = FragmentAddCustomerBinding.inflate(layoutInflater)
 
-        seamstressViewModel = ViewModelProvider(this)[SeamstressViewModel::class.java]
-
         binding.frNewCustomerBtnCancel.setOnClickListener {
             findNavController().navigate(AddCustomerFragmentDirections.actionAddCustomerToCustomersList())
         }
@@ -73,6 +71,7 @@ class AddCustomerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        seamstressViewModel = ViewModelProvider(this)[SeamstressViewModel::class.java]
         viewLifecycleOwner.lifecycleScope.launch {
             seamstressViewModel.newCustomerId.collect { newCustomerId ->
                 Toast.makeText(requireContext(), "$newCustomerId", Toast.LENGTH_LONG).show()

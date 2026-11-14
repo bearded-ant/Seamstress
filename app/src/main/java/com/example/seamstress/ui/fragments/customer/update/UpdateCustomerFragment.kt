@@ -28,79 +28,89 @@ class UpdateCustomerFragment : Fragment() {
     private val binding
         get() = _binding!!
 
+    private var customerId: Long = 0L
+    private var customer: Customers? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentUpdateCustomerBinding.inflate(layoutInflater)
+        return binding.root
+    }
 
-        seamstressViewModel = ViewModelProvider(this)[SeamstressViewModel::class.java]
-        val safeArg = UpdateCustomerFragmentArgs.fromBundle(requireArguments())
-        val customerId = safeArg.customerEntityId
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        customerId = UpdateCustomerFragmentArgs.fromBundle(requireArguments()).customerEntityId
 
         seamstressViewModel = ViewModelProvider(this)[SeamstressViewModel::class.java]
         seamstressViewModel.selectCustomerById(customerId)
-        seamstressViewModel.selectByIdCustomerLiveData.observe(requireActivity()) { customer ->
-            bindCustomerCard(customer)
-
-            binding.frUpdateCustomerBtnSave.setOnClickListener {
-                val name = binding.frUpdateCustomerName.text?.toString()?.trim().orEmpty()
-                val phone = parsePhone(binding.frUpdateCustomerPhone.text?.toString())
-                val balance = parseBalance(binding.frUpdateCustomerBalance.text?.toString())
-                if (name.isEmpty()) {
-                    binding.frUpdateCustomerName.error = getString(R.string.error_customer_name_empty)
-                    return@setOnClickListener
-                }
-                if (phone == null) {
-                    binding.frUpdateCustomerPhone.error =
-                        getString(R.string.error_customer_phone_invalid)
-                    return@setOnClickListener
-                }
-                if (balance == null) {
-                    binding.frUpdateCustomerBalance.error =
-                        getString(R.string.error_customer_balance_invalid)
-                    return@setOnClickListener
-                }
-                binding.frUpdateCustomerBtnSave.isEnabled = false
-                val updatedCustomer = Customers(
-                    id = customer.id,
-                    name = name,
-                    phone = phone.ifEmpty { null },
-                    img = R.drawable.ic_baseline_add_a_photo_24,
-                    balance = balance
-                )
-                seamstressViewModel.updateCustomer(updatedCustomer)
-                Toast.makeText(requireContext(), "success update", Toast.LENGTH_SHORT).show()
-                findNavController().navigate(
-                    UpdateCustomerFragmentDirections.actionUpdateCustomerToCustomerCard(
-                        customerId
-                    )
-                )
-            }
-
-            binding.frUpdateCustomerBtnDelete.setOnClickListener {
-
-
-                val alertBuilder = AlertDialog.Builder(requireContext())
-                alertBuilder.setPositiveButton("Да") { _, _ ->
-                    seamstressViewModel.deleteCustomer(customer)
-                    findNavController().navigate(UpdateCustomerFragmentDirections.actionUpdateCustomerToCustomersList())
-                }
-                alertBuilder.setNegativeButton("Нет") { _, _ -> }
-                alertBuilder.setTitle("Удалить клиента ${customer.name}?")
-                alertBuilder.setMessage("Вы уверены, что хотите удалить клиента ${customer.name}?")
-                alertBuilder.create().show()
-            }
-
-            binding.frUpdateCustomerBtnCancel.setOnClickListener {
-                findNavController().navigate(
-                    UpdateCustomerFragmentDirections.actionUpdateCustomerToCustomerCard(customerId)
-                )
-            }
+        seamstressViewModel.selectByIdCustomerLiveData.observe(viewLifecycleOwner) { loaded ->
+            customer = loaded
+            bindCustomerCard(loaded)
         }
 
-        return binding.root
+        binding.frUpdateCustomerBtnSave.setOnClickListener { saveCustomer() }
+        binding.frUpdateCustomerBtnDelete.setOnClickListener { confirmDelete() }
+        binding.frUpdateCustomerBtnCancel.setOnClickListener {
+            findNavController().navigate(
+                UpdateCustomerFragmentDirections.actionUpdateCustomerToCustomerCard(customerId)
+            )
+        }
+    }
+
+    private fun saveCustomer() {
+        val current = customer ?: return
+
+        val name = binding.frUpdateCustomerName.text?.toString()?.trim().orEmpty()
+        val phone = parsePhone(binding.frUpdateCustomerPhone.text?.toString())
+        val balance = parseBalance(binding.frUpdateCustomerBalance.text?.toString())
+        if (name.isEmpty()) {
+            binding.frUpdateCustomerName.error = getString(R.string.error_customer_name_empty)
+            return
+        }
+        if (phone == null) {
+            binding.frUpdateCustomerPhone.error =
+                getString(R.string.error_customer_phone_invalid)
+            return
+        }
+        if (balance == null) {
+            binding.frUpdateCustomerBalance.error =
+                getString(R.string.error_customer_balance_invalid)
+            return
+        }
+
+        binding.frUpdateCustomerBtnSave.isEnabled = false
+        val updatedCustomer = Customers(
+            id = current.id,
+            name = name,
+            phone = phone.ifEmpty { null },
+            img = R.drawable.ic_baseline_add_a_photo_24,
+            balance = balance
+        )
+        seamstressViewModel.updateCustomer(updatedCustomer)
+        Toast.makeText(requireContext(), "success update", Toast.LENGTH_SHORT).show()
+        findNavController().navigate(
+            UpdateCustomerFragmentDirections.actionUpdateCustomerToCustomerCard(customerId)
+        )
+    }
+
+    private fun confirmDelete() {
+        val current = customer ?: return
+        AlertDialog.Builder(requireContext())
+            .setPositiveButton("Да") { _, _ ->
+                seamstressViewModel.deleteCustomer(current)
+                findNavController().navigate(
+                    UpdateCustomerFragmentDirections.actionUpdateCustomerToCustomersList()
+                )
+            }
+            .setNegativeButton("Нет") { _, _ -> }
+            .setTitle("Удалить клиента ${current.name}?")
+            .setMessage("Вы уверены, что хотите удалить клиента ${current.name}?")
+            .create()
+            .show()
     }
 
     override fun onDestroyView() {

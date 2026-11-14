@@ -20,8 +20,6 @@ class CustomersListFragment : Fragment(), CustomerClickListener {
         fun newInstance(): CustomersListFragment = CustomersListFragment()
     }
 
-    private lateinit var seamstressViewModel: SeamstressViewModel
-
     private var _binding: FragmentCustomersListBinding? = null
     private val binding
         get() = _binding!!
@@ -32,28 +30,29 @@ class CustomersListFragment : Fragment(), CustomerClickListener {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentCustomersListBinding.inflate(layoutInflater)
+        return binding.root
+    }
 
-        seamstressViewModel = ViewModelProvider(requireActivity())[SeamstressViewModel::class.java]
-        seamstressViewModel.getAllCustomers.observe(requireActivity()) { initRecycler(it) }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.frCustomerListRecycler.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+
+        val seamstressViewModel = ViewModelProvider(this)[SeamstressViewModel::class.java]
+        seamstressViewModel.getAllCustomers.observe(viewLifecycleOwner) { initRecycler(it) }
 
         binding.floatingActionButton.setOnClickListener {
             findNavController().navigate(CustomersListFragmentDirections.actionCustomersListToAddCustomer())
         }
-
-        return binding.root
     }
 
     private fun initRecycler(clients: List<Customers>) {
-        val clientsRecycler = binding.frCustomerListRecycler
-        val customersRecyclerAdapter = CustomersRecyclerAdapter(clients, this)
-
-        clientsRecycler.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        clientsRecycler.adapter = customersRecyclerAdapter
+        binding.frCustomerListRecycler.adapter = CustomersRecyclerAdapter(clients, this)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         _binding = null
     }
 

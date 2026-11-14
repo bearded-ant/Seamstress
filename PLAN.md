@@ -11,6 +11,8 @@
       (`parseBalance`, `toFloatOrNull`, `inputType`, блокировка кнопки, пустой телефон → null).
 - [x] Этап 1, п.2: `newCustomerId` — `Channel` + `Flow` вместо `MutableLiveData`,
       подписка в `onViewCreated` на `viewLifecycleOwner.lifecycleScope`.
+- [x] Этап 1, п.3: ViewModel на каждый экран, `onDestroyView`, `viewLifecycleOwner`,
+      обработчики вынесены из наблюдателей.
 - [x] Поворот экрана отключён: `android:screenOrientation="portrait"` у `MainActivity`.
 - [x] Баланс переведён на `Long` (целые рубли, лимит 1 000 000 000), колонка в ассете —
       `INTEGER`, телефоны в ассете приведены к 11 цифрам. БД поднята до `version = 2`
@@ -31,11 +33,11 @@
    `_newCustomerId` → `Channel`/`Event` вместо `MutableLiveData`.
    *Готово, когда:* поворот и возврат «назад» не повторяют переход.
 
-- [ ] **Жизненный цикл экранов**
-   `_binding = null` из `onDestroy` → `onDestroyView` (`CustomersListFragment.kt:55`,
-   `AddMeasurementFragment.kt:47`, `CardMeasurementFragment.kt:58`);
-   все `observe(requireActivity())` → `viewLifecycleOwner`;
-   ViewModel везде одного уровня (Activity-scoped, как в `AGENTS.md`).
+- [x] **Жизненный цикл экранов**
+   `_binding = null` перенесён в `onDestroyView` на всех экранах; подписки и обработчики —
+   в `onViewCreated`, наблюдение только через `viewLifecycleOwner`. ViewModel — свой на каждый
+   экран (`ViewModelProvider(this)`): Activity-scoped вариант из `AGENTS.md` отменён, потому что
+   общий `selectByIdCustomerLiveData` отдавал в экран редактирования данные другого клиента.
    *Готово, когда:* нет `requireActivity()` в роли `LifecycleOwner`, поворот не плодит экраны.
 
 - [ ] **Безопасное чтение**

@@ -22,37 +22,40 @@ class CustomerCardFragment : Fragment(), MeasurementItemClickListener {
         fun newInstance(): CustomerCardFragment = CustomerCardFragment()
     }
 
-    private lateinit var seamstressViewModel: SeamstressViewModel
-    private lateinit var measurementsViewModel: MeasurementsViewModel
-
     private var _binding: FragmentCardCustomerBinding? = null
     private val binding
         get() = _binding!!
+
+    private var customerId: Long = 0L
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         _binding = FragmentCardCustomerBinding.inflate(layoutInflater)
+        return binding.root
+    }
 
-//todo на писать проверку на наличие аргумента?
-        val safeArgs = CustomerCardFragmentArgs.fromBundle(requireArguments())
-        val customerId = safeArgs.customerEntityId
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        seamstressViewModel = ViewModelProvider(this)[SeamstressViewModel::class.java]
+        customerId = CustomerCardFragmentArgs.fromBundle(requireArguments()).customerEntityId
+
+        val seamstressViewModel = ViewModelProvider(this)[SeamstressViewModel::class.java]
         seamstressViewModel.selectCustomerById(customerId)
-        seamstressViewModel.selectByIdCustomerLiveData.observe(requireActivity()) {
+        seamstressViewModel.selectByIdCustomerLiveData.observe(viewLifecycleOwner) {
             bindCustomerCard(it)
         }
 
-        measurementsViewModel = ViewModelProvider(this)[MeasurementsViewModel::class.java]
-
+        val measurementsViewModel = ViewModelProvider(this)[MeasurementsViewModel::class.java]
         measurementsViewModel.getMeasurementByCustomerId(customerId)
         measurementsViewModel.measurementLiveData.observe(viewLifecycleOwner) {
             initMeasurementsRecycler(it)
         }
+
+        binding.frCardCustomerRecyclerMeasurements.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 
         binding.floatingActionButton.setOnClickListener {
             val action =
@@ -63,17 +66,11 @@ class CustomerCardFragment : Fragment(), MeasurementItemClickListener {
         binding.itemCustomer.itemCustomerBtnAddMeasurement.setOnClickListener {
             findNavController().navigate(CustomerCardFragmentDirections.actionCustomerCardToAddMeasurement())
         }
-
-        return binding.root
-
     }
 
     private fun initMeasurementsRecycler(measurements: List<Measurement>) {
-        val measurementsRecycler = binding.frCardCustomerRecyclerMeasurements
-        measurementsRecycler.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        val adapter = MeasurementRecyclerAdapter(this, measurements)
-        measurementsRecycler.adapter = adapter
+        binding.frCardCustomerRecyclerMeasurements.adapter =
+            MeasurementRecyclerAdapter(this, measurements)
     }
 
     override fun onDestroyView() {

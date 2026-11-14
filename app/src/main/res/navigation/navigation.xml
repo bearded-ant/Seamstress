@@ -14,7 +14,24 @@
         <action
             android:id="@+id/action_customersList_to_addCustomer"
             app:destination="@id/addCustomerFragment" />
+        <action
+            android:id="@+id/action_customersList_to_settings"
+            app:destination="@id/settingsFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.seamstress.ui.fragments.settings.SettingsFragment"
+        android:label="Настройки">
+        <action
+            android:id="@+id/action_settings_to_metricsReference"
+            app:destination="@id/metricsReferenceFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/metricsReferenceFragment"
+        android:name="com.example.seamstress.ui.fragments.settings.MetricsReferenceFragment"
+        android:label="Справочник мерок" />
     <fragment
         android:id="@+id/customerFragment"
         android:name="com.example.seamstress.ui.fragments.customer.card.CustomerCardFragment"

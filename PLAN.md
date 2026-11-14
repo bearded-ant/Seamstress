@@ -13,6 +13,7 @@
       подписка в `onViewCreated` на `viewLifecycleOwner.lifecycleScope`.
 - [x] Этап 1, п.3: ViewModel на каждый экран, `onDestroyView`, `viewLifecycleOwner`,
       обработчики вынесены из наблюдателей.
+- [x] Настройки приложения: `SettingsFragment` + «Справочник мерок» на Compose.
 - [x] Поворот экрана отключён: `android:screenOrientation="portrait"` у `MainActivity`.
 - [x] Баланс переведён на `Long` (целые рубли, лимит 1 000 000 000), колонка в ассете —
       `INTEGER`, телефоны в ассете приведены к 11 цифрам. БД поднята до `version = 2`
@@ -108,12 +109,14 @@
   `buildFeatures { compose = true }`. XML-экраны продолжают работать.
   *Готово, когда:* проект собирается — `assembleDebug` прошёл.
 
-- [x] **Шаг 1. Пилот — «Новый замер»**
-  `AddMeasurementScreen` на Compose внутри `ComposeView`, тема `SeamstressTheme` (Material3),
-  поля имени и типа, список мерок из справочника, `@Preview`. Удалены
-  `fragment_add_measurement.xml`, `item_metrics_list.xml`, `MetricRecyclerAdapter`,
-  `MetricViewHolder`. «Отменить» возвращает назад; сохранение — заглушка-тост до этапа 1, п.7
-  (для записи нужен `customerId` во входных аргументах и `insert` с возвратом id).
+- [x] **Шаг 1. Пилот — Compose на настройках и замере**
+  Шестерёнка в тулбаре списка клиентов → `SettingsScreen` → «Справочник мерок»
+  (`MetricsReferenceScreen`, только чтение, данные из `MetricViewModel`). Инфраструктура
+  обкатана: `ComposeView`, `SeamstressTheme` (Material3), меню через `MenuProvider`.
+  Экран «Новый замер» в карточке клиента сведён к форме имени и типа изделия: справочник
+  мерок к клиенту не относится. Сохранение — заглушка до этапа 1, п.7.
+  Удалены `fragment_add_measurement.xml`, `item_metrics_list.xml`, `MetricRecyclerAdapter`,
+  `MetricViewHolder`.
   *Готово, когда:* экран работает и навигация остаётся прежней, XML этого экрана удалён.
 
 - [ ] **Шаг 2. Список клиентов и карточка клиента**

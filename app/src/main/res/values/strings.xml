@@ -38,6 +38,8 @@
     <string name="measurement_name_hint">Название замера</string>
     <string name="measurement_type_hint">Тип изделия</string>
     <string name="metrics_empty">Справочник мерок пуст</string>
+    <string name="settings">Настройки</string>
+    <string name="metrics_reference">Справочник мерок</string>
     <string name="delete_btn">удалить</string>
     <string name="edit_customer_btn">edit customer</string>
 </resources>

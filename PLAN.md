@@ -94,3 +94,59 @@
    Тест на каскадное удаление с Room in-memory (`androidTest`), CI на `assembleDebug` +
    `lintDebug`, lint-конфиг с `abortOnError`; затем уборка `ui/fragments/notused/`,
    `domain/dress/*`, дубля `item_customer.xml` и jpeg в `drawable`.
+
+## Этап 3. Миграция UI на Jetpack Compose
+
+Цель — декларативный UI и единый `NavHost`, без XML-разметки, ViewBinding, адаптеров
+и Safe Args. Среды хватает: `compileSdk 37` + AGP 9.5.1 — это требования Compose 1.12+.
+Миграция по экрану, проект собирается и работает на каждом шаге.
+
+- [ ] **Шаг 0. Инфраструктура**
+  `androidx.compose:compose-bom` (1.12+), `material3`, `activity-compose`, `navigation-compose`,
+  `ui-tooling` (debug); плагин `org.jetbrains.kotlin.plugin.compose` версии Kotlin внутри AGP,
+  `buildFeatures { compose = true }`. XML-экраны продолжают работать.
+  *Готово, когда:* проект собирается, пустой `@Preview` рендерится в Android Studio.
+
+- [ ] **Шаг 1. Пилот — «Новый замер»**
+  Экран не реализован, переписывать нечего: делаем сразу на Compose в `ComposeView` внутри
+  существующего фрагмента. Там же обкатать тему Material3, текстовые поля, клавиатуру.
+  *Готово, когда:* экран работает и навигация остаётся прежней, XML этого экрана удалён.
+
+- [ ] **Шаг 2. Список клиентов и карточка клиента**
+  `LazyColumn` вместо `RecyclerView` + `CustomersRecyclerAdapter`/`CustomerRecyclerViewHolder`
+  и `MeasurementRecyclerAdapter`/`MeasurementViewHolder`; удалить 3 layout-файла.
+  *Готово, когда:* список и карточка полностью на Compose, адаптеры удалены.
+
+- [ ] **Шаг 3. Формы «Новый клиент» и «Редактирование»**
+  Текстовые поля с `error` и лимитами (11 цифр, баланс до 1 000 000 000), блокировка кнопки
+  на время записи; `parseBalance`/`parsePhone` переезжают в ViewModel/UiState.
+  *Готово, когда:* обе формы на Compose, XML удалён, валидация та же.
+
+- [ ] **Шаг 4. Карточка замера**
+  Список мерок через `LazyColumn`; попутно JOIN с `metrics` (этап 1, п.6).
+  *Готово, когда:* экран на Compose, `TakenMeasuredRecyclerAdapter` удалён.
+
+- [ ] **Шаг 5. Схлопывание оболочки**
+  `MainActivity` с `NavHost` Compose, типизированные маршруты вместо `navigation.xml`
+  и Safe Args; удалить фрагменты, `Navigation`-fragment-зависимости, `viewBinding`,
+  `fragment_*` layout'ы.
+  *Готово, когда:* в проекте нет ни одного XML-layout'а и ни одного фрагмента.
+
+- [ ] **Шаг 6. Свобода вёрстки**
+  Снять `android:screenOrientation="portrait"`, включить `enableEdgeToEdge()` и обработать
+  инсеты (этап 2, п.4). После Compose обрезка формы не возвращается.
+  *Готово, когда:* поворот и жесты работают, содержимое не уезжает под системные бары.
+
+**Что удаляется по итогу:** 20 файлов `res/layout`, 6 классов recycler'а, `navigation.xml`,
+Safe Args, ViewBinding, `Fragment`-обвязка (`_binding`, `onDestroyView`, `viewLifecycleOwner`).
+
+**Что в миграцию не входит:** схема и связи БД (этап 2, п.1), удаление с каскадом
+(этап 1, п.5), фича сохранения замера, приватность бэкапа. Это отдельные работы, UI-тулкитом
+не решаются.
+
+**Сроки (один разработчик, знает Compose):** шаг 0–1 — 1 день, шаги 2–4 — 2–3 дня,
+шаги 5–6 — 1 день. Итого 4–5 рабочих дней на паритет.
+
+**Риски:** типизированная навигация вместо Safe Args (граф пишется заново), `TextField`
+и клавиатура в формах, edge-to-edge. Смягчение — миграция по одному экрану и работающее
+приложение после каждого шага.

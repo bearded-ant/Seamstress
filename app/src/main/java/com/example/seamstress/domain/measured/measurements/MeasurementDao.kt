@@ -15,7 +15,7 @@ interface MeasurementDao {
     suspend fun updateMeasurements(measurement: Measurement)
 
     @Insert
-    suspend fun insertMeasurements(measurement: Measurement)
+    suspend fun insertMeasurements(measurement: Measurement): Long
 
     @Delete
     suspend fun deleteMeasurements(measurement: Measurement)

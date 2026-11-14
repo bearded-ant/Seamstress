@@ -89,6 +89,9 @@
         <action
             android:id="@+id/action_addMeasurement_to_cardMeasurement"
             app:destination="@id/cardMeasurementFragment" />
+        <argument
+            android:name="customerId"
+            app:argType="long" />
     </fragment>
     <fragment
         android:id="@+id/cardMeasurementFragment"

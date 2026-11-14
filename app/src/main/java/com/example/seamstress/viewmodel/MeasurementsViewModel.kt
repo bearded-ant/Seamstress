@@ -9,7 +9,13 @@ import com.example.seamstress.data.MeasurementsRepository
 import com.example.seamstress.domain.SeamstressDataBase
 import com.example.seamstress.domain.measured.measurements.Measurement
 import com.example.seamstress.domain.measured.measurements.MeasurementDao
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class MeasurementsViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -57,6 +63,22 @@ class MeasurementsViewModel(application: Application) : AndroidViewModel(applica
     fun insertMeasurement(measurement: Measurement) {
         viewModelScope.launch {
             measurementsRepository.insertMeasurement(measurement)
+        }
+    }
+
+    private val _measurementSaved = Channel<Long>(Channel.BUFFERED)
+    val measurementSaved: Flow<Long> = _measurementSaved.receiveAsFlow()
+
+    fun addMeasurement(customerId: Long, name: String, dressType: String) {
+        viewModelScope.launch {
+            val measurement = Measurement(
+                id = 0L,
+                name = name,
+                dateCreation = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(Date()),
+                dressType = dressType,
+                customerId = customerId
+            )
+            _measurementSaved.send(measurementsRepository.insertMeasurement(measurement))
         }
     }
 }

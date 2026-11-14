@@ -64,7 +64,9 @@ class CustomerCardFragment : Fragment(), MeasurementItemClickListener {
         }
 
         binding.itemCustomer.itemCustomerBtnAddMeasurement.setOnClickListener {
-            findNavController().navigate(CustomerCardFragmentDirections.actionCustomerCardToAddMeasurement())
+            findNavController().navigate(
+                CustomerCardFragmentDirections.actionCustomerCardToAddMeasurement(customerId)
+            )
         }
     }
 

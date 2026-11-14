@@ -15,9 +15,8 @@ class MeasurementsRepository(private val measurementDao: MeasurementDao) {
         measurementDao.updateMeasurements(measurement)
     }
 
-    suspend fun insertMeasurement(measurement: Measurement) {
+    suspend fun insertMeasurement(measurement: Measurement): Long =
         measurementDao.insertMeasurements(measurement)
-    }
 
     suspend fun deleteMeasurement(measurement: Measurement) {
         measurementDao.deleteMeasurements(measurement)

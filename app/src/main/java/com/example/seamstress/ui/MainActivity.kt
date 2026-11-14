@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.seamstress.R
+import com.google.android.material.appbar.MaterialToolbar
 
 
 class MainActivity : AppCompatActivity() {
@@ -13,6 +14,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
+
+        setSupportActionBar(findViewById<MaterialToolbar>(R.id.toolbar))
+
         val navController = findNavController(R.id.fragmentContainerView)
         setupActionBarWithNavController(navController)
     }

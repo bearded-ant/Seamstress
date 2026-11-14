@@ -23,6 +23,7 @@ import com.example.seamstress.R
 
 @Composable
 fun AddMeasurementScreen(
+    saving: Boolean,
     onSave: (name: String, dressType: String) -> Unit,
     onCancel: () -> Unit
 ) {
@@ -53,7 +54,7 @@ fun AddMeasurementScreen(
             ) {
                 Button(
                     onClick = { onSave(name.trim(), dressType.trim()) },
-                    enabled = name.isNotBlank(),
+                    enabled = name.isNotBlank() && !saving,
                     modifier = Modifier.padding(end = 8.dp)
                 ) {
                     Text(stringResource(R.string.save_btn))

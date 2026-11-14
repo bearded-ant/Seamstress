@@ -28,8 +28,8 @@ const FONT = {
   bold: { family: "Inter", style: "Bold" },
 };
 
-const ROOT_W = 1440;
-const ROOT_H = 1600;
+const ROOT_W = 1520;
+const ROOT_H = 2100;
 const CARD_W = 320;
 const GAP = 10;
 
@@ -202,11 +202,11 @@ const SCREENS = [
     tech: "xml",
     x: 560, y: 560, h: 270,
     lines: [
-      "SeamstressViewModel",
-      "+ MeasurementsViewModel",
-      "две LiveData",
-      "item_customer + RecyclerView(h)",
-      "FAB + кнопка «замер»",
+      "фото · имя · телефон · баланс",
+      "кнопка «снять мерки»",
+      "кнопка «новое изделие»",
+      "скролл снятых мерок",
+      "скролл изделий клиента",
     ],
   },
   {
@@ -241,11 +241,11 @@ const SCREENS = [
     tech: "compose",
     x: 1060, y: 520, h: 240,
     lines: [
-      "MeasurementsViewModel",
-      "saving: mutableStateOf",
-      "OutlinedTextField ×2",
-      "Cancel → navigateUp",
-      "save → popBackStack",
+      "дата создания",
+      "название изделия",
+      "класс изделия",
+      "метрики: из класса изделия",
+      "доп. метрики — из общего справочника",
     ],
   },
   {
@@ -268,9 +268,31 @@ const SCREENS = [
     tech: "compose",
     x: 1060, y: 1020, h: 190,
     lines: [
-      "MetricViewModel",
-      "getAllMetrics → observeAsState",
-      "LazyColumn Metric",
+      "список всех возможных метрик",
+      "кнопка создания новой метрики",
+    ],
+  },
+  {
+    key: "classes",
+    title: "ClassReferenceFragment",
+    desc: "справочник классов изделий",
+    tech: "xml",
+    x: 1060, y: 1250, h: 190,
+    lines: [
+      "перечень классов изделий",
+    ],
+  },
+  {
+    key: "createclass",
+    title: "CreateClassFragment",
+    desc: "создание класса изделия",
+    tech: "xml",
+    x: 1060, y: 1490, h: 210,
+    lines: [
+      "название",
+      "все метрики из справочника",
+      "выбор метрик и порядок",
+      "сохранить",
     ],
   },
 ];
@@ -312,7 +334,7 @@ const EDGES = [
   {
     name: "карточка → новый замер",
     pts: [[880, 680], [1060, 680]],
-    label: "«замер» · *customerId", lx: 895, ly: 668,
+    label: "«снять мерки» · *customerId", lx: 895, ly: 668,
   },
   {
     name: "карточка → карточка замера",
@@ -323,6 +345,34 @@ const EDGES = [
     name: "настройки → справочник",
     pts: [[880, 1095], [1060, 1095]],
     label: "Справочник мерок", lx: 895, ly: 1082,
+  },
+  {
+    name: "настройки → справочник классов",
+    pts: [[720, 1210], [720, 1290], [1060, 1290]],
+    label: "Справочник классов", lx: 740, ly: 1276,
+  },
+  {
+    name: "справочник классов → новый замер",
+    pts: [[1380, 1420], [1500, 1420], [1500, 700], [1380, 700]],
+    dash: true,
+    label: "метрики класса", lx: 1386, ly: 1408, lw: 130,
+  },
+  {
+    name: "справочник классов → создание класса",
+    pts: [[1200, 1440], [1200, 1490]],
+    label: "добавить класс", lx: 1215, ly: 1468, lw: 130,
+  },
+  {
+    name: "справочник метрик → создание класса",
+    pts: [[1060, 1150], [1020, 1150], [1020, 1520], [1060, 1520]],
+    dash: true,
+    label: "метрики из справочника", lx: 890, ly: 1500, lw: 130,
+  },
+  {
+    name: "справочник → новый замер",
+    pts: [[1380, 1150], [1460, 1150], [1460, 490], [1200, 490], [1200, 520]],
+    dash: true,
+    label: "доп. метрики", lx: 1240, ly: 476,
   },
 ];
 
@@ -441,7 +491,7 @@ function legendCard() {
 
   const notes = vstack("Пояснения", { w: CARD_W - 40, gap: 6, padT: 4 });
   notes.appendChild(tx("сплошная стрелка — действие навигации", { size: 12, color: C.muted, width: CARD_W - 40 }));
-  notes.appendChild(tx("пунктир — возврат или отмена", { size: 12, color: C.muted, width: CARD_W - 40 }));
+  notes.appendChild(tx("пунктир — возврат, отмена, источник данных", { size: 12, color: C.muted, width: CARD_W - 40 }));
   notes.appendChild(tx("*arg — аргумент Safe Args (Long)", { size: 12, color: C.muted, width: CARD_W - 40 }));
   f.appendChild(notes);
   return f;
@@ -524,7 +574,7 @@ async function main() {
   title.y = 30;
   root.appendChild(title);
 
-  const subtitle = tx("8 экранов · 9 переходов · аргументы только Long · по факту на 2026-11-15", {
+  const subtitle = tx(SCREENS.length + " экранов · " + EDGES.length + " связей · аргументы только Long · по факту на 2026-11-15", {
     size: 16,
     color: C.muted,
   });
@@ -564,7 +614,7 @@ async function main() {
     const color = e.dash ? C.back : C.edge;
     root.appendChild(polyline(shorten(e.pts, 9), { name: e.name, color: color, dash: e.dash }));
     root.appendChild(arrowhead(tip, dir, color));
-    const label = tx(e.label, { size: 12, color: C.muted, width: 260 });
+    const label = tx(e.label, { size: 12, color: C.muted, width: e.lw || 260 });
     label.x = e.lx;
     label.y = e.ly;
     root.appendChild(label);
@@ -573,11 +623,11 @@ async function main() {
   // заметки
   const notes = notesCard();
   notes.x = 560;
-  notes.y = 1230;
+  notes.y = 1740;
   root.appendChild(notes);
 
   figma.viewport.scrollAndZoomIntoView([root]);
-  figma.notify("Готово: доска архитектуры (8 экранов, 9 переходов)");
+  figma.notify("Готово: доска архитектуры (" + SCREENS.length + " экранов, " + EDGES.length + " связей)");
   figma.closePlugin();
 }
 

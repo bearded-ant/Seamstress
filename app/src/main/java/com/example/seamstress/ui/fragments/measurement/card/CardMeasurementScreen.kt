@@ -8,8 +8,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,69 +25,80 @@ import com.example.seamstress.domain.measured.taken.TakenMetricRow
 @Composable
 fun CardMeasurementScreen(
     measurement: MeasurementRow?,
-    taken: List<TakenMetricRow>
+    taken: List<TakenMetricRow>,
+    onEdit: () -> Unit
 ) {
-    if (measurement == null) {
-        Text(
-            text = stringResource(R.string.measurement_not_found),
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(16.dp)
-        )
-        return
-    }
-
-    Column(modifier = Modifier.fillMaxSize()) {
-        Card(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    text = measurement.dateCreation,
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text(
-                    text = measurement.name,
-                    style = MaterialTheme.typography.headlineSmall
-                )
-                Text(
-                    text = measurement.className,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
+    Scaffold(
+        floatingActionButton = {
+            if (measurement != null) {
+                ExtendedFloatingActionButton(onClick = onEdit) {
+                    Text(stringResource(R.string.edit_measurement))
+                }
             }
         }
-
-        if (taken.isEmpty()) {
+    ) { innerPadding ->
+        if (measurement == null) {
             Text(
-                text = stringResource(R.string.taken_measurements_empty),
+                text = stringResource(R.string.measurement_not_found),
                 style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(innerPadding).padding(16.dp)
             )
-            return@Column
+            return@Scaffold
         }
 
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(taken, key = { it.metricId }) { row ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = row.shortName,
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                        Text(
-                            text = row.metricName,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
+        Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+            Card(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+                Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = formatMeasure(row.value),
+                        text = measurement.dateCreation,
                         style = MaterialTheme.typography.titleMedium
                     )
+                    Text(
+                        text = measurement.name,
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                    Text(
+                        text = measurement.className,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
                 }
-                HorizontalDivider()
+            }
+
+            if (taken.isEmpty()) {
+                Text(
+                    text = stringResource(R.string.taken_measurements_empty),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(16.dp)
+                )
+                return@Column
+            }
+
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                items(taken, key = { it.metricId }) { row ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = row.shortName,
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Text(
+                                text = row.metricName,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                        Text(
+                            text = formatMeasure(row.value),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+                    HorizontalDivider()
+                }
             }
         }
     }

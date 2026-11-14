@@ -59,23 +59,12 @@ class MeasurementsViewModel(application: Application) : AndroidViewModel(applica
     fun measurementsByCustomer(customerId: Long): LiveData<List<MeasurementRow>> =
         measurementsRepository.getMeasurementsByCustomerId(customerId)
 
-    private val _measurementByIdLiveData = MutableLiveData<MeasurementRow?>()
-    val measurementByIdLiveData: LiveData<MeasurementRow?> = _measurementByIdLiveData
+    /** Карточка замера: замер и его мерки приходят из Room и обновляются после правки. */
+    fun measurementById(id: Long): LiveData<MeasurementRow?> =
+        measurementsRepository.getMeasurementById(id)
 
-    private val _takenLiveData = MutableLiveData<List<TakenMetricRow>>()
-    val takenLiveData: LiveData<List<TakenMetricRow>> = _takenLiveData
-
-    /** Карточка замера: сначала сам замер, затем его мерки в порядке метрик класса. */
-    fun loadMeasurementCard(id: Long) {
-        viewModelScope.launch {
-            val measurement = measurementsRepository.getMeasurementById(id)
-            _measurementByIdLiveData.postValue(measurement)
-            val taken = measurement?.let {
-                measurementsRepository.getTakenMeasurements(it.id, it.classId)
-            } ?: emptyList()
-            _takenLiveData.postValue(taken)
-        }
-    }
+    fun takenMeasurements(id: Long): LiveData<List<TakenMetricRow>> =
+        measurementsRepository.getTakenMeasurements(id)
 
     private val _measurementSaved = Channel<Long>(Channel.BUFFERED)
     val measurementSaved: Flow<Long> = _measurementSaved.receiveAsFlow()
@@ -111,6 +100,39 @@ class MeasurementsViewModel(application: Application) : AndroidViewModel(applica
             _measurementSaved.send(
                 measurementsRepository.insertMeasurementWithTaken(measurement, taken)
             )
+        }
+    }
+
+    private val _measurementUpdated = Channel<Long>(Channel.BUFFERED)
+    val measurementUpdated: Flow<Long> = _measurementUpdated.receiveAsFlow()
+
+    fun updateMeasurement(
+        measurementId: Long,
+        customerId: Long,
+        name: String,
+        classId: Long,
+        dateCreation: String,
+        values: List<Pair<Long, Float>>
+    ) {
+        viewModelScope.launch {
+            val measurement = Measurement(
+                id = measurementId,
+                name = name,
+                dateCreation = dateCreation,
+                classId = classId,
+                customerId = customerId
+            )
+            val taken = values.map { (metricId, value) ->
+                TakenMeasurement(
+                    id = 0L,
+                    metricId = metricId,
+                    measuredId = measurementId,
+                    customerId = customerId,
+                    value = value
+                )
+            }
+            measurementsRepository.updateMeasurementWithTaken(measurement, taken)
+            _measurementUpdated.send(measurementId)
         }
     }
 }

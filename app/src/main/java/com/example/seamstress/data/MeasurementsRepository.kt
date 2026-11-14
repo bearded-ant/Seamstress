@@ -16,14 +16,19 @@ class MeasurementsRepository(
     fun getMeasurementsByCustomerId(customerId: Long): LiveData<List<MeasurementRow>> =
         measurementDao.getMeasurementsByCustomerId(customerId)
 
-    suspend fun getMeasurementById(id: Long): MeasurementRow? =
+    fun getMeasurementById(id: Long): LiveData<MeasurementRow?> =
         measurementDao.getMeasurementById(id)
 
-    suspend fun getTakenMeasurements(measurementId: Long, classId: Long): List<TakenMetricRow> =
-        takenMeasurementDao.getTakenMeasurement(measuredId = measurementId, classId = classId)
+    fun getTakenMeasurements(measurementId: Long): LiveData<List<TakenMetricRow>> =
+        takenMeasurementDao.getTakenMeasurement(measurementId)
 
     suspend fun insertMeasurementWithTaken(
         measurement: Measurement,
         taken: List<TakenMeasurement>
     ): Long = measurementDao.insertMeasurementWithTaken(measurement, taken)
+
+    suspend fun updateMeasurementWithTaken(
+        measurement: Measurement,
+        taken: List<TakenMeasurement>
+    ) = measurementDao.updateMeasurementWithTaken(measurement, taken)
 }

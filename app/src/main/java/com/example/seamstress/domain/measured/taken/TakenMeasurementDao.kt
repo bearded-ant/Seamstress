@@ -1,5 +1,6 @@
 package com.example.seamstress.domain.measured.taken
 
+import androidx.lifecycle.LiveData
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Insert
@@ -14,12 +15,13 @@ interface TakenMeasurementDao {
                coalesce(cm.position, 1000) as position
         from taken_measurements t
         join metrics m on m.id = t.metric_id
-        left join dress_class_metrics cm on cm.metric_id = t.metric_id and cm.class_id = :classId
+        join measurements ms on ms.id = t.measured_id
+        left join dress_class_metrics cm on cm.metric_id = t.metric_id and cm.class_id = ms.class_id
         where t.measured_id = :measuredId
         order by position, t.id
         """
     )
-    suspend fun getTakenMeasurement(measuredId: Long, classId: Long): List<TakenMetricRow>
+    fun getTakenMeasurement(measuredId: Long): LiveData<List<TakenMetricRow>>
 
     @Insert
     suspend fun insertTakenMeasurements(taken: List<TakenMeasurement>): List<Long>

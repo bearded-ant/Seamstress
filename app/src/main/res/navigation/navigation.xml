@@ -121,8 +121,23 @@
             android:id="@+id/action_cardMeasurement_to_cardCustomer"
             app:destination="@id/customerFragment"
             app:popUpTo="@id/customerFragment" />
+        <action
+            android:id="@+id/action_cardMeasurement_to_updateMeasurement"
+            app:destination="@id/updateMeasurementFragment" />
         <argument
             android:name="measurementId"
             app:argType="long" />
+    </fragment>
+    <fragment
+        android:id="@+id/updateMeasurementFragment"
+        android:name="com.example.seamstress.ui.fragments.measurement.update.UpdateMeasurementFragment"
+        android:label="Редактирование замера" >
+        <argument
+            android:name="measurementId"
+            app:argType="long" />
+        <action
+            android:id="@+id/action_updateMeasurement_to_cardMeasurement"
+            app:destination="@id/cardMeasurementFragment"
+            app:popUpTo="@id/cardMeasurementFragment" />
     </fragment>
 </navigation>

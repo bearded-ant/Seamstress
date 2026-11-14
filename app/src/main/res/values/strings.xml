@@ -59,4 +59,5 @@
     <string name="add_extra_metric">Добавить метрику из справочника</string>
     <string name="measurement_not_found">Замер не найден</string>
     <string name="taken_measurements_empty">Мерки не сняты</string>
+    <string name="edit_measurement">Редактировать</string>
 </resources>

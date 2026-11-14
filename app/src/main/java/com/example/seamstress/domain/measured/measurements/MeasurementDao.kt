@@ -31,13 +31,16 @@ abstract class MeasurementDao {
         where m.id = :id
         """
     )
-    abstract suspend fun getMeasurementById(id: Long): MeasurementRow?
+    abstract fun getMeasurementById(id: Long): LiveData<MeasurementRow?>
 
     @Insert
     abstract suspend fun insertMeasurements(measurement: Measurement): Long
 
     @Insert
     abstract suspend fun insertTakenMeasurements(taken: List<TakenMeasurement>): List<Long>
+
+    @Query("delete from taken_measurements where measured_id = :measuredId")
+    abstract suspend fun deleteTakenForMeasurement(measuredId: Long)
 
     @Update
     abstract suspend fun updateMeasurements(measurement: Measurement)
@@ -56,5 +59,18 @@ abstract class MeasurementDao {
             insertTakenMeasurements(taken.map { it.copy(measuredId = measurementId) })
         }
         return measurementId
+    }
+
+    /** Правка замера: шапка обновляется, мерки заменяются целиком. */
+    @Transaction
+    open suspend fun updateMeasurementWithTaken(
+        measurement: Measurement,
+        taken: List<TakenMeasurement>
+    ) {
+        updateMeasurements(measurement)
+        deleteTakenForMeasurement(measurement.id)
+        if (taken.isNotEmpty()) {
+            insertTakenMeasurements(taken.map { it.copy(measuredId = measurement.id) })
+        }
     }
 }

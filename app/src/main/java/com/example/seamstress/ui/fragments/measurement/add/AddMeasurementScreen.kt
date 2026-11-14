@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -54,16 +55,30 @@ fun AddMeasurementScreen(
     saving: Boolean,
     onClassSelected: (Long) -> Unit,
     onSave: (date: String, name: String, classId: Long, values: List<Pair<Long, Float>>) -> Unit,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    initialDate: String? = null,
+    initialName: String = "",
+    initialClassId: Long? = null,
+    initialValues: Map<Long, String> = emptyMap()
 ) {
     val formatter = remember { SimpleDateFormat(DATE_PATTERN, Locale.getDefault()) }
-    var date by remember { mutableStateOf(formatter.format(Date())) }
-    var name by remember { mutableStateOf("") }
-    var selectedClassId by remember { mutableStateOf<Long?>(null) }
+    var date by remember { mutableStateOf(initialDate ?: formatter.format(Date())) }
+    var name by remember { mutableStateOf(initialName) }
+    var selectedClassId by remember { mutableStateOf(initialClassId) }
     val selectedClassName = classes.firstOrNull { it.id == selectedClassId }?.name.orEmpty()
 
-    val values = remember { mutableStateMapOf<Long, String>() }
+    val values = remember { mutableStateMapOf<Long, String>().apply { putAll(initialValues) } }
     val extraMetricIds = remember { mutableStateListOf<Long>() }
+
+    // При правке доп. метрики — те, что сняты, но не входят в класс изделия.
+    LaunchedEffect(classMetrics) {
+        if (classMetrics.isNotEmpty()) {
+            val classMetricIds = classMetrics.map { it.id }.toSet()
+            initialValues.keys
+                .filter { it !in classMetricIds && it !in extraMetricIds }
+                .forEach { extraMetricIds.add(it) }
+        }
+    }
 
     var showDatePicker by remember { mutableStateOf(false) }
     var showClassDialog by remember { mutableStateOf(false) }
@@ -72,10 +87,6 @@ fun AddMeasurementScreen(
     val extraMetrics = extraMetricIds.mapNotNull { id -> allMetrics.firstOrNull { it.id == id } }
 
     val requiredIds = classMetrics.map { it.id } + extraMetricIds
-    val valuesValid = requiredIds.all { id ->
-        val parsed = values[id].toMeasure()
-        parsed != null && parsed > 0f
-    }
 
     Column(
         modifier = Modifier
@@ -178,12 +189,10 @@ fun AddMeasurementScreen(
                         date,
                         name.trim(),
                         classId,
-                        requiredIds.mapNotNull { id ->
-                            values[id].toMeasure()?.let { id to it }
-                        }
+                        requiredIds.map { id -> id to (values[id].toMeasure() ?: 0f) }
                     )
                 },
-                enabled = name.isNotBlank() && selectedClassId != null && valuesValid && !saving
+                enabled = name.isNotBlank() && selectedClassId != null && !saving
             ) {
                 Text(stringResource(R.string.save_btn))
             }
@@ -309,6 +318,7 @@ private fun MetricValueField(
             value = value,
             onValueChange = { onValueChange(it.filter { ch -> ch.isDigit() || ch == '.' || ch == ',' }) },
             singleLine = true,
+            placeholder = { Text("0") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
             modifier = Modifier.width(110.dp)
         )

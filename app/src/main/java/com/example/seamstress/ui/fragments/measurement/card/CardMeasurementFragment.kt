@@ -10,6 +10,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.example.seamstress.ui.theme.SeamstressTheme
 import com.example.seamstress.viewmodel.MeasurementsViewModel
 
@@ -21,6 +22,8 @@ class CardMeasurementFragment : Fragment() {
 
     private val viewModel by lazy { ViewModelProvider(this)[MeasurementsViewModel::class.java] }
     private val args by lazy { CardMeasurementFragmentArgs.fromBundle(requireArguments()) }
+    private val measurementLive by lazy { viewModel.measurementById(args.measurementId) }
+    private val takenLive by lazy { viewModel.takenMeasurements(args.measurementId) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,17 +32,20 @@ class CardMeasurementFragment : Fragment() {
     ): View = ComposeView(requireContext()).apply {
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         setContent {
-            val measurement by viewModel.measurementByIdLiveData.observeAsState()
-            val taken by viewModel.takenLiveData.observeAsState(emptyList())
+            val measurement by measurementLive.observeAsState()
+            val taken by takenLive.observeAsState(emptyList())
             SeamstressTheme {
-                CardMeasurementScreen(measurement = measurement, taken = taken)
+                CardMeasurementScreen(
+                    measurement = measurement,
+                    taken = taken,
+                    onEdit = {
+                        findNavController().navigate(
+                            CardMeasurementFragmentDirections
+                                .actionCardMeasurementToUpdateMeasurement(args.measurementId)
+                        )
+                    }
+                )
             }
         }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        viewModel.loadMeasurementCard(args.measurementId)
     }
 }

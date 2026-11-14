@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.seamstress.R
 import com.example.seamstress.databinding.FragmentCardCustomerBinding
 import com.example.seamstress.domain.customers.Customers
-import com.example.seamstress.domain.measured.measurements.Measurement
+import com.example.seamstress.domain.measured.measurements.MeasurementRow
 import com.example.seamstress.ui.fragments.customer.card.recycler.MeasurementItemClickListener
 import com.example.seamstress.ui.fragments.customer.card.recycler.MeasurementRecyclerAdapter
 import com.example.seamstress.viewmodel.MeasurementsViewModel
@@ -50,7 +50,7 @@ class CustomerCardFragment : Fragment(), MeasurementItemClickListener {
 
         val measurementsViewModel = ViewModelProvider(this)[MeasurementsViewModel::class.java]
         measurementsViewModel.getMeasurementByCustomerId(customerId)
-        measurementsViewModel.measurementLiveData.observe(viewLifecycleOwner) {
+        measurementsViewModel.measurementsByCustomerLiveData.observe(viewLifecycleOwner) {
             initMeasurementsRecycler(it)
         }
 
@@ -63,6 +63,8 @@ class CustomerCardFragment : Fragment(), MeasurementItemClickListener {
             findNavController().navigate(action)
         }
 
+        binding.itemCustomer.itemCustomerBtnAddDress.visibility = View.GONE
+
         binding.itemCustomer.itemCustomerBtnAddMeasurement.setOnClickListener {
             findNavController().navigate(
                 CustomerCardFragmentDirections.actionCustomerCardToAddMeasurement(customerId)
@@ -70,7 +72,7 @@ class CustomerCardFragment : Fragment(), MeasurementItemClickListener {
         }
     }
 
-    private fun initMeasurementsRecycler(measurements: List<Measurement>) {
+    private fun initMeasurementsRecycler(measurements: List<MeasurementRow>) {
         binding.frCardCustomerRecyclerMeasurements.adapter =
             MeasurementRecyclerAdapter(this, measurements)
     }
@@ -87,7 +89,7 @@ class CustomerCardFragment : Fragment(), MeasurementItemClickListener {
         binding.itemCustomer.itemCustomerBalance.text = customer.balance.toString()
     }
 
-    override fun onMeasureItemClick(measurement: Measurement) {
+    override fun onMeasureItemClick(measurement: MeasurementRow) {
         val action =
             CustomerCardFragmentDirections.actionCustomerCardToMeasurementCard(measurement.id)
         findNavController().navigate(action)

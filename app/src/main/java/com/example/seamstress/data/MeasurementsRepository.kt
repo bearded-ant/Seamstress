@@ -1,24 +1,29 @@
 package com.example.seamstress.data
 
+import androidx.lifecycle.LiveData
 import com.example.seamstress.domain.measured.measurements.Measurement
 import com.example.seamstress.domain.measured.measurements.MeasurementDao
+import com.example.seamstress.domain.measured.measurements.MeasurementRow
+import com.example.seamstress.domain.measured.taken.TakenMeasurement
+import com.example.seamstress.domain.measured.taken.TakenMeasurementDao
+import com.example.seamstress.domain.measured.taken.TakenMetricRow
 
-class MeasurementsRepository(private val measurementDao: MeasurementDao) {
+class MeasurementsRepository(
+    private val measurementDao: MeasurementDao,
+    private val takenMeasurementDao: TakenMeasurementDao
+) {
 
-    suspend fun getMeasurementsByCustomerId(customerId: Long): List<Measurement> =
+    suspend fun getMeasurementsByCustomerId(customerId: Long): List<MeasurementRow> =
         measurementDao.getMeasurementsByCustomerId(customerId)
 
-    suspend fun getMeasurementsById(id: Long): Measurement =
-        measurementDao.getMeasurementsById(id)
+    suspend fun getMeasurementById(id: Long): MeasurementRow? =
+        measurementDao.getMeasurementById(id)
 
-    suspend fun updateMeasurement(measurement: Measurement) {
-        measurementDao.updateMeasurements(measurement)
-    }
+    suspend fun getTakenMeasurements(measurementId: Long, classId: Long): List<TakenMetricRow> =
+        takenMeasurementDao.getTakenMeasurement(measuredId = measurementId, classId = classId)
 
-    suspend fun insertMeasurement(measurement: Measurement): Long =
-        measurementDao.insertMeasurements(measurement)
-
-    suspend fun deleteMeasurement(measurement: Measurement) {
-        measurementDao.deleteMeasurements(measurement)
-    }
+    suspend fun insertMeasurementWithTaken(
+        measurement: Measurement,
+        taken: List<TakenMeasurement>
+    ): Long = measurementDao.insertMeasurementWithTaken(measurement, taken)
 }

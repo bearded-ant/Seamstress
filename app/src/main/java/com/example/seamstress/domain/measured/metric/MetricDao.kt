@@ -2,6 +2,7 @@ package com.example.seamstress.domain.measured.metric
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
+import androidx.room.Insert
 import androidx.room.Query
 
 @Dao
@@ -10,5 +11,11 @@ interface MetricDao {
     fun getAllMetrics(): LiveData<List<Metric>>
 
     @Query("select * from metrics where id = :id")
-    suspend fun getMetricById(id: Long): Metric
+    suspend fun getMetricById(id: Long): Metric?
+
+    @Query("select * from metrics where id in (:ids)")
+    suspend fun getMetricsByIds(ids: List<Long>): List<Metric>
+
+    @Insert
+    suspend fun insertMetric(metric: Metric): Long
 }

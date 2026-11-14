@@ -6,5 +6,7 @@ import com.example.seamstress.domain.measured.metric.MetricDao
 
 class MetricsRepository(private val metricDao: MetricDao) {
     val getAllMetrics: LiveData<List<Metric>> = metricDao.getAllMetrics()
-    suspend fun getMetricById(metricId: Long): Metric = metricDao.getMetricById(metricId)
+    suspend fun getMetricById(metricId: Long): Metric? = metricDao.getMetricById(metricId)
+    suspend fun getMetricsByIds(ids: List<Long>): List<Metric> = metricDao.getMetricsByIds(ids)
+    suspend fun insertMetric(metric: Metric): Long = metricDao.insertMetric(metric)
 }

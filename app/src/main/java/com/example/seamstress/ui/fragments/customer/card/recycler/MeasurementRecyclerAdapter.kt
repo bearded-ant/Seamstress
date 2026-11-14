@@ -4,11 +4,11 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.seamstress.R
-import com.example.seamstress.domain.measured.measurements.Measurement
+import com.example.seamstress.domain.measured.measurements.MeasurementRow
 
 class MeasurementRecyclerAdapter(
     private val click: MeasurementItemClickListener,
-    private val measurement: List<Measurement>
+    private val measurement: List<MeasurementRow>
 ) :
     RecyclerView.Adapter<MeasurementViewHolder>() {
 

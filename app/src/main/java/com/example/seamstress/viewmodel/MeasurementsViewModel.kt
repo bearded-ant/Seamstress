@@ -7,78 +7,117 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.seamstress.data.MeasurementsRepository
 import com.example.seamstress.domain.SeamstressDataBase
+import com.example.seamstress.domain.dress.DressClassDao
+import com.example.seamstress.domain.dress.DressClassItem
 import com.example.seamstress.domain.measured.measurements.Measurement
 import com.example.seamstress.domain.measured.measurements.MeasurementDao
+import com.example.seamstress.domain.measured.measurements.MeasurementRow
+import com.example.seamstress.domain.measured.metric.Metric
+import com.example.seamstress.domain.measured.metric.MetricDao
+import com.example.seamstress.domain.measured.taken.TakenMeasurement
+import com.example.seamstress.domain.measured.taken.TakenMeasurementDao
+import com.example.seamstress.domain.measured.taken.TakenMetricRow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class MeasurementsViewModel(application: Application) : AndroidViewModel(application) {
 
     private val measurementsRepository: MeasurementsRepository
+    private val dressClassDao: DressClassDao
+    private val metricDao: MetricDao
+
+    val allClasses: LiveData<List<DressClassItem>>
+    val allMetrics: LiveData<List<Metric>>
 
     init {
         val db = SeamstressDataBase.getDatabase(application)
 
         val measurementDao: MeasurementDao = db.measurementsDao()
-        measurementsRepository = MeasurementsRepository(measurementDao)
+        val takenMeasurementDao: TakenMeasurementDao = db.takenMeasurementsDao()
+        measurementsRepository = MeasurementsRepository(measurementDao, takenMeasurementDao)
+        dressClassDao = db.dressClassDao()
+        metricDao = db.metricDao()
+        allClasses = dressClassDao.getAllClasses()
+        allMetrics = metricDao.getAllMetrics()
     }
 
-    private var _getMeasurementLiveDataByCustomerId = MutableLiveData<List<Measurement>>()
-    val measurementLiveData: LiveData<List<Measurement>> = _getMeasurementLiveDataByCustomerId
+    private val _classMetricsLiveData = MutableLiveData<List<Metric>>()
+    val classMetricsLiveData: LiveData<List<Metric>> = _classMetricsLiveData
+
+    /** Метрики класса в порядке снятия — из них строятся поля формы замера. */
+    fun loadClassMetrics(classId: Long) {
+        viewModelScope.launch {
+            val ids = dressClassDao.getMetricIds(classId)
+            val byId = metricDao.getMetricsByIds(ids).associateBy { it.id }
+            _classMetricsLiveData.postValue(ids.mapNotNull { byId[it] })
+        }
+    }
+
+    private val _measurementsByCustomerLiveData = MutableLiveData<List<MeasurementRow>>()
+    val measurementsByCustomerLiveData: LiveData<List<MeasurementRow>> =
+        _measurementsByCustomerLiveData
 
     fun getMeasurementByCustomerId(id: Long) {
         viewModelScope.launch {
             val response = measurementsRepository.getMeasurementsByCustomerId(id)
-            _getMeasurementLiveDataByCustomerId.postValue(response)
+            _measurementsByCustomerLiveData.postValue(response)
         }
     }
 
-    private var _getMeasurementLiveDataById = MutableLiveData<Measurement>()
-    val measurementByIdLiveData: LiveData<Measurement> = _getMeasurementLiveDataById
+    private val _measurementByIdLiveData = MutableLiveData<MeasurementRow?>()
+    val measurementByIdLiveData: LiveData<MeasurementRow?> = _measurementByIdLiveData
 
-    fun getMeasurementById(id: Long) {
-        viewModelScope.launch {
-            val response = measurementsRepository.getMeasurementsById(id)
-            _getMeasurementLiveDataById.postValue(response)
-        }
-    }
+    private val _takenLiveData = MutableLiveData<List<TakenMetricRow>>()
+    val takenLiveData: LiveData<List<TakenMetricRow>> = _takenLiveData
 
-    fun deleteMeasurement(measurement: Measurement) {
+    /** Карточка замера: сначала сам замер, затем его мерки в порядке метрик класса. */
+    fun loadMeasurementCard(id: Long) {
         viewModelScope.launch {
-            measurementsRepository.deleteMeasurement(measurement)
-        }
-    }
-
-    fun updateMeasurement(measurement: Measurement) {
-        viewModelScope.launch {
-            measurementsRepository.updateMeasurement(measurement)
-        }
-    }
-
-    fun insertMeasurement(measurement: Measurement) {
-        viewModelScope.launch {
-            measurementsRepository.insertMeasurement(measurement)
+            val measurement = measurementsRepository.getMeasurementById(id)
+            _measurementByIdLiveData.postValue(measurement)
+            val taken = measurement?.let {
+                measurementsRepository.getTakenMeasurements(it.id, it.classId)
+            } ?: emptyList()
+            _takenLiveData.postValue(taken)
         }
     }
 
     private val _measurementSaved = Channel<Long>(Channel.BUFFERED)
     val measurementSaved: Flow<Long> = _measurementSaved.receiveAsFlow()
 
-    fun addMeasurement(customerId: Long, name: String, dressType: String) {
+    /**
+     * Сохраняет замер и снятые мерки одной транзакцией.
+     * [values] — пары «id метрики → значение» для заполненных полей.
+     */
+    fun addMeasurement(
+        customerId: Long,
+        name: String,
+        classId: Long,
+        dateCreation: String,
+        values: List<Pair<Long, Float>>
+    ) {
         viewModelScope.launch {
             val measurement = Measurement(
                 id = 0L,
                 name = name,
-                dateCreation = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(Date()),
-                dressType = dressType,
+                dateCreation = dateCreation,
+                classId = classId,
                 customerId = customerId
             )
-            _measurementSaved.send(measurementsRepository.insertMeasurement(measurement))
+            val taken = values.map { (metricId, value) ->
+                TakenMeasurement(
+                    id = 0L,
+                    metricId = metricId,
+                    measuredId = 0L,
+                    customerId = customerId,
+                    value = value
+                )
+            }
+            _measurementSaved.send(
+                measurementsRepository.insertMeasurementWithTaken(measurement, taken)
+            )
         }
     }
 }

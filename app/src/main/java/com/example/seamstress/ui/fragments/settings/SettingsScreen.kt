@@ -16,11 +16,19 @@ import androidx.compose.ui.unit.dp
 import com.example.seamstress.R
 
 @Composable
-fun SettingsScreen(onMetricsClick: () -> Unit) {
+fun SettingsScreen(
+    onMetricsClick: () -> Unit,
+    onClassesClick: () -> Unit
+) {
     Column(modifier = Modifier.fillMaxSize()) {
         SettingsItem(
             title = stringResource(R.string.metrics_reference),
             onClick = onMetricsClick
+        )
+        HorizontalDivider()
+        SettingsItem(
+            title = stringResource(R.string.classes_reference),
+            onClick = onClassesClick
         )
         HorizontalDivider()
     }

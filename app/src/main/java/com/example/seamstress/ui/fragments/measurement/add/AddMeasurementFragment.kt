@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -32,13 +34,26 @@ class AddMeasurementFragment : Fragment() {
     ): View = ComposeView(requireContext()).apply {
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         setContent {
+            val classes by viewModel.allClasses.observeAsState(emptyList())
+            val allMetrics by viewModel.allMetrics.observeAsState(emptyList())
+            val classMetrics by viewModel.classMetricsLiveData.observeAsState(emptyList())
             SeamstressTheme {
                 AddMeasurementScreen(
+                    classes = classes,
+                    allMetrics = allMetrics,
+                    classMetrics = classMetrics,
                     saving = saving.value,
-                    onSave = { name, dressType ->
+                    onClassSelected = { classId -> viewModel.loadClassMetrics(classId) },
+                    onSave = { date, name, classId, values ->
                         if (!saving.value) {
                             saving.value = true
-                            viewModel.addMeasurement(args.customerId, name, dressType)
+                            viewModel.addMeasurement(
+                                customerId = args.customerId,
+                                name = name,
+                                classId = classId,
+                                dateCreation = date,
+                                values = values
+                            )
                         }
                     },
                     onCancel = { findNavController().navigateUp() }

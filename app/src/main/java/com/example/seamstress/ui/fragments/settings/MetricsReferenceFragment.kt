@@ -26,7 +26,12 @@ class MetricsReferenceFragment : Fragment() {
             setContent {
                 val metrics by metricViewModel.getAllMetrics.observeAsState(emptyList())
                 SeamstressTheme {
-                    MetricsReferenceScreen(metrics)
+                    MetricsReferenceScreen(
+                        metrics = metrics,
+                        onCreateMetric = { shortName, name, description ->
+                            metricViewModel.insertMetric(shortName, name, description)
+                        }
+                    )
                 }
             }
         }

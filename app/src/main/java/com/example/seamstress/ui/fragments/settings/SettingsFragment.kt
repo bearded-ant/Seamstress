@@ -25,6 +25,11 @@ class SettingsFragment : Fragment() {
                         findNavController().navigate(
                             SettingsFragmentDirections.actionSettingsToMetricsReference()
                         )
+                    },
+                    onClassesClick = {
+                        findNavController().navigate(
+                            SettingsFragmentDirections.actionSettingsToClassReference()
+                        )
                     }
                 )
             }

@@ -42,4 +42,21 @@
     <string name="metrics_reference">Справочник мерок</string>
     <string name="delete_btn">удалить</string>
     <string name="edit_customer_btn">edit customer</string>
+    <string name="classes_reference">Справочник классов изделий</string>
+    <string name="classes_empty">Справочник классов пуст</string>
+    <string name="class_metrics_count">%1$d метрик</string>
+    <string name="class_metrics">Метрики класса</string>
+    <string name="all_metrics">Все метрики справочника</string>
+    <string name="class_name">Название класса</string>
+    <string name="create_metric">Новая метрика</string>
+    <string name="metric_short_name">Краткое имя</string>
+    <string name="metric_name">Название</string>
+    <string name="metric_description">Описание</string>
+    <string name="measurement_date">Дата</string>
+    <string name="measurement_class">Класс изделия</string>
+    <string name="not_selected">не выбран</string>
+    <string name="extra_metrics">Дополнительные мерки</string>
+    <string name="add_extra_metric">Добавить метрику из справочника</string>
+    <string name="measurement_not_found">Замер не найден</string>
+    <string name="taken_measurements_empty">Мерки не сняты</string>
 </resources>

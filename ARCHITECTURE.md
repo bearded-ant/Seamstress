@@ -9,20 +9,25 @@
 
 ```
 MainActivity : AppCompatActivity
- └ NavHostFragment (R.id.fragmentContainerView) ← navigation.xml, старт customersListFragment
+ └ setContent { SeamstressTheme { SeamstressNavHost() } } — navigation-compose, старт CustomersList
 
 App : Application — пустой (db/repository закомментированы);
                     val Context.app существует, но не используется
 ui/theme/SeamstressTheme — Compose Material3, lightColorScheme
+ui/components — ScreenScaffold (тулбар), observeLoaded, rememberToast, formatMeasure
+ui/navigation — @Serializable-маршруты и NavGraphBuilder-расширения (три графа + NavHost)
+ui/screens/* — stateless-Compose экраны, ничего не знают о навигации
+ui/fragments/notused — мёртвые XML-фрагменты, в графе не участвуют
 
-ui/fragments/* ──создаёт через ViewModelProvider(this)──> viewmodel/* : AndroidViewModel (4)
+ui/navigation/* ──viewModel()──> viewmodel/* : AndroidViewModel (4)
                       └─init: SeamstressDataBase.getDatabase(app) → DAO (5) → Repository (4)
               └──рисует Room-сущности и projection-строки напрямую (DTO/маппинга нет)
 ```
 
-Ключевое свойство: каждый экран получает **свой** экземпляр ViewModel, а ViewModel сам
-открывает БД. Общих состояний и кэшей между экранами нет; данные перезапрашиваются
-при каждом создании View. Исключение — синглтон `SeamstressDataBase.INSTANCE`.
+Ключевое свойство: `viewModel()` внутри `composable` создаёт **свой** экземпляр ViewModel
+на точку возврата (NavBackStackEntry), а ViewModel сам открывает БД. Общих состояний
+и кэшей между экранами нет; данные перезапрашиваются при каждом новом экземпляре.
+Исключение — синглтон `SeamstressDataBase.INSTANCE`.
 
 ## 2. Модель данных (Room, БД `seamstress_db`, version 3, exportSchema = false)
 
@@ -39,7 +44,8 @@ TakenMeasurement(id, metricId, measuredId, customerId, value: Float)         tak
 
 Дата замера — строка `dd.MM.yyyy` (форматируется на экране, не в БД). Баланс — целые рубли
 (`Long`). Связи объявлены только в SQL-запросах: `@ForeignKey` и `ON DELETE CASCADE` нет,
-индексов нет.
+индексов нет; удаление клиента чистит его строки вручную — `CustomersDao.deleteCustomerWithData`
+(`@Transaction`: `taken_measurements` → `measurements` → `customers`).
 
 Три projection-класса (не таблицы), отдаются прямо в UI:
 
@@ -63,7 +69,7 @@ TakenMetricRow(metricId, value, shortName, metricName, position)        JOIN met
 
 ```
 CustomersRepository          getAllCustomers: LiveData<List<Customers>>
-                             getById / insert(→Long) / delete / update : suspend
+                             getCustomerById(→Customers?) / insert(→Long) / delete / update : suspend
 MeasurementsRepository       getMeasurementsByCustomerId / getMeasurementById /
                              getTakenMeasurements : LiveData
                              insertMeasurementWithTaken / updateMeasurementWithTaken : suspend
@@ -77,7 +83,8 @@ DressClassesRepository       getAllClasses: LiveData<List<DressClassItem>>
 
 - `MeasurementDao.insertMeasurementWithTaken` — вставка замера, затем мерок с его id;
 - `MeasurementDao.updateMeasurementWithTaken` — update шапки, удаление мерок, повторная вставка;
-- `DressClassDao.insertClassWithMetrics` — класс, затем `DressClassMetric` с `position` по порядку.
+- `DressClassDao.insertClassWithMetrics` — класс, затем `DressClassMetric` с `position` по порядку;
+- `CustomersDao.deleteCustomerWithData` — мерки клиента, его замеры, затем сам клиент.
 
 Списки и одиночные строки отдаются `LiveData` (Room перезапрашивает сам), запись — `suspend`.
 
@@ -88,13 +95,19 @@ DressClassesRepository       getAllClasses: LiveData<List<DressClassItem>>
 ```
 SeamstressViewModel
   getAllCustomers: LiveData<List<Customers>>
-  _selectByIdCustomerLiveData: MutableLiveData<Customers> (через postValue)
-  Channel<Long> newCustomerId → Flow — разовый навигационный сигнал после insert
-  selectCustomerById / insertCustomer / deleteCustomer / updateCustomer
+  formState: LiveData<CustomerFormState> — поля, ошибки, saving (одна форма на add и update)
+  _selectByIdCustomerLiveData: MutableLiveData<Customers?> (через value, null — клиента нет)
+  Channel<Long> newCustomerId → Flow — новый клиент записан, id для перехода
+  Channel<Long> customerSaved → Flow — правка записана
+  Channel<Unit> saveFailed → Flow — запись сорвалась, кнопка снова активна
+  Channel<Unit> customerDeleted → Flow — удаление завершено
+  onNameChange / onPhoneChange / onBalanceChange / fillForm
+  saveCustomer(id = 0L) — валидация + insert или update, блокировка через saving
+  selectCustomerById / deleteCustomer
 
 MeasurementsViewModel            (самая нагруженная: замеры + классы + метрики)
   allClasses: LiveData<List<DressClassItem>>, allMetrics: LiveData<List<Metric>>
-  classMetricsLiveData: MutableLiveData<List<Metric>> (через postValue, из loadClassMetrics)
+  classMetricsLiveData: MutableLiveData<List<Metric>> (через value, из loadClassMetrics)
   measurementsByCustomer(id) / measurementById(id) / takenMeasurements(id): LiveData
   Channel<Long> measurementSaved / measurementUpdated → Flow
   addMeasurement(customerId, name, classId, dateCreation, values: List<Pair<Long, Float>>)
@@ -111,156 +124,158 @@ DressClassViewModel
   insertClass(name, metricIds)
 ```
 
-Асинхронность: `viewModelScope.launch`; чтение — `LiveData` (+ `postValue` в двух местах),
-одноразовые события навигации — `Channel(BUFFERED).receiveAsFlow()`.
+Асинхронность: `viewModelScope.launch`; чтение — `LiveData` (запись только через `value`,
+`postValue` в проекте нет), одноразовые события навигации — `Channel(BUFFERED).receiveAsFlow()`.
 Время (`dateCreation`) ставит экран, а не ViewModel.
 
-## 5. UI: классы и наследование
+Валидация формы клиента — в ViewModel: `CustomerFormState.kt` держит `CustomerFormState`
+и top-level `parseBalance` (0…1 000 000 000, пусто → 0), `parsePhone` (ровно 11 цифр, пусто → ""),
+`filterPhone`/`filterBalance` (только цифры, 11/10 символов) и константы `MAX_BALANCE`.
 
-Две параллельные ветки, 4 экрана на XML и 7 на Compose.
+## 5. UI: экраны и навигация
+
+Фрагментов в рабочем коде нет; XML-фрагменты остались только в мёртвом `notused/`.
 
 ```
-ViewBinding-ветка (XML)                              Compose-ветка (ComposeView)
-CustomersListFragment : Fragment,                    AddMeasurementFragment → AddMeasurementScreen
-    CustomerClickListener, MenuProvider              CardMeasurementFragment → CardMeasurementScreen
-CustomerCardFragment : Fragment,                     UpdateMeasurementFragment → AddMeasurementScreen
-    MeasurementItemClickListener                     SettingsFragment → SettingsScreen
-AddCustomerFragment : Fragment                       MetricsReferenceFragment → MetricsReferenceScreen
-UpdateCustomerFragment : Fragment                    ClassReferenceFragment → ClassReferenceScreen
-                                                     CreateClassFragment → CreateClassScreen
+маршрут (ui/navigation/Routes.kt)   экран (ui/screens/*)         ViewModel
+CustomersList                     → CustomersListScreen         SeamstressViewModel
+CustomerCard(customerId)          → CustomerCardScreen          SeamstressViewModel + MeasurementsViewModel
+AddCustomer                       → CustomerFormScreen          SeamstressViewModel
+UpdateCustomer(customerId)        → CustomerFormScreen          SeamstressViewModel
+AddMeasurement(customerId)        → AddMeasurementScreen        MeasurementsViewModel
+CardMeasurement(measurementId)    → CardMeasurementScreen       MeasurementsViewModel
+UpdateMeasurement(measurementId)  → AddMeasurementScreen        MeasurementsViewModel
+Settings                          → SettingsScreen              —
+MetricsReference                  → MetricsReferenceScreen      MetricViewModel
+ClassReference                    → ClassReferenceScreen        DressClassViewModel
+CreateClass                       → CreateClassScreen            DressClassViewModel + MetricViewModel
 ```
 
-Compose-экраны stateless: получают данные и колбэки, состояние — `remember`
-внутри экрана; флаг `saving` — `mutableStateOf` в поле фрагмента; подписки на `LiveData` —
-`observeAsState` в `setContent`.
+Маршруты — `@Serializable`-объекты и data-классы (только `Long`-аргументы), старт — `CustomersList`.
+`SeamstressNavHost` собирает три `NavGraphBuilder`-расширения (`CustomerGraph`, `MeasurementGraph`,
+`SettingsGraph`); `navigation.xml`, Safe Args и `menu_customers_list.xml` удалены, шестерёнка
+переехала в `TopAppBar` списка клиентов.
 
-RecyclerView — 2 комплекта «Adapter → ViewHolder → ClickListener»:
+Compose-экраны stateless: получают данные и колбэки, своё состояние — `remember`
+внутри экрана; подписки на `LiveData` — `observeAsState`, одноразовые события —
+`LaunchedEffect { viewModel.xxx.collect { … } }`. Каркас каждого экрана — `ScreenScaffold`
+(`TopAppBar` с заголовком из `strings.xml`, стрелкой «назад» при `onBack != null`
+и слотами действий). Тема — `SeamstressTheme` в `MainActivity`.
 
-| Adapter | ViewHolder | Click |
-|---|---|---|
-| `CustomersRecyclerAdapter` | `CustomerRecyclerViewHolder` | `CustomerClickListener` (интерфейс) |
-| `MeasurementRecyclerAdapter` | `MeasurementViewHolder` | `MeasurementItemClickListener` (интерфейс) |
+«Ещё не пришло» и «не найдено» различает `LiveData.observeLoaded()` (`ui/components`):
+первое значение источника, включая `null`, помечается как `loaded`. Формы клиента состояние
+не держат: поля, ошибки и `saving` приходят из `formState` в `SeamstressViewModel`.
 
-Валидация — не классы, а top-level функции в `ui/fragments/customer/CustomerInput.kt`:
-`parseBalance` (0…1 000 000 000, пусто → 0), `parsePhone` (ровно 11 цифр, пусто → ""),
-константы `MAX_BALANCE`, `PHONE_DIGITS`.
+RecyclerView в проекте не осталось: списки — `LazyColumn` (клиенты, мерки) и `LazyRow`
+(замеры в карточке, плитки 150×150 dp), ключи — id сущностей.
 
-Общие соглашения: ViewBinding в поле `_binding` + getter, обнуление в `onDestroyView`;
-подписки и обработчики — в `onViewCreated`, наблюдение только через `viewLifecycleOwner`;
-вся навигация — Safe Args.
+Общие соглашения: навигация — только через `navController.navigate(Маршрут)`; подписки
+и обработчики — внутри destination-композабла, чтобы отписка шла с композицией.
 
 ## 6. Поток вызова
 
 ```
-клик → Fragment / Composable → vm.method() → viewModelScope.launch → Repository → suspend DAO → Room
+клик → Composable → vm.method() → viewModelScope.launch → Repository → suspend DAO → Room
                               ↓
-              LiveData (postValue) / Channel → Flow (событие «сделано»)
+              LiveData (value) / Channel → Flow (событие «сделано»)
                               ↓
-     observe(viewLifecycleOwner) / observeAsState → пересобрать Adapter / navigate / Toast / popBackStack
+     observeAsState/observeLoaded / LaunchedEffect.collect → пересобрать список / navigate / Toast
 ```
 
 ## 7. Граф экранов и переходы
 
 ```
-                     [CustomersListFragment] ★ старт
-                       │ FAB                      │ меню «Настройки»
-        ┌──────────────┘                          └──> [SettingsFragment]
-        ▼                                                   ├──> [MetricsReferenceFragment]
-[AddCustomerFragment]                                       └──> [ClassReferenceFragment]
-        │ insert → popUpTo(customersList)                          │ FAB «+»
-        └──> [CustomerCardFragment *customerEntityId]              ▼
-                   │ FAB (карандаш) ──> [UpdateCustomerFragment *customerEntityId]
-                   │ «снять мерки» ───> [AddMeasurementFragment *customerId]
-                   └ клик по замеру ──> [CardMeasurementFragment *measurementId]
+                     [CustomersList] ★ старт
+                       │ FAB                      │ шестерёнка в тулбаре
+        ┌──────────────┘                          └──> [Settings]
+        ▼                                                   ├──> [MetricsReference]
+[AddCustomer]                                               └──> [ClassReference]
+        │ save → navigate(CustomerCard) { popUpTo<CustomersList> }   │ FAB «+»
+        └──> [CustomerCard(customerId)]                             ▼
+                   │ FAB (карандаш) ──> [UpdateCustomer(customerId)]     [CreateClass]
+                   │ «снять мерки» ───> [AddMeasurement(customerId)]      │ save → navigate(ClassReference)
+                   └ клик по замеру ──> [CardMeasurement(measurementId)]  │      { popUpTo<ClassReference>(inclusive) }
                                               │ FAB «Редактировать»
                                               ▼
-                                    [UpdateMeasurementFragment *measurementId]
+                                    [UpdateMeasurement(measurementId)]
 
-[ClassReferenceFragment] ──FAB «+»──> [CreateClassFragment]
-        ▲                                        │ save → popUpTo(classReference)
-        └────────────────────────────────────────┘
-
-[UpdateCustomerFragment]  Save / Cancel → [CustomerCard] (popUpTo customersList)
-                          Delete → [CustomersList]
-[AddMeasurementFragment]  Cancel → navigateUp;  Save → insert + popBackStack
-[CardMeasurementFragment] переходов нет, кроме FAB «Редактировать»
-[UpdateMeasurementFragment] Save → update + popBackStack;  Cancel → navigateUp
-[MetricsReferenceFragment] FAB «+» открывает диалог CreateMetricDialog (не экран, не в графе)
+[UpdateCustomer]  Save → navigate(CustomerCard) { popUpTo<CustomersList> }
+                  Cancel → popBackStack;  Delete → событие customerDeleted → navigate(CustomersList) { popUpTo(inclusive) }
+[AddMeasurement]  Save → measurementSaved → popBackStack;  Cancel → popBackStack
+[CardMeasurement] FAB «Редактировать» → [UpdateMeasurement]
+[UpdateMeasurement] Save → measurementUpdated → popBackStack;  Cancel → popBackStack
+[MetricsReference] FAB «+» открывает диалог CreateMetricDialog (не экран, не в графе)
 ```
 
-Аргументы передаются только `Long`: `customerEntityId`, `customerId`, `measurementId`;
-сущности между экранами не передаются — карточка достаёт данные из БД по id.
-id назначений в `navigation.xml` не совпадают с именами классов: `customerFragment` —
-это `CustomerCardFragment`, `metricsReferenceFragment` — `MetricsReferenceFragment`,
-`classReferenceFragment` — `ClassReferenceFragment`.
+Аргументы маршрутов — только `Long` (`customerId`, `measurementId`); сущности между экранами
+не передаются — экран достаёт данные из БД по id.
 
-Объявлены в `navigation.xml`, но нигде не вызываются:
-
-- `action_customerCard_to_customersList`
-- `action_addMeasurement_to_customerCard`
-- `action_addMeasurement_to_cardMeasurement`
-- `action_cardMeasurement_to_cardCustomer`
-- `action_updateMeasurement_to_cardMeasurement`
+Действий «объявлено, но не вызывается» больше нет: граф описан кодом, лишние маршруты
+просто не объявляются.
 
 ## 8. Состав экранов
 
-| Экран | Технология | ViewModel | Состояние | Из чего состоит |
+| Маршрут | Composable | ViewModel | Состояние | Из чего состоит |
 |---|---|---|---|---|
-| `CustomersListFragment` | XML + ViewBinding + MenuProvider | SeamstressViewModel | `getAllCustomers: LiveData` | RecyclerView (vertical) + FAB + `menu_customers_list` |
-| `CustomerCardFragment` | XML + ViewBinding | SeamstressViewModel + MeasurementsViewModel | две LiveData | `item_customer` (include) + RecyclerView (horizontal) + FAB; кнопка «новое изделие» скрыта (`GONE`) |
-| `AddCustomerFragment` | XML + ViewBinding | SeamstressViewModel | `Channel<Long> newCustomerId` | 3 поля ввода, Save/Cancel, ошибки в TextInputLayout, блокировка Save |
-| `UpdateCustomerFragment` | XML + ViewBinding | SeamstressViewModel | `customer: Customers?`, `customerId` | те же поля + Save/Cancel/Delete + AlertDialog |
-| `AddMeasurementFragment` | Compose в ComposeView | MeasurementsViewModel | `saving` в поле фрагмента, форма — `remember` | дата (DatePicker), название, класс (AlertDialog с RadioButton), значения по метрикам класса, доп. метрики из справочника |
-| `CardMeasurementFragment` | Compose в ComposeView | MeasurementsViewModel | две LiveData + `measurement: MeasurementRow?` | Card «дата · название · класс» + LazyColumn «мерка — значение» + FAB «Редактировать» |
-| `UpdateMeasurementFragment` | Compose в ComposeView | MeasurementsViewModel | две LiveData + `saving` | тот же `AddMeasurementScreen` с предзаполнением (`initialDate/Name/ClassId/Values`) |
-| `SettingsFragment` | Compose | — | — | Column из двух `SettingsItem`: мерки, классы |
-| `MetricsReferenceFragment` | Compose + `runtime-livedata` | MetricViewModel | `observeAsState` | LazyColumn `Metric`: shortName / name / description + FAB «+» → `CreateMetricDialog` |
-| `ClassReferenceFragment` | Compose + `runtime-livedata` | DressClassViewModel | `observeAsState` | LazyColumn: класс + «N метрик» + FAB «+» |
-| `CreateClassFragment` | Compose + `runtime-livedata` | DressClassViewModel + MetricViewModel | `saving` + `remember` | поле названия, чекбоксы всех метрик, выбранные с порядком ↑↓, Save/Cancel |
+| `CustomersList` | `CustomersListScreen` | SeamstressViewModel | `getAllCustomers` → `observeAsState` | `LazyColumn` карточек (фото · имя · телефон · баланс), FAB «+», шестерёнка в `TopAppBar` |
+| `CustomerCard` | `CustomerCardScreen` | SeamstressViewModel + MeasurementsViewModel | `selectByIdCustomerLiveData` → `observeLoaded`, `measurementsByCustomer` → `observeAsState` | Card «фото · имя · телефон · баланс» + «снять мерки», `LazyRow` плиток замеров, FAB «Редактировать»; кнопки «новое изделие» нет |
+| `AddCustomer` | `CustomerFormScreen` | SeamstressViewModel | `formState` → `observeAsState` | фото, поля имя/телефон/баланс с `error`, Save/Cancel, Save выключен при `saving`; переход — по `newCustomerId` |
+| `UpdateCustomer` | `CustomerFormScreen` | SeamstressViewModel | `formState` + `selectByIdCustomerLiveData` → `fillForm` | тот же экран + Delete с AlertDialog; Save → `customerSaved` → карточка (`popUpTo<CustomersList>`), Delete → `customerDeleted` → список |
+| `AddMeasurement` | `AddMeasurementScreen` | MeasurementsViewModel | `saving` в `remember`, форма — внутри экрана | дата (DatePicker), название, класс (AlertDialog с RadioButton), значения по метрикам класса, доп. метрики из справочника |
+| `CardMeasurement` | `CardMeasurementScreen` | MeasurementsViewModel | `measurementById` → `observeLoaded`, `takenMeasurements` → `observeAsState` | Card «дата · название · класс» + LazyColumn «мерка — значение» + FAB «Редактировать» |
+| `UpdateMeasurement` | `AddMeasurementScreen` | MeasurementsViewModel | две LiveData → `observeLoaded` + `saving` в `remember` | тот же экран с предзаполнением (`initialDate/Name/ClassId/Values`) |
+| `Settings` | `SettingsScreen` | — | — | Column из двух `SettingsItem`: мерки, классы |
+| `MetricsReference` | `MetricsReferenceScreen` | MetricViewModel | `observeAsState` | LazyColumn `Metric`: shortName / name / description + FAB «+» → `CreateMetricDialog` |
+| `ClassReference` | `ClassReferenceScreen` | DressClassViewModel | `observeAsState` | LazyColumn: класс + «N метрик» + FAB «+» |
+| `CreateClass` | `CreateClassScreen` | DressClassViewModel + MetricViewModel | `saving` + `remember` | поле названия, чекбоксы всех метрик, выбранные с порядком ↑↓, Save/Cancel |
 
 Не экран: `CreateMetricDialog` (`private @Composable` в `MetricsReferenceScreen.kt`) —
 AlertDialog с полями shortName / name / description; Save активен, когда короткое и полное
 имя не пустые; пишет через `MetricViewModel.insertMetric`, закрывается по `onDismiss`.
 
-Экран «Настройки» доступен только из меню списка клиентов. Справочники — листы
+Экран «Настройки» доступен только из тулбара списка клиентов. Справочники — листы
 (только назад системной кнопкой), кроме пары «классы → новый класс».
 
 ## 9. Отклонения и мёртвый код по факту
 
-- ViewModel на фрагмент (`ViewModelProvider(this)`): у каждого экрана свой экземпляр и свой
-  вызов `getDatabase`; при возврате назад ViewModel переживает пересоздание View, но данные
-  перезапрашиваются в `onViewCreated`.
+- ViewModel создаётся `viewModel()` в destination-композабле: экземпляр на точку возврата,
+  свой вызов `getDatabase`; при пересоздании экрана данные перезапрашиваются.
 - Слой данных — прямой прокси к DAO; сущности и projection-строки уходят в UI без маппинга.
   JOIN с `metrics` сделан в `TakenMeasurementDao` (карточка печатает shortName / name / value),
   но `Metric` и `TakenMeasurement` по-прежнему не связаны на уровне Room.
 - `Customers.img` игнорируется: во всех местах ставится `R.drawable.ic_baseline_add_a_photo_24`.
 - `pre_seamstress` + `fallbackToDestructiveMigration(true)`: при смене версии база на
   устройстве пересоздаётся пустой.
-- `CustomersDao.getCustomerById` возвращает non-null `Customers`: удалённый клиент даст
-  исключение в `CustomerCardFragment` / `UpdateCustomerFragment`. `getMeasurementById` уже
-  nullable, и карточка замера печатает `measurement_not_found`.
+- Удаление клиента — вручную в `@Transaction` (см. §2): каскада на уровне Room нет, при
+  рассинхроне схемы и запроса сироты возможны только по новым таблицам.
+- `getCustomerById` возвращает `Customers?`, `getMeasurementById` — `MeasurementRow?`:
+  на отсутствующей записи все три карточки показывают тост и `popBackStack`:
+  карточка клиента и редактирование — «Клиент не найден», карточка замера — «Замер не найден».
 - Пустые поля мерок сохраняются как `0f` (`requiredIds.map { id -> id to (values[id].toMeasure() ?: 0f) }`):
   «не снимал» и «ноль» в БД неразличимы.
-- `saving` живёт в поле фрагмента, а не в ViewModel, и не сбрасывается при ошибке записи:
-  неудачная вставка оставляет кнопку Save заблокированной до пересоздания экрана.
-- `AddCustomerFragment` после неудачной вставки тоже не возвращает кнопку Save в активное
-  состояние; `UpdateCustomerFragment` показывает хардкод-тост `"success update"` и переходит
-  сразу после вызова `updateCustomer`, не дожидаясь записи.
+- `AddMeasurement`/`UpdateMeasurement`: `saving` живёт в `remember` destination-композабла,
+  а не в ViewModel, и не сбрасывается при ошибке записи: неудачная вставка оставляет кнопку
+  Save заблокированной до ухода с экрана. В формах клиента это не так — `saving` в `formState`,
+  ошибка записи разблокирует кнопку и показывает тост «Не удалось сохранить».
 - `Metric.typeId` всегда `1` — типа метрики в UI нет.
-- Мёртвое: `ui/fragments/notused/` (7 фрагментов и 7 их layout'ов, в графе отсутствуют),
-  `newInstance()` во всех фрагментах (не вызываются, местами с неверным типом возврата),
-  `fragment_update_measurement.xml` (экран давно на Compose), `domain/dress/Dress.kt`,
-  `DressRepo.kt`, `DressSources.kt`, `App`, неиспользуемые `getMetricById` и `getClassById`.
-- Адаптеры списков пересоздаются на каждую эмиссию LiveData (без `ListAdapter`/`DiffUtil`).
+- `viewBinding = true` остался ради мёртвого `DimensListFragment`; в рабочем коде биндингов нет.
+- Мёртвое: `ui/fragments/notused/` (7 фрагментов и 7 их layout'ов, вне графа), `newInstance()`
+  в этих фрагментах, `domain/dress/Dress.kt`, `DressRepo.kt`, `DressSources.kt`,
+  `App`, неиспользуемые `getMetricById` и `getClassById`.
+- Адаптеров нет; `LazyColumn`/`LazyRow` получают список целиком и пересобираются на каждую
+  эмиссию LiveData (без `DiffUtil`, ключи — id).
 
 ## 10. Сверка с доской архитектуры (`design/figma-arch/code.js`)
 
+Доска называет узлы фрагментами (так было до миграции); в коде это Compose-экраны
+и маршруты из §5–§8.
+
 | Узел | По доске | В коде | Статус |
 |---|---|---|---|
-| `CustomersListFragment` | XML, RecyclerView + FAB, `menu_customers_list` | так же | совпадает |
-| `AddCustomerFragment` | XML, имя/телефон/баланс, блокировка Save | так же | совпадает |
-| `UpdateCustomerFragment` | XML, Save/Cancel → карточка, Delete → список | так же | совпадает |
-| `CustomerCardFragment` | кнопка «новое изделие», скролл изделий клиента | кнопка скрыта (`GONE`), списка изделий нет | расхождение |
+| `CustomersListFragment` | XML, RecyclerView + FAB, меню | Compose, `LazyColumn` + FAB, иконка в `TopAppBar` | расхождение (технология) |
+| `AddCustomerFragment` | XML, имя/телефон/баланс, блокировка Save | Compose, `CustomerFormScreen` + `formState`, блокировка Save при `saving` | расхождение (технология) |
+| `UpdateCustomerFragment` | XML, Save/Cancel → карточка, Delete → список | Compose, та же форма + Delete → список (`popUpTo`) | расхождение (технология) |
+| `CustomerCardFragment` | кнопка «новое изделие», скролл изделий клиента | Compose-карточка, кнопки «новое изделие» и списка изделий нет | расхождение |
 | `SettingsFragment` | `SettingsScreen(onMetricsClick)`, один пункт | два пункта: мерки + классы (`onClassesClick`) | расхождение |
 | `MetricsReferenceFragment` | список + создание метрики | так же (+ диалог `CreateMetricDialog`) | совпадает |
 | `ClassReferenceFragment` | Compose, `DressClassViewModel`, FAB «+» | так же | совпадает |
@@ -269,6 +284,5 @@ AlertDialog с полями shortName / name / description; Save активен,
 | `CardMeasurementFragment` | Compose, `measurementById` + `takenMeasurements`, FAB «Редактировать» | так же | совпадает |
 | `UpdateMeasurementFragment` | Compose, форма = `AddMeasurementScreen`, предзаполнение | так же | совпадает |
 | `CreateMetricDialog` | AlertDialog в `MetricsReferenceScreen`, не экран | так же | совпадает |
-| Переходы (17 связей) | 12 сплошных + 5 пунктирных | все действия и источники данных есть | совпадает |
-| Мёртвые действия | 5 | те же 5 | совпадает |
+| Переходы (17 связей) | 12 сплошных + 5 пунктирных | все переходы источников данных есть; лишних маршрутов нет | совпадает |
 | Слои: 11 экранов + диалог, 4 VM, 4 репозитория | 11 / 4 / 4 | 11 / 4 / 4 | совпадает |

@@ -51,7 +51,7 @@ class MeasurementsViewModel(application: Application) : AndroidViewModel(applica
         viewModelScope.launch {
             val ids = dressClassDao.getMetricIds(classId)
             val byId = metricDao.getMetricsByIds(ids).associateBy { it.id }
-            _classMetricsLiveData.postValue(ids.mapNotNull { byId[it] })
+            _classMetricsLiveData.value = ids.mapNotNull { byId[it] }
         }
     }
 

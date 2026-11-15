@@ -1,28 +1,20 @@
 package com.example.seamstress.ui
 
 import android.os.Bundle
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
-import androidx.navigation.ui.setupActionBarWithNavController
-import com.example.seamstress.R
-import com.google.android.material.appbar.MaterialToolbar
-
+import com.example.seamstress.ui.navigation.SeamstressNavHost
+import com.example.seamstress.ui.theme.SeamstressTheme
 
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_main)
-
-        setSupportActionBar(findViewById<MaterialToolbar>(R.id.toolbar))
-
-        val navController = findNavController(R.id.fragmentContainerView)
-        setupActionBarWithNavController(navController)
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.fragmentContainerView)
-        return navController.navigateUp() || super.onSupportNavigateUp()
+        setContent {
+            SeamstressTheme {
+                SeamstressNavHost()
+            }
+        }
     }
 }

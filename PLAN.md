@@ -43,20 +43,25 @@
    `AGENTS.md` приведён в соответствие.
    *Готово, когда:* нет `requireActivity()` в роли `LifecycleOwner`, поворот не плодит экраны.
 
-- [ ] **Безопасное чтение**
+- [x] **Безопасное чтение**
    Одиночные DAO-запросы → nullable (`CustomersDao.kt:13`, `MeasurementDao.kt:12`,
    `MetricDao.kt:13`); при отсутствии записи — тост и навигация назад; `postValue` → `value`.
    *Готово, когда:* открытие карточки удалённого клиента не падает.
+   Сделано: `getCustomerById`: `Customers?`, `selectByIdCustomerLiveData`: `LiveData<Customers?>`,
+   тост «Клиент не найден» + `popBackStack()` в карточке и в редактировании.
 
-- [ ] **Удаление без сирот**
+- [x] **Удаление без сирот**
    Удаление клиента чистит замеры и `taken_measurements` (`@Transaction` в DAO);
    после save/delete — `popUpTo` в действиях `navigation.xml`.
    *Готово, когда:* back не ведёт на удалённое, в базе нет висячих строк.
+   Сделано: `CustomersDao.deleteCustomerWithData` (`@Transaction`), `popUpTo` у
+   `action_updateCustomer_to_customersList`.
 
-- [ ] **Карточка замера**
+- [x] **Карточка замера**
    JOIN с `metrics` вместо `metricId` (`TakenMeasuredViewHolder.kt:17`);
    FAB `fr_card_measurement_floatingActionButton` либо работает, либо убран.
    *Готово, когда:* в списке «Обхват груди — 92».
+   Сделано раньше: `CardMeasurementScreen` на Compose с JOIN, FAB ведёт в редактирование.
 
 - [x] **Экран нового замера**
    Дата, название, класс изделия, значения по метрикам класса и доп. метрики из справочника;
@@ -127,25 +132,47 @@
   `MetricViewHolder`.
   *Готово, когда:* экран работает и навигация остаётся прежней, XML этого экрана удалён.
 
-- [ ] **Шаг 2. Список клиентов и карточка клиента**
+- [x] **Шаг 2. Список клиентов и карточка клиента**
   `LazyColumn` вместо `RecyclerView` + `CustomersRecyclerAdapter`/`CustomerRecyclerViewHolder`
-  и `MeasurementRecyclerAdapter`/`MeasurementViewHolder`; удалить 3 layout-файла.
+  и `MeasurementRecyclerAdapter`/`MeasurementViewHolder`; удалить layout-файлы
+  (`fragment_customers_list`, `fragment_card_customer`, `item_customer`, `item_list_customer`,
+  `item_list_measurement`). `CustomersListScreen` и `CustomerCardScreen` — stateless,
+  фрагменты только собирают `ComposeView` и навигацию; горизонтальный `LazyRow` замеров.
   *Готово, когда:* список и карточка полностью на Compose, адаптеры удалены.
+  Сделано: 6 классов recycler'а и 5 layout'ов удалены, `assembleDebug` зелёный.
 
-- [ ] **Шаг 3. Формы «Новый клиент» и «Редактирование»**
+- [x] **Шаг 3. Формы «Новый клиент» и «Редактирование»**
   Текстовые поля с `error` и лимитами (11 цифр, баланс до 1 000 000 000), блокировка кнопки
   на время записи; `parseBalance`/`parsePhone` переезжают в ViewModel/UiState.
   *Готово, когда:* обе формы на Compose, XML удалён, валидация та же.
+  Сделано: общий `CustomerFormScreen`, состояние формы — `CustomerFormState` в
+  `SeamstressViewModel` (`formState`: поля, ошибки, `saving`), `parseBalance`/`parsePhone`
+  и фильтры ввода — в `CustomerFormState.kt`; `saveCustomer(id)` пишет в БД, навигация — по
+  событиям `newCustomerId`/`customerSaved`, ошибка записи разблокирует кнопку и показывает тост.
+  Удалены `fragment_add_customer.xml`, `fragment_update_customer.xml`, `CustomerInput.kt`.
 
-- [ ] **Шаг 4. Карточка замера**
+- [x] **Шаг 4. Карточка замера**
   Список мерок через `LazyColumn`; попутно JOIN с `metrics` (этап 1, п.6).
   *Готово, когда:* экран на Compose, `TakenMeasuredRecyclerAdapter` удалён.
+  Сделано: `CardMeasurementScreen` (Card «дата · название · класс», `LazyColumn` «мерка —
+  значение», пустое состояние, FAB «Редактировать»), JOIN в `TakenMeasurementDao`; адаптера
+  в проекте нет. Добавлены `loaded` и обработка отсутствующего замера — тост «Замер не найден»
+  и `popBackStack`, как в карточке клиента.
 
-- [ ] **Шаг 5. Схлопывание оболочки**
+- [x] **Шаг 5. Схлопывание оболочки**
   `MainActivity` с `NavHost` Compose, типизированные маршруты вместо `navigation.xml`
   и Safe Args; удалить фрагменты, `Navigation`-fragment-зависимости, `viewBinding`,
   `fragment_*` layout'ы.
   *Готово, когда:* в проекте нет ни одного XML-layout'а и ни одного фрагмента.
+  Сделано: `MainActivity` — `setContent { SeamstressTheme { SeamstressNavHost() } }`;
+  `ui/navigation/Routes.kt` — `@Serializable`-маршруты, три `NavGraphBuilder`-расширения;
+  `ui/screens/*` — stateless-экраны, каркас — `ScreenScaffold` (TopAppBar + «назад»),
+  загрузка/не-найдено — `observeLoaded()`. Плагин Safe Args, `navigation.xml`,
+  `menu_customers_list.xml`, `activity_main.xml`, `fragment_update_measurement.xml`,
+  11 фрагментов и пакеты `ui/fragments/{customer,measurement,settings}` удалены;
+  ViewModel — через `viewModel()`, событие `customerDeleted` для перехода после удаления.
+  **Остаток:** `viewBinding = true` и 7 `fragment_*.xml` держатся только мёртвым
+  `ui/fragments/notused/` — удалять его без явной просьбы нельзя.
 
 - [ ] **Шаг 6. Свобода вёрстки**
   Снять `android:screenOrientation="portrait"`, включить `enableEdgeToEdge()` и обработать

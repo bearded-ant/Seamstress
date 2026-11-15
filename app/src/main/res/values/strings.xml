@@ -60,4 +60,28 @@
     <string name="measurement_not_found">Замер не найден</string>
     <string name="taken_measurements_empty">Мерки не сняты</string>
     <string name="edit_measurement">Редактировать</string>
+    <string name="add_customer">Новый клиент</string>
+    <string name="edit_customer">Редактировать клиента</string>
+    <string name="take_measurements">снять мерки</string>
+    <string name="customer_balance_value">Баланс: %1$d</string>
+    <string name="customer_not_found">Клиент не найден</string>
+    <string name="delete_customer_title">Удалить клиента %1$s?</string>
+    <string name="delete_customer_message">Вы уверены, что хотите удалить клиента %1$s?</string>
+    <string name="dialog_yes">Да</string>
+    <string name="dialog_no">Нет</string>
+    <string name="save_failed">Не удалось сохранить</string>
+    <string name="back">Назад</string>
+
+    <!-- Заголовки тулбара -->
+    <string name="title_customers_list">Список клиентов</string>
+    <string name="title_customer">Клиент</string>
+    <string name="title_add_customer">Новый клиент</string>
+    <string name="title_update_customer">Редактирование</string>
+    <string name="title_settings">Настройки</string>
+    <string name="title_metrics_reference">Справочник мерок</string>
+    <string name="title_class_reference">Справочник классов изделий</string>
+    <string name="title_create_class">Новый класс изделия</string>
+    <string name="title_add_measurement">Новый замер</string>
+    <string name="title_card_measurement">Мерки</string>
+    <string name="title_update_measurement">Редактирование замера</string>
 </resources>

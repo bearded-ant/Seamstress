@@ -14,7 +14,8 @@
 - [x] Этап 1, п.3: ViewModel на каждый экран, `onDestroyView`, `viewLifecycleOwner`,
       обработчики вынесены из наблюдателей.
 - [x] Настройки приложения: `SettingsFragment` + «Справочник мерок» на Compose.
-- [x] Поворот экрана отключён: `android:screenOrientation="portrait"` у `MainActivity`.
+- [x] Поворот экрана: сначала был зафиксирован `screenOrientation="portrait"`, шаг 6 этапа 3
+      его снял (edge-to-edge, инсеты).
 - [x] Баланс переведён на `Long` (целые рубли, лимит 1 000 000 000), колонка в ассете —
       `INTEGER`, телефоны в ассете приведены к 11 цифрам. БД поднята до `version = 2`
       с `fallbackToDestructiveMigration(true)`.
@@ -174,10 +175,15 @@
   **Остаток:** `viewBinding = true` и 7 `fragment_*.xml` держатся только мёртвым
   `ui/fragments/notused/` — удалять его без явной просьбы нельзя.
 
-- [ ] **Шаг 6. Свобода вёрстки**
+- [x] **Шаг 6. Свобода вёрстки**
   Снять `android:screenOrientation="portrait"`, включить `enableEdgeToEdge()` и обработать
   инсеты (этап 2, п.4). После Compose обрезка формы не возвращается.
   *Готово, когда:* поворот и жесты работают, содержимое не уезжает под системные бары.
+  Сделано: `portrait` снят, в манифесте `windowSoftInputMode="adjustResize"`;
+  `MainActivity` зовёт `enableEdgeToEdge()` (`statusBarStyle = dark(TRANSPARENT)` — светлые
+  иконки на фиолетовом тулбаре, навигационная панель — прозрачная с тёмными иконками).
+  `ScreenScaffold` красит фон, `TopAppBar` уходит под статус-бар, содержимому даны
+  `safeDrawing` (низ + горизонталь, для вырезов в повороте) и `imePadding()`.
 
 **Что удаляется по итогу:** 20 файлов `res/layout`, 6 классов recycler'а, `navigation.xml`,
 Safe Args, ViewBinding, `Fragment`-обвязка (`_binding`, `onDestroyView`, `viewLifecycleOwner`).

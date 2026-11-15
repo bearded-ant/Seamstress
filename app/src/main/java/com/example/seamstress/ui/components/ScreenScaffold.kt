@@ -1,9 +1,16 @@
 package com.example.seamstress.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -20,6 +27,9 @@ import com.example.seamstress.R
 /**
  * Тулбар приложения и содержимое экрана — замена `MaterialToolbar` из `activity_main.xml`.
  * [onBack] = null оставляет экран без стрелки «назад».
+ *
+ * Инсеты: `TopAppBar` сам добавляет отступ статус-бара (его фон уходит под него),
+ * а содержимое получает низ и горизонтальные вырезы — при повороте и под навигационной панелью.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,7 +39,11 @@ fun ScreenScaffold(
     actions: @Composable RowScope.() -> Unit = {},
     content: @Composable () -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
         TopAppBar(
             title = { Text(title) },
             navigationIcon = {
@@ -50,7 +64,17 @@ fun ScreenScaffold(
                 actionIconContentColor = MaterialTheme.colorScheme.onPrimary
             )
         )
-        Box(modifier = Modifier.weight(1f).fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxSize()
+                .windowInsetsPadding(
+                    WindowInsets.safeDrawing.only(
+                        WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom
+                    )
+                )
+                .imePadding()
+        ) {
             content()
         }
     }

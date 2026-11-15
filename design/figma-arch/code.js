@@ -28,8 +28,8 @@ const FONT = {
   bold: { family: "Inter", style: "Bold" },
 };
 
-const ROOT_W = 1520;
-const ROOT_H = 2100;
+const ROOT_W = 1940;
+const ROOT_H = 2600;
 const CARD_W = 320;
 const GAP = 10;
 
@@ -252,13 +252,29 @@ const SCREENS = [
     key: "meas",
     title: "CardMeasurementFragment",
     desc: "карточка замера",
-    tech: "xml",
-    x: 1060, y: 800, h: 215,
+    tech: "compose",
+    x: 1060, y: 800, h: 235,
     lines: [
-      "MeasurementsViewModel",
-      "+ TakenMeasurementsViewModel",
-      "TextView ×3 + RecyclerView",
-      "переходов нет (лист)",
+      "одна MeasurementsViewModel",
+      "measurementById + takenMeasurements",
+      "Card: дата · название · класс",
+      "LazyColumn: мерка + значение",
+      "FAB «Редактировать» → *measurementId",
+    ],
+  },
+  {
+    key: "updatemeas",
+    title: "UpdateMeasurementFragment",
+    desc: "редактирование замера",
+    tech: "compose",
+    x: 1060, y: 1085, h: 275,
+    lines: [
+      "одна MeasurementsViewModel",
+      "measurementById + takenMeasurements",
+      "форма = AddMeasurementScreen",
+      "поля предзаполнены из замера",
+      "Save → update, popBackStack",
+      "Cancel → navigateUp",
     ],
   },
   {
@@ -266,7 +282,7 @@ const SCREENS = [
     title: "MetricsReferenceFragment",
     desc: "справочник мерок",
     tech: "compose",
-    x: 1060, y: 1020, h: 190,
+    x: 1060, y: 1410, h: 190,
     lines: [
       "список всех возможных метрик",
       "кнопка создания новой метрики",
@@ -276,26 +292,48 @@ const SCREENS = [
     key: "classes",
     title: "ClassReferenceFragment",
     desc: "справочник классов изделий",
-    tech: "xml",
-    x: 1060, y: 1250, h: 190,
+    tech: "compose",
+    x: 1060, y: 1640, h: 235,
     lines: [
-      "перечень классов изделий",
+      "DressClassViewModel",
+      "getAllClasses: LiveData",
+      "LazyColumn: класс + число метрик",
+      "FAB «+» → создание класса",
+      "пусто → текст classes_empty",
     ],
   },
   {
     key: "createclass",
     title: "CreateClassFragment",
     desc: "создание класса изделия",
-    tech: "xml",
-    x: 1060, y: 1490, h: 210,
+    tech: "compose",
+    x: 1060, y: 1920, h: 255,
     lines: [
-      "название",
-      "все метрики из справочника",
-      "выбор метрик и порядок",
-      "сохранить",
+      "DressClassViewModel + MetricViewModel",
+      "поле «название»",
+      "чекбоксы — все метрики",
+      "выбранные: порядок ↑↓",
+      "Save: название + ≥1 метрика",
+      "Cancel → navigateUp",
     ],
   },
 ];
+
+/* диалоговый узел: не экран и не пункт навигации */
+const DIALOG = {
+  kind: "Диалог",
+  title: "CreateMetricDialog",
+  desc: "диалог новой метрики, не экран",
+  tech: "compose",
+  x: 1560, y: 1410, h: 235,
+  lines: [
+    "открывается по FAB «+»",
+    "AlertDialog в MetricsReferenceScreen",
+    "поля: shortName, name, description",
+    "Save: короткое и полное не пустые",
+    "Save → insertMetric, onDismiss",
+  ],
+};
 
 /* ---------- переходы ---------- */
 
@@ -343,34 +381,50 @@ const EDGES = [
   },
   {
     name: "настройки → справочник",
-    pts: [[880, 1095], [1060, 1095]],
-    label: "Справочник мерок", lx: 895, ly: 1082,
+    pts: [[880, 1115], [960, 1115], [960, 1485], [1060, 1485]],
+    label: "Справочник мерок", lx: 895, ly: 1085, lw: 150,
   },
   {
     name: "настройки → справочник классов",
-    pts: [[720, 1210], [720, 1290], [1060, 1290]],
-    label: "Справочник классов", lx: 740, ly: 1276,
+    pts: [[720, 1210], [720, 1680], [1060, 1680]],
+    label: "Справочник классов", lx: 740, ly: 1666,
+  },
+  {
+    name: "карточка замера → редактирование",
+    pts: [[1200, 1035], [1200, 1085]],
+    label: "FAB «Редактировать» · *measurementId", lx: 1215, ly: 1044,
+  },
+  {
+    name: "редактирование → карточка замера (назад)",
+    pts: [[1060, 1200], [990, 1200], [990, 1000], [1060, 1000]],
+    dash: true,
+    label: "popBackStack", lx: 900, ly: 1128, lw: 90,
   },
   {
     name: "справочник классов → новый замер",
-    pts: [[1380, 1420], [1500, 1420], [1500, 700], [1380, 700]],
+    pts: [[1380, 1855], [1500, 1855], [1500, 700], [1380, 700]],
     dash: true,
-    label: "метрики класса", lx: 1386, ly: 1408, lw: 130,
+    label: "метрики класса", lx: 1386, ly: 1843, lw: 130,
   },
   {
     name: "справочник классов → создание класса",
-    pts: [[1200, 1440], [1200, 1490]],
-    label: "добавить класс", lx: 1215, ly: 1468, lw: 130,
+    pts: [[1200, 1875], [1200, 1920]],
+    label: "добавить класс", lx: 1215, ly: 1898, lw: 130,
   },
   {
     name: "справочник метрик → создание класса",
-    pts: [[1060, 1150], [1020, 1150], [1020, 1520], [1060, 1520]],
+    pts: [[1060, 1540], [1020, 1540], [1020, 1950], [1060, 1950]],
     dash: true,
-    label: "метрики из справочника", lx: 890, ly: 1500, lw: 130,
+    label: "метрики из справочника", lx: 880, ly: 1930, lw: 130,
+  },
+  {
+    name: "справочник метрик → диалог новой метрики",
+    pts: [[1380, 1580], [1560, 1580]],
+    label: "FAB «+»", lx: 1395, ly: 1552, lw: 90,
   },
   {
     name: "справочник → новый замер",
-    pts: [[1380, 1150], [1460, 1150], [1460, 490], [1200, 490], [1200, 520]],
+    pts: [[1380, 1540], [1460, 1540], [1460, 490], [1200, 490], [1200, 520]],
     dash: true,
     label: "доп. метрики", lx: 1240, ly: 476,
   },
@@ -463,7 +517,7 @@ function layersCard() {
   f.appendChild(sectionTitle("Слои"));
   f.appendChild(rule(CARD_W - 40));
   cardBody(f, [
-    "ui/fragments — 8 экранов",
+    "ui/fragments — 11 экранов",
     "viewmodel — 4 AndroidViewModel",
     "data — 4 репозитория (1:1 к DAO)",
     "domain — Room-сущности и DAO",
@@ -498,14 +552,15 @@ function legendCard() {
 }
 
 function notesCard() {
-  const f = card("Что не показано стрелками", { w: 820, h: 300 });
+  const f = card("Что не показано стрелками", { w: 820, h: 330 });
   f.appendChild(sectionTitle("Что не показано стрелками"));
   f.appendChild(rule(820 - 40));
   const rows = [
     "UpdateCustomer Save/Cancel → CustomerCard, popUpTo(customersList)",
     "UpdateCustomer Delete → CustomersList",
     "AddMeasurement сохраняет и делает popBackStack",
-    "CardMeasurement — лист, только системный «назад»",
+    "UpdateMeasurement Save → update, popBackStack",
+    "UpdateMeasurement Cancel → navigateUp",
   ];
   for (const r of rows) {
     f.appendChild(tx(r, { size: 12, color: C.muted, width: 820 - 40 }));
@@ -517,6 +572,7 @@ function notesCard() {
     "action_addMeasurement_to_customerCard",
     "action_addMeasurement_to_cardMeasurement",
     "action_cardMeasurement_to_cardCustomer",
+    "action_updateMeasurement_to_cardMeasurement",
   ];
   for (const d of dead) {
     f.appendChild(tx(d, { size: 12, color: C.faint, width: 820 - 40 }));
@@ -527,7 +583,7 @@ function notesCard() {
 /* ---------- сборка ---------- */
 
 function screenCard(s) {
-  const c = card("Экран · " + s.title, {
+  const c = card((s.kind || "Экран") + " · " + s.title, {
     h: s.h,
     stroke: s.start ? C.start : (s.tech === "compose" ? C.compose : C.xml),
     sw: s.start ? 2.5 : 1.5,
@@ -606,6 +662,11 @@ async function main() {
     root.appendChild(c);
   }
 
+  const dialog = screenCard(DIALOG);
+  dialog.x = DIALOG.x;
+  dialog.y = DIALOG.y;
+  root.appendChild(dialog);
+
   // переходы
   for (const e of EDGES) {
     const tip = e.pts[e.pts.length - 1];
@@ -623,7 +684,7 @@ async function main() {
   // заметки
   const notes = notesCard();
   notes.x = 560;
-  notes.y = 1740;
+  notes.y = 2220;
   root.appendChild(notes);
 
   figma.viewport.scrollAndZoomIntoView([root]);

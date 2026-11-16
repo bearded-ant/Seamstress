@@ -25,6 +25,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.seamstress.R
 import com.example.seamstress.domain.customers.Customers
+import com.example.seamstress.ui.components.formatMoney
+import com.example.seamstress.ui.components.formatPhone
 
 @Composable
 fun CustomersListScreen(
@@ -74,12 +76,12 @@ private fun CustomerRow(customer: Customers, onClick: () -> Unit) {
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
-                    text = customer.phone.orEmpty(),
+                    text = formatPhone(customer.phone),
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(top = 4.dp)
                 )
                 Text(
-                    text = stringResource(R.string.customer_balance_value, customer.balance),
+                    text = stringResource(R.string.customer_balance_value, formatMoney(customer.balance)),
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(top = 12.dp)
                 )

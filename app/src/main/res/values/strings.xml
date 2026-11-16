@@ -63,7 +63,7 @@
     <string name="add_customer">Новый клиент</string>
     <string name="edit_customer">Редактировать клиента</string>
     <string name="take_measurements">снять мерки</string>
-    <string name="customer_balance_value">Баланс: %1$d</string>
+    <string name="customer_balance_value">Баланс: %1$s</string>
     <string name="customer_not_found">Клиент не найден</string>
     <string name="delete_customer_title">Удалить клиента %1$s?</string>
     <string name="delete_customer_message">Вы уверены, что хотите удалить клиента %1$s?</string>
@@ -105,7 +105,7 @@
     <string name="title_update_dress">Редактирование изделия</string>
     <string name="dress_name">Название изделия</string>
     <string name="dress_price">Стоимость, ₽</string>
-    <string name="dress_price_value">Стоимость: %1$d ₽</string>
+    <string name="dress_price_value">Стоимость: %1$s</string>
     <string name="dress_price_not_set">Стоимость не указана</string>
     <string name="error_dress_price_invalid">Стоимость — целое число от 0 до 1 000 000 000</string>
     <string name="dress_photos">Фото</string>

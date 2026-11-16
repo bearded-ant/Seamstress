@@ -35,6 +35,8 @@ import com.example.seamstress.R
 import com.example.seamstress.domain.customers.Customers
 import com.example.seamstress.domain.dresses.DressRow
 import com.example.seamstress.domain.measured.measurements.MeasurementRow
+import com.example.seamstress.ui.components.formatMoney
+import com.example.seamstress.ui.components.formatPhone
 
 @Composable
 fun CustomerCardScreen(
@@ -157,12 +159,12 @@ private fun CustomerHeader(customer: Customers, onAddMeasurement: () -> Unit) {
                     style = MaterialTheme.typography.headlineSmall
                 )
                 Text(
-                    text = customer.phone.orEmpty(),
+                    text = formatPhone(customer.phone),
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(top = 4.dp)
                 )
                 Text(
-                    text = stringResource(R.string.customer_balance_value, customer.balance),
+                    text = stringResource(R.string.customer_balance_value, formatMoney(customer.balance)),
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(top = 12.dp)
                 )

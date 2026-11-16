@@ -45,6 +45,7 @@ import com.example.seamstress.domain.dresses.DressMetricRow
 import com.example.seamstress.domain.dresses.DressPhoto
 import com.example.seamstress.domain.dresses.DressRow
 import com.example.seamstress.ui.components.formatMeasure
+import com.example.seamstress.ui.components.formatMoney
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -106,7 +107,7 @@ fun DressCardScreen(
                     )
                     Text(
                         text = if (dress.price != null) {
-                            stringResource(R.string.dress_price_value, dress.price)
+                            stringResource(R.string.dress_price_value, formatMoney(dress.price))
                         } else {
                             stringResource(R.string.dress_price_not_set)
                         },

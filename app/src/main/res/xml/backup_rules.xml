@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- API 26-30: то же исключение БД и фото клиентов из бэкапа. -->
+<full-backup-content>
+    <exclude domain="database" path="." />
+    <exclude domain="file" path="dress_photos/" />
+    <exclude domain="file" path="customer_photos/" />
+</full-backup-content>

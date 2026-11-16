@@ -25,6 +25,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -32,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.seamstress.R
 import com.example.seamstress.domain.customers.Customers
+import com.example.seamstress.domain.dresses.DressRow
 import com.example.seamstress.domain.measured.measurements.MeasurementRow
 
 @Composable
@@ -39,9 +41,12 @@ fun CustomerCardScreen(
     customer: Customers?,
     loaded: Boolean,
     measurements: List<MeasurementRow>,
+    dresses: List<DressRow>,
     onEdit: () -> Unit,
     onAddMeasurement: () -> Unit,
-    onMeasurementClick: (Long) -> Unit
+    onMeasurementClick: (Long) -> Unit,
+    onAddDress: () -> Unit,
+    onDressClick: (Long) -> Unit
 ) {
     Scaffold(
         floatingActionButton = {
@@ -92,6 +97,42 @@ fun CustomerCardScreen(
                         MeasurementTile(
                             measurement = measurement,
                             onClick = { onMeasurementClick(measurement.id) }
+                        )
+                    }
+                }
+            }
+
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.dress_list_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(1f)
+                )
+                TextButton(onClick = onAddDress) {
+                    Text(stringResource(R.string.btn_add_clothes_text))
+                }
+            }
+
+            if (dresses.isEmpty()) {
+                Text(
+                    text = stringResource(R.string.dress_list_empty),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(16.dp)
+                )
+            } else {
+                LazyRow(
+                    contentPadding = PaddingValues(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(dresses, key = { it.id }) { dress ->
+                        DressTile(
+                            dress = dress,
+                            onClick = { onDressClick(dress.id) }
                         )
                     }
                 }
@@ -150,6 +191,28 @@ private fun MeasurementTile(measurement: MeasurementRow, onClick: () -> Unit) {
             )
             Text(
                 text = measurement.name,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+    }
+}
+
+@Composable
+private fun DressTile(dress: DressRow, onClick: () -> Unit) {
+    Card(modifier = Modifier.width(150.dp).height(150.dp).clickable(onClick = onClick)) {
+        Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+            Text(
+                text = dress.name,
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 2
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = dress.className.orEmpty(),
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = dress.createdAt,
                 style = MaterialTheme.typography.bodySmall
             )
         }

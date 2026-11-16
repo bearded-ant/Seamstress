@@ -122,6 +122,8 @@
     <string name="dress_from_measurement">Взять из замера клиента</string>
     <string name="dress_from_set">Общие мерки (именной набор)</string>
     <string name="dress_not_found">Изделие не найдено</string>
+    <string name="dress_list_title">Изделия</string>
+    <string name="dress_list_empty">Изделий нет</string>
     <string name="delete_dress_title">Удалить изделие %1$s?</string>
     <string name="delete_dress_message">Вы уверены, что хотите удалить изделие %1$s? Мерки, фото и комментарии будут удалены.</string>
 </resources>

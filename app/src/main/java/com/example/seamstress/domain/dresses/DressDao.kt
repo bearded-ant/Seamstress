@@ -55,6 +55,16 @@ interface DressDao {
     @Query("select * from dress_photo where dress_id = :dressId order by id")
     suspend fun getDressPhotosOnce(dressId: Long): List<DressPhoto>
 
+    /** Фото всех изделий клиента — для очистки файлов при удалении клиента. */
+    @Query(
+        """
+        select p.* from dress_photo p
+        join dress d on d.id = p.dress_id
+        where d.customer_id = :customerId
+        """
+    )
+    suspend fun getPhotosByCustomerId(customerId: Long): List<DressPhoto>
+
     @Query("select * from dress_comment where dress_id = :dressId order by id")
     fun getDressComments(dressId: Long): LiveData<List<DressComment>>
 

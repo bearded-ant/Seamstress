@@ -10,22 +10,27 @@ import com.example.seamstress.data.CustomersRepository
 import com.example.seamstress.domain.SeamstressDataBase
 import com.example.seamstress.domain.customers.Customers
 import com.example.seamstress.domain.customers.CustomersDao
+import com.example.seamstress.domain.dresses.DressDao
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import java.io.File
 
 class SeamstressViewModel(application: Application) : AndroidViewModel(application) {
 
     val getAllCustomers: LiveData<List<Customers>>
     private val customerRepo: CustomersRepository
+    private val dressDao: DressDao
 
     init {
         val db = SeamstressDataBase.getDatabase(application)
 
         val customersDao: CustomersDao = db.customersDao()
         customerRepo = CustomersRepository(customersDao)
+        dressDao = db.dressDao()
         getAllCustomers = customerRepo.getAllCustomers
     }
 
@@ -125,9 +130,12 @@ class SeamstressViewModel(application: Application) : AndroidViewModel(applicati
     private val _customerDeleted = Channel<Unit>(Channel.BUFFERED)
     val customerDeleted: Flow<Unit> = _customerDeleted.receiveAsFlow()
 
+    /** Удаление клиента: замеры и изделия уходят каскадом, файлы фото изделий убираются. */
     fun deleteCustomer(client: Customers) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
+            val photos = dressDao.getPhotosByCustomerId(client.id)
             customerRepo.deleteCustomer(client)
+            photos.forEach { runCatching { File(it.path).delete() } }
             _customerDeleted.send(Unit)
         }
     }

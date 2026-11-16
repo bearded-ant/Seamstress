@@ -18,6 +18,7 @@
     <string name="first_fragment_button_new_sizes_text">новый замер</string>
 
     <string name="btn_customers_text">клиенты</string>
+    <string name="customers_empty">Клиентов нет</string>
     <string name="btn_add_customer_text">новый клиент</string>
     <string name="btn_clothes_text">одежда</string>
     <string name="btn_add_clothes_text">новое изделие</string>

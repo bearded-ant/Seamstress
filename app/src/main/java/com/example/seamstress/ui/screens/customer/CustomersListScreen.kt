@@ -45,6 +45,15 @@ fun CustomersListScreen(
             }
         }
     ) { innerPadding ->
+        if (customers.isEmpty()) {
+            Text(
+                text = stringResource(R.string.customers_empty),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(innerPadding).padding(16.dp)
+            )
+            return@Scaffold
+        }
+
         LazyColumn(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             items(customers, key = { it.id }) { customer ->
                 CustomerRow(

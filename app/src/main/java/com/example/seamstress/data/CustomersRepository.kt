@@ -8,6 +8,7 @@ class CustomersRepository(private val customersDao: CustomersDao) {
 
     val getAllCustomers: LiveData<List<Customers>> = customersDao.getAllCustomers()
     suspend fun getCustomerById(id: Long): Customers? = customersDao.getCustomerById(id)
+    fun getCustomerByIdLiveData(id: Long): LiveData<Customers?> = customersDao.getCustomerByIdLiveData(id)
     suspend fun insertCustomer(customers: Customers): Long = customersDao.insertCustomer(customers)
 
     suspend fun deleteCustomer(customers: Customers) {

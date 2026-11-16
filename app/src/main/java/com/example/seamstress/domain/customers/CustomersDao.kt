@@ -12,6 +12,9 @@ interface CustomersDao {
     @Query("select * from customers where id= :id")
     suspend fun getCustomerById(id: Long): Customers?
 
+    @Query("select * from customers where id = :id")
+    fun getCustomerByIdLiveData(id: Long): LiveData<Customers?>
+
     @Insert
     suspend fun insertCustomer(customers: Customers): Long
 

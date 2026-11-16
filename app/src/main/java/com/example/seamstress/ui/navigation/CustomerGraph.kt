@@ -54,7 +54,7 @@ fun NavGraphBuilder.customerGraph(navController: NavHostController) {
         val viewModel: SeamstressViewModel = viewModel()
         val measurementsViewModel: MeasurementsViewModel = viewModel()
         val dressViewModel: DressViewModel = viewModel()
-        val customer = viewModel.selectByIdCustomerLiveData.observeLoaded()
+        val customer = remember(route.customerId) { viewModel.customerById(route.customerId) }.observeLoaded()
         val measurementsLive = remember(route.customerId) {
             measurementsViewModel.measurementsByCustomer(route.customerId)
         }
@@ -65,7 +65,6 @@ fun NavGraphBuilder.customerGraph(navController: NavHostController) {
         val dresses by dressesLive.observeAsState(emptyList())
         val toast = rememberToast()
 
-        LaunchedEffect(route.customerId) { viewModel.selectCustomerById(route.customerId) }
         LaunchedEffect(customer.loaded, customer.value) {
             if (customer.loaded && customer.value == null) {
                 toast(R.string.customer_not_found)
@@ -126,10 +125,9 @@ fun NavGraphBuilder.customerGraph(navController: NavHostController) {
         val route = entry.toRoute<UpdateCustomer>()
         val viewModel: SeamstressViewModel = viewModel()
         val state by viewModel.formState.observeAsState(CustomerFormState())
-        val customer = viewModel.selectByIdCustomerLiveData.observeLoaded()
+        val customer = remember(route.customerId) { viewModel.customerById(route.customerId) }.observeLoaded()
         val toast = rememberToast()
 
-        LaunchedEffect(route.customerId) { viewModel.selectCustomerById(route.customerId) }
         LaunchedEffect(customer.loaded, customer.value) {
             val loaded = customer.value
             if (customer.loaded) {

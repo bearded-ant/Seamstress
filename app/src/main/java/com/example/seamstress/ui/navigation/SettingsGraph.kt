@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -129,7 +130,7 @@ fun NavGraphBuilder.settingsGraph(navController: NavHostController) {
         val viewModel: StandardSetViewModel = viewModel()
         val classes by viewModel.allClasses.observeAsState(emptyList())
         val allMetrics by viewModel.allMetrics.observeAsState(emptyList())
-        val classMetrics by viewModel.classMetricsLiveData.observeAsState(emptyList())
+        val classMetrics by viewModel.classMetrics.collectAsState()
         var saving by remember { mutableStateOf(false) }
 
         LaunchedEffect(Unit) {
@@ -164,7 +165,7 @@ fun NavGraphBuilder.settingsGraph(navController: NavHostController) {
         val setMetrics = remember(route.setId) { viewModel.setMetrics(route.setId) }.observeLoaded()
         val classes by viewModel.allClasses.observeAsState(emptyList())
         val allMetrics by viewModel.allMetrics.observeAsState(emptyList())
-        val classMetrics by viewModel.classMetricsLiveData.observeAsState(emptyList())
+        val classMetrics by viewModel.classMetrics.collectAsState()
         var saving by remember { mutableStateOf(false) }
         var deleting by remember { mutableStateOf(false) }
         val toast = rememberToast()

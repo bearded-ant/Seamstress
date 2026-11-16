@@ -60,14 +60,8 @@ class SeamstressViewModel(application: Application) : AndroidViewModel(applicati
 
     private fun state(): CustomerFormState = _formState.value ?: CustomerFormState()
 
-    private var _selectByIdCustomerLiveData = MutableLiveData<Customers?>()
-    val selectByIdCustomerLiveData: LiveData<Customers?> = _selectByIdCustomerLiveData
-    fun selectCustomerById(id: Long) {
-        viewModelScope.launch {
-            val response = customerRepo.getCustomerById(id)
-            _selectByIdCustomerLiveData.value = response
-        }
-    }
+    /** Клиент по id из Room: LiveData обновляется сам после правки и удаления. */
+    fun customerById(id: Long): LiveData<Customers?> = customerRepo.getCustomerByIdLiveData(id)
 
     private val _newCustomerId = Channel<Long>(Channel.BUFFERED)
     val newCustomerId: Flow<Long> = _newCustomerId.receiveAsFlow()

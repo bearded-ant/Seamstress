@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -31,7 +32,7 @@ fun NavGraphBuilder.measurementGraph(navController: NavHostController) {
         val viewModel: MeasurementsViewModel = viewModel()
         val classes by viewModel.allClasses.observeAsState(emptyList())
         val allMetrics by viewModel.allMetrics.observeAsState(emptyList())
-        val classMetrics by viewModel.classMetricsLiveData.observeAsState(emptyList())
+        val classMetrics by viewModel.classMetrics.collectAsState()
         var saving by remember { mutableStateOf(false) }
 
         LaunchedEffect(Unit) {
@@ -131,7 +132,7 @@ fun NavGraphBuilder.measurementGraph(navController: NavHostController) {
             } else {
                 val classes by viewModel.allClasses.observeAsState(emptyList())
                 val allMetrics by viewModel.allMetrics.observeAsState(emptyList())
-                val classMetrics by viewModel.classMetricsLiveData.observeAsState(emptyList())
+                val classMetrics by viewModel.classMetrics.collectAsState()
 
                 LaunchedEffect(row.classId) { viewModel.loadClassMetrics(row.classId) }
 

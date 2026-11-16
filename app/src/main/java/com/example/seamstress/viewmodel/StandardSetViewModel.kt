@@ -3,7 +3,6 @@ package com.example.seamstress.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.seamstress.data.StandardSetsRepository
 import com.example.seamstress.domain.SeamstressDataBase
@@ -15,11 +14,19 @@ import com.example.seamstress.domain.standards.StandardMetric
 import com.example.seamstress.domain.standards.StandardMetricRow
 import com.example.seamstress.domain.standards.StandardSet
 import com.example.seamstress.domain.standards.StandardSetItem
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class StandardSetViewModel(application: Application) : AndroidViewModel(application) {
 
     private val standardSetsRepository: StandardSetsRepository
@@ -39,16 +46,17 @@ class StandardSetViewModel(application: Application) : AndroidViewModel(applicat
         allMetrics = metricDao.getAllMetrics()
     }
 
-    private val _classMetricsLiveData = MutableLiveData<List<Metric>>()
-    val classMetricsLiveData: LiveData<List<Metric>> = _classMetricsLiveData
+    private val selectedClassId = MutableStateFlow<Long?>(null)
 
-    /** Метрики класса в порядке снятия — каркас формы набора. */
-    fun loadClassMetrics(classId: Long) {
-        viewModelScope.launch {
-            val ids = dressClassDao.getMetricIds(classId)
-            val byId = metricDao.getMetricsByIds(ids).associateBy { it.id }
-            _classMetricsLiveData.value = ids.mapNotNull { byId[it] }
+    /** Метрики класса в порядке снятия — каркас формы набора; Room Flow. */
+    val classMetrics: StateFlow<List<Metric>> = selectedClassId
+        .flatMapLatest { classId ->
+            if (classId == null) flowOf(emptyList()) else dressClassDao.getClassMetrics(classId)
         }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    fun loadClassMetrics(classId: Long) {
+        selectedClassId.value = classId
     }
 
     fun setById(id: Long): LiveData<StandardSet?> = standardSetsRepository.getSetById(id)

@@ -5,6 +5,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
+import com.example.seamstress.domain.measured.metric.Metric
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DressClassDao {
@@ -24,6 +26,17 @@ interface DressClassDao {
 
     @Query("select metric_id from dress_class_metrics where class_id = :classId order by position")
     suspend fun getMetricIds(classId: Long): List<Long>
+
+    /** Метрики класса в порядке снятия — каркас форм, Room Flow. */
+    @Query(
+        """
+        select m.* from metrics m
+        join dress_class_metrics cm on cm.metric_id = m.id
+        where cm.class_id = :classId
+        order by cm.position
+        """
+    )
+    fun getClassMetrics(classId: Long): Flow<List<Metric>>
 
     @Insert
     suspend fun insertClass(dressClass: DressClass): Long

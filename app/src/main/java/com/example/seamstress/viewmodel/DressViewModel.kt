@@ -4,7 +4,6 @@ import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.seamstress.data.DressesRepository
 import com.example.seamstress.domain.SeamstressDataBase
@@ -22,9 +21,16 @@ import com.example.seamstress.domain.measured.metric.Metric
 import com.example.seamstress.domain.measured.metric.MetricDao
 import com.example.seamstress.domain.measured.taken.TakenMeasurementDao
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
@@ -34,6 +40,7 @@ import java.util.Locale
 private const val DATE_PATTERN = "dd.MM.yyyy"
 private const val PHOTO_DIR = "dress_photos"
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class DressViewModel(application: Application) : AndroidViewModel(application) {
 
     private val dressesRepository: DressesRepository
@@ -56,16 +63,17 @@ class DressViewModel(application: Application) : AndroidViewModel(application) {
         allMetrics = metricDao.getAllMetrics()
     }
 
-    private val _classMetricsLiveData = MutableLiveData<List<Metric>>()
-    val classMetricsLiveData: LiveData<List<Metric>> = _classMetricsLiveData
+    private val selectedClassId = MutableStateFlow<Long?>(null)
 
-    /** Метрики класса в порядке снятия — каркас формы изделия. */
-    fun loadClassMetrics(classId: Long) {
-        viewModelScope.launch {
-            val ids = dressClassDao.getMetricIds(classId)
-            val byId = metricDao.getMetricsByIds(ids).associateBy { it.id }
-            _classMetricsLiveData.value = ids.mapNotNull { byId[it] }
+    /** Метрики класса в порядке снятия — каркас формы изделия; Room Flow. */
+    val classMetrics: StateFlow<List<Metric>> = selectedClassId
+        .flatMapLatest { classId ->
+            if (classId == null) flowOf(emptyList()) else dressClassDao.getClassMetrics(classId)
         }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    fun loadClassMetrics(classId: Long) {
+        selectedClassId.value = classId
     }
 
     /** Замеры клиента — источник копирования значений в форму изделия. */

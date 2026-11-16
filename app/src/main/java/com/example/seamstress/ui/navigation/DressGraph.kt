@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -115,7 +116,7 @@ fun NavGraphBuilder.dressGraph(navController: NavHostController) {
         val setViewModel: StandardSetViewModel = viewModel()
         val classes by viewModel.allClasses.observeAsState(emptyList())
         val allMetrics by viewModel.allMetrics.observeAsState(emptyList())
-        val classMetrics by viewModel.classMetricsLiveData.observeAsState(emptyList())
+        val classMetrics by viewModel.classMetrics.collectAsState()
         val measurements by remember(route.customerId) {
             viewModel.measurementsByCustomer(route.customerId)
         }.observeAsState(emptyList())
@@ -165,7 +166,7 @@ fun NavGraphBuilder.dressGraph(navController: NavHostController) {
         val metricRows = remember(route.dressId) { viewModel.dressMetrics(route.dressId) }.observeLoaded()
         val classes by viewModel.allClasses.observeAsState(emptyList())
         val allMetrics by viewModel.allMetrics.observeAsState(emptyList())
-        val classMetrics by viewModel.classMetricsLiveData.observeAsState(emptyList())
+        val classMetrics by viewModel.classMetrics.collectAsState()
         val sets by setViewModel.allSets.observeAsState(emptyList())
         var saving by remember { mutableStateOf(false) }
         var deleting by remember { mutableStateOf(false) }

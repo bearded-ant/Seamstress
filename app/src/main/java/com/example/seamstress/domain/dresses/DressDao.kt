@@ -52,6 +52,9 @@ interface DressDao {
     @Query("select * from dress_photo where dress_id = :dressId order by id")
     fun getDressPhotos(dressId: Long): LiveData<List<DressPhoto>>
 
+    @Query("select * from dress_photo where dress_id = :dressId order by id")
+    suspend fun getDressPhotosOnce(dressId: Long): List<DressPhoto>
+
     @Query("select * from dress_comment where dress_id = :dressId order by id")
     fun getDressComments(dressId: Long): LiveData<List<DressComment>>
 

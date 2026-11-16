@@ -24,6 +24,9 @@ class DressesRepository(private val dressDao: DressDao) {
     fun getDressPhotos(dressId: Long): LiveData<List<DressPhoto>> =
         dressDao.getDressPhotos(dressId)
 
+    suspend fun getDressPhotosOnce(dressId: Long): List<DressPhoto> =
+        dressDao.getDressPhotosOnce(dressId)
+
     fun getDressComments(dressId: Long): LiveData<List<DressComment>> =
         dressDao.getDressComments(dressId)
 

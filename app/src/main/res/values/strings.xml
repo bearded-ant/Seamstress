@@ -98,4 +98,30 @@
     <string name="standard_set_not_found">Набор не найден</string>
     <string name="delete_standard_set_title">Удалить набор %1$s?</string>
     <string name="delete_standard_set_message">Вы уверены, что хотите удалить набор %1$s?</string>
+
+    <!-- Изделия -->
+    <string name="title_dress_card">Изделие</string>
+    <string name="title_add_dress">Новое изделие</string>
+    <string name="title_update_dress">Редактирование изделия</string>
+    <string name="dress_name">Название изделия</string>
+    <string name="dress_price">Стоимость, ₽</string>
+    <string name="dress_price_value">Стоимость: %1$d ₽</string>
+    <string name="dress_price_not_set">Стоимость не указана</string>
+    <string name="error_dress_price_invalid">Стоимость — целое число от 0 до 1 000 000 000</string>
+    <string name="dress_photos">Фото</string>
+    <string name="dress_photos_empty">Фото нет</string>
+    <string name="dress_photo_load">Загрузить</string>
+    <string name="dress_photo_camera">Снять камерой</string>
+    <string name="dress_photo_delete">Удалить фото</string>
+    <string name="dress_camera_unavailable">Камера недоступна</string>
+    <string name="dress_metrics">Мерки</string>
+    <string name="dress_comments">Комментарии</string>
+    <string name="dress_comments_empty">Комментариев нет</string>
+    <string name="dress_comment_add">Добавить комментарий</string>
+    <string name="dress_comment_hint">Текст комментария</string>
+    <string name="dress_from_measurement">Взять из замера клиента</string>
+    <string name="dress_from_set">Общие мерки (именной набор)</string>
+    <string name="dress_not_found">Изделие не найдено</string>
+    <string name="delete_dress_title">Удалить изделие %1$s?</string>
+    <string name="delete_dress_message">Вы уверены, что хотите удалить изделие %1$s? Мерки, фото и комментарии будут удалены.</string>
 </resources>

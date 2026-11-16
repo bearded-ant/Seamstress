@@ -1,35 +1,80 @@
 package com.example.seamstress.viewmodel
 
 import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.seamstress.data.DressesRepository
 import com.example.seamstress.domain.SeamstressDataBase
+import com.example.seamstress.domain.dress.DressClassDao
+import com.example.seamstress.domain.dress.DressClassItem
 import com.example.seamstress.domain.dresses.Dress
 import com.example.seamstress.domain.dresses.DressComment
 import com.example.seamstress.domain.dresses.DressMetric
 import com.example.seamstress.domain.dresses.DressMetricRow
 import com.example.seamstress.domain.dresses.DressPhoto
 import com.example.seamstress.domain.dresses.DressRow
+import com.example.seamstress.domain.measured.measurements.MeasurementDao
+import com.example.seamstress.domain.measured.measurements.MeasurementRow
+import com.example.seamstress.domain.measured.metric.Metric
+import com.example.seamstress.domain.measured.metric.MetricDao
+import com.example.seamstress.domain.measured.taken.TakenMeasurementDao
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 private const val DATE_PATTERN = "dd.MM.yyyy"
+private const val PHOTO_DIR = "dress_photos"
 
 class DressViewModel(application: Application) : AndroidViewModel(application) {
 
     private val dressesRepository: DressesRepository
+    private val dressClassDao: DressClassDao
+    private val metricDao: MetricDao
+    private val measurementDao: MeasurementDao
+    private val takenMeasurementDao: TakenMeasurementDao
+
+    val allClasses: LiveData<List<DressClassItem>>
+    val allMetrics: LiveData<List<Metric>>
 
     init {
         val db = SeamstressDataBase.getDatabase(application)
         dressesRepository = DressesRepository(db.dressDao())
+        dressClassDao = db.dressClassDao()
+        metricDao = db.metricDao()
+        measurementDao = db.measurementsDao()
+        takenMeasurementDao = db.takenMeasurementsDao()
+        allClasses = dressClassDao.getAllClasses()
+        allMetrics = metricDao.getAllMetrics()
     }
+
+    private val _classMetricsLiveData = MutableLiveData<List<Metric>>()
+    val classMetricsLiveData: LiveData<List<Metric>> = _classMetricsLiveData
+
+    /** Метрики класса в порядке снятия — каркас формы изделия. */
+    fun loadClassMetrics(classId: Long) {
+        viewModelScope.launch {
+            val ids = dressClassDao.getMetricIds(classId)
+            val byId = metricDao.getMetricsByIds(ids).associateBy { it.id }
+            _classMetricsLiveData.value = ids.mapNotNull { byId[it] }
+        }
+    }
+
+    /** Замеры клиента — источник копирования значений в форму изделия. */
+    fun measurementsByCustomer(customerId: Long): LiveData<List<MeasurementRow>> =
+        measurementDao.getMeasurementsByCustomerId(customerId)
+
+    /** Значения замера для копирования: пары «id метрики → значение». */
+    suspend fun measurementValues(measurementId: Long): List<Pair<Long, Float>> =
+        takenMeasurementDao.getTakenMeasurementOnce(measurementId).map { it.metricId to it.value }
 
     /** Изделия клиента из Room: список обновляется сам после записи. */
     fun dressesByCustomer(customerId: Long): LiveData<List<DressRow>> =
@@ -110,10 +155,12 @@ class DressViewModel(application: Application) : AndroidViewModel(application) {
     private val _dressDeleted = Channel<Long>(Channel.BUFFERED)
     val dressDeleted: Flow<Long> = _dressDeleted.receiveAsFlow()
 
-    /** Удаление изделия: мерки, фото и комментарии уходят каскадом. */
+    /** Удаление изделия: мерки, фото и комментарии уходят каскадом, файлы фото удаляются. */
     fun deleteDress(dressId: Long) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
+            val photos = dressesRepository.getDressPhotosOnce(dressId)
             dressesRepository.deleteDressById(dressId)
+            photos.forEach { runCatching { File(it.path).delete() } }
             _dressDeleted.send(dressId)
         }
     }
@@ -124,8 +171,49 @@ class DressViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /** Файл под снимок камерой; создаётся до запуска камеры. */
+    fun createCameraPhotoFile(dressId: Long): File {
+        val dir = File(getApplication<Application>().filesDir, PHOTO_DIR).apply { mkdirs() }
+        return File(dir, "${dressId}_${System.currentTimeMillis()}.jpg")
+    }
+
+    /** Снимок камерой удался — файл уже на месте, пишем строку; иначе убираем пустой файл. */
+    fun addPhotoFromFile(dressId: Long, file: File) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (file.exists() && file.length() > 0) {
+                dressesRepository.insertDressPhoto(
+                    DressPhoto(id = 0L, dressId = dressId, path = file.absolutePath)
+                )
+            } else {
+                file.delete()
+            }
+        }
+    }
+
+    /** Фото из галереи: копия потока в хранилище приложения, не drawable. */
+    fun addPhotoFromUri(dressId: Long, uri: Uri) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val file = createCameraPhotoFile(dressId)
+            val copied = runCatching {
+                getApplication<Application>().contentResolver.openInputStream(uri)?.use { input ->
+                    file.outputStream().use { output -> input.copyTo(output) }
+                } != null
+            }.getOrDefault(false)
+            if (copied && file.length() > 0) {
+                dressesRepository.insertDressPhoto(
+                    DressPhoto(id = 0L, dressId = dressId, path = file.absolutePath)
+                )
+            } else {
+                file.delete()
+            }
+        }
+    }
+
     fun deletePhoto(photo: DressPhoto) {
-        viewModelScope.launch { dressesRepository.deleteDressPhoto(photo) }
+        viewModelScope.launch(Dispatchers.IO) {
+            dressesRepository.deleteDressPhoto(photo)
+            runCatching { File(photo.path).delete() }
+        }
     }
 
     fun addComment(dressId: Long, text: String) {

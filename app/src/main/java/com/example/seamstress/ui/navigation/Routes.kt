@@ -28,6 +28,15 @@ data class CardMeasurement(val measurementId: Long) : Route
 data class UpdateMeasurement(val measurementId: Long) : Route
 
 @Serializable
+data class DressCard(val dressId: Long) : Route
+
+@Serializable
+data class AddDress(val customerId: Long) : Route
+
+@Serializable
+data class UpdateDress(val dressId: Long) : Route
+
+@Serializable
 data object Settings : Route
 
 @Serializable

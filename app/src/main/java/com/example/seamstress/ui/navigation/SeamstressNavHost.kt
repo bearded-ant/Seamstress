@@ -11,6 +11,7 @@ fun SeamstressNavHost() {
     NavHost(navController = navController, startDestination = CustomersList) {
         customerGraph(navController)
         measurementGraph(navController)
+        dressGraph(navController)
         settingsGraph(navController)
     }
 }

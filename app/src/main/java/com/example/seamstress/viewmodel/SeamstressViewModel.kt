@@ -1,11 +1,11 @@
 package com.example.seamstress.viewmodel
 
 import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.seamstress.R
 import com.example.seamstress.data.CustomersRepository
 import com.example.seamstress.domain.SeamstressDataBase
 import com.example.seamstress.domain.customers.Customers
@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.io.File
+
+private const val CUSTOMER_PHOTO_DIR = "customer_photos"
 
 class SeamstressViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -39,10 +41,12 @@ class SeamstressViewModel(application: Application) : AndroidViewModel(applicati
 
     /** Заполняет форму при редактировании. */
     fun fillForm(customer: Customers) {
+        originalImgPath = customer.img
         _formState.value = CustomerFormState(
             name = customer.name,
             phone = customer.phone.orEmpty(),
-            balance = customer.balance.toString()
+            balance = customer.balance.toString(),
+            imgPath = customer.img
         )
     }
 
@@ -102,7 +106,7 @@ class SeamstressViewModel(application: Application) : AndroidViewModel(applicati
                     id = id,
                     name = name,
                     phone = phone!!.ifEmpty { null },
-                    img = R.drawable.ic_baseline_add_a_photo_24,
+                    img = current.imgPath,
                     balance = balance!!
                 )
                 if (id == 0L) {
@@ -110,6 +114,11 @@ class SeamstressViewModel(application: Application) : AndroidViewModel(applicati
                 } else {
                     customerRepo.updateCustomer(customer)
                     _customerSaved.send(id)
+                }
+                pendingPhotoFile = null
+                val oldImg = originalImgPath
+                if (oldImg != null && oldImg != current.imgPath) {
+                    runCatching { File(oldImg).delete() }
                 }
             } catch (e: CancellationException) {
                 throw e
@@ -124,13 +133,44 @@ class SeamstressViewModel(application: Application) : AndroidViewModel(applicati
     private val _customerDeleted = Channel<Unit>(Channel.BUFFERED)
     val customerDeleted: Flow<Unit> = _customerDeleted.receiveAsFlow()
 
-    /** Удаление клиента: замеры и изделия уходят каскадом, файлы фото изделий убираются. */
+    /** Удаление клиента: замеры и изделия уходят каскадом, файлы фото убираются. */
     fun deleteCustomer(client: Customers) {
         viewModelScope.launch(Dispatchers.IO) {
             val photos = dressDao.getPhotosByCustomerId(client.id)
             customerRepo.deleteCustomer(client)
             photos.forEach { runCatching { File(it.path).delete() } }
+            client.img?.let { path -> runCatching { File(path).delete() } }
             _customerDeleted.send(Unit)
         }
+    }
+
+    private var originalImgPath: String? = null
+    private var pendingPhotoFile: File? = null
+
+    /** Фото из галереи: копия в хранилище приложения, путь — в состояние формы. */
+    fun addCustomerPhotoFromUri(uri: Uri) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val dir = File(getApplication<Application>().filesDir, CUSTOMER_PHOTO_DIR).apply { mkdirs() }
+            val file = File(dir, "customer_${System.currentTimeMillis()}.jpg")
+            val copied = runCatching {
+                getApplication<Application>().contentResolver.openInputStream(uri)?.use { input ->
+                    file.outputStream().use { output -> input.copyTo(output) }
+                } != null
+            }.getOrDefault(false)
+            if (copied && file.length() > 0) {
+                pendingPhotoFile?.delete()
+                pendingPhotoFile = file
+                _formState.postValue(state().copy(imgPath = file.absolutePath))
+            } else {
+                file.delete()
+            }
+        }
+    }
+
+    /** Отмена формы: несохранённое фото убирается, путь возвращается к исходному. */
+    fun discardPendingPhoto() {
+        pendingPhotoFile?.delete()
+        pendingPhotoFile = null
+        _formState.value = state().copy(imgPath = originalImgPath)
     }
 }

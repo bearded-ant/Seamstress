@@ -17,6 +17,8 @@ data class CustomerFormState(
     val name: String = "",
     val phone: String = "",
     val balance: String = "",
+    /** Путь к файлу фото клиента; null — фото нет. */
+    val imgPath: String? = null,
     val nameError: Boolean = false,
     val phoneError: Boolean = false,
     val balanceError: Boolean = false,

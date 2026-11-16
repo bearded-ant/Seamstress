@@ -50,7 +50,7 @@ class CascadeDeleteTest {
         db.query("PRAGMA foreign_key_check", emptyArray()).use { it.count }
 
     private suspend fun insertCustomer(): Long =
-        db.customersDao().insertCustomer(Customers(0L, "Клиент", null, 0, 0L))
+        db.customersDao().insertCustomer(Customers(0L, "Клиент", null, null, 0L))
 
     private suspend fun insertMetric(): Long =
         db.metricDao().insertMetric(Metric(0L, 1L, "ОГ", "обхват груди", null))

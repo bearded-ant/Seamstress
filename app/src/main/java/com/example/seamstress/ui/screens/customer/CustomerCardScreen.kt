@@ -35,6 +35,7 @@ import com.example.seamstress.R
 import com.example.seamstress.domain.customers.Customers
 import com.example.seamstress.domain.dresses.DressRow
 import com.example.seamstress.domain.measured.measurements.MeasurementRow
+import com.example.seamstress.ui.components.PhotoImage
 import com.example.seamstress.ui.components.formatMoney
 import com.example.seamstress.ui.components.formatPhone
 
@@ -147,11 +148,17 @@ fun CustomerCardScreen(
 private fun CustomerHeader(customer: Customers, onAddMeasurement: () -> Unit) {
     Card(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
         Column(modifier = Modifier.fillMaxWidth()) {
-            Image(
-                painter = painterResource(R.drawable.ic_baseline_add_a_photo_24),
-                contentDescription = stringResource(R.string.customer_photo),
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxWidth().height(194.dp)
+            PhotoImage(
+                path = customer.img,
+                modifier = Modifier.fillMaxWidth().height(194.dp),
+                placeholder = {
+                    Image(
+                        painter = painterResource(R.drawable.ic_baseline_add_a_photo_24),
+                        contentDescription = stringResource(R.string.customer_photo),
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             )
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(

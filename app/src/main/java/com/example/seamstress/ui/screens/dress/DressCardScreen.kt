@@ -1,8 +1,5 @@
 package com.example.seamstress.ui.screens.dress
 
-import android.graphics.BitmapFactory
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,16 +23,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -44,10 +37,9 @@ import com.example.seamstress.domain.dresses.DressComment
 import com.example.seamstress.domain.dresses.DressMetricRow
 import com.example.seamstress.domain.dresses.DressPhoto
 import com.example.seamstress.domain.dresses.DressRow
+import com.example.seamstress.ui.components.PhotoImage
 import com.example.seamstress.ui.components.formatMeasure
 import com.example.seamstress.ui.components.formatMoney
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 /**
  * Карточка изделия: название · фото-слайдер (загрузить/снять камерой/удалить) ·
@@ -129,7 +121,7 @@ fun DressCardScreen(
                         ) { page ->
                             val photo = photos[page]
                             Box(modifier = Modifier.fillMaxSize()) {
-                                DressPhotoImage(
+                                PhotoImage(
                                     path = photo.path,
                                     modifier = Modifier.fillMaxSize()
                                 )
@@ -279,39 +271,4 @@ private fun AddCommentDialog(
             TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel_btn)) }
         }
     )
-}
-
-/** Фото из файла приложения: декодирование вне главного потока с даунсемплингом. */
-@Composable
-private fun DressPhotoImage(path: String, modifier: Modifier = Modifier) {
-    var bitmap by remember(path) { mutableStateOf<ImageBitmap?>(null) }
-
-    LaunchedEffect(path) {
-        bitmap = withContext(Dispatchers.IO) {
-            runCatching {
-                val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-                BitmapFactory.decodeFile(path, bounds)
-                var sample = 1
-                while (bounds.outWidth / sample > 1600 || bounds.outHeight / sample > 1600) {
-                    sample *= 2
-                }
-                BitmapFactory.decodeFile(
-                    path,
-                    BitmapFactory.Options().apply { inSampleSize = sample }
-                )?.asImageBitmap()
-            }.getOrNull()
-        }
-    }
-
-    val image = bitmap
-    if (image != null) {
-        Image(
-            bitmap = image,
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = modifier
-        )
-    } else {
-        Box(modifier = modifier.background(MaterialTheme.colorScheme.surfaceVariant))
-    }
 }

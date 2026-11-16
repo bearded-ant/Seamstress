@@ -9,6 +9,7 @@ data class Customers(
     val id: Long,
     val name: String,
     val phone: String?,
-    val img: Int,
+    /** Путь к файлу фото в хранилище приложения; null — фото нет. */
+    val img: String?,
     val balance: Long = 0L
 )

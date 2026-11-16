@@ -27,6 +27,7 @@
     <string name="add_customer_btn">add_customer_btn</string>
     <string name="item_dress_list_photo">item_dress_list_photo</string>
     <string name="customer_photo">customer_photo</string>
+    <string name="customer_photo_load">Загрузить фото</string>
     <string name="save_btn">сохранить</string>
     <string name="cancel_btn">отменить</string>
     <string name="customer_name">имя клиента</string>

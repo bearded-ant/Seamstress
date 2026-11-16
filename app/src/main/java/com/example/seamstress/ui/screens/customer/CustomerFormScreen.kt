@@ -30,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.seamstress.R
+import com.example.seamstress.ui.components.PhotoImage
 import com.example.seamstress.viewmodel.CustomerFormState
 
 /**
@@ -42,6 +43,7 @@ fun CustomerFormScreen(
     onNameChange: (String) -> Unit,
     onPhoneChange: (String) -> Unit,
     onBalanceChange: (String) -> Unit,
+    onPickPhoto: () -> Unit,
     onSave: () -> Unit,
     onCancel: () -> Unit,
     onDelete: (() -> Unit)? = null
@@ -55,12 +57,22 @@ fun CustomerFormScreen(
     ) {
         Card(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
             Column(modifier = Modifier.fillMaxWidth()) {
-                Image(
-                    painter = painterResource(R.drawable.ic_baseline_add_a_photo_24),
-                    contentDescription = stringResource(R.string.customer_photo),
+                PhotoImage(
+                    path = state.imgPath,
                     contentScale = ContentScale.Fit,
-                    modifier = Modifier.fillMaxWidth().height(194.dp)
+                    modifier = Modifier.fillMaxWidth().height(194.dp),
+                    placeholder = {
+                        Image(
+                            painter = painterResource(R.drawable.ic_baseline_add_a_photo_24),
+                            contentDescription = stringResource(R.string.customer_photo),
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
                 )
+                TextButton(onClick = onPickPhoto, modifier = Modifier.padding(start = 8.dp)) {
+                    Text(stringResource(R.string.customer_photo_load))
+                }
                 Column(
                     modifier = Modifier.fillMaxWidth().padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)

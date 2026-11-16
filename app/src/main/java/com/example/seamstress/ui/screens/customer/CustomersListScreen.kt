@@ -25,6 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.seamstress.R
 import com.example.seamstress.domain.customers.Customers
+import com.example.seamstress.ui.components.PhotoImage
 import com.example.seamstress.ui.components.formatMoney
 import com.example.seamstress.ui.components.formatPhone
 
@@ -64,11 +65,17 @@ private fun CustomerRow(customer: Customers, onClick: () -> Unit) {
             .clickable(onClick = onClick)
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {
-            Image(
-                painter = painterResource(R.drawable.ic_baseline_add_a_photo_24),
-                contentDescription = stringResource(R.string.customer_photo),
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.width(122.dp).height(122.dp)
+            PhotoImage(
+                path = customer.img,
+                modifier = Modifier.width(122.dp).height(122.dp),
+                placeholder = {
+                    Image(
+                        painter = painterResource(R.drawable.ic_baseline_add_a_photo_24),
+                        contentDescription = stringResource(R.string.customer_photo),
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             )
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(

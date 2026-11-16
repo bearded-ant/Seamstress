@@ -1,5 +1,8 @@
 package com.example.seamstress.ui.navigation
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.LaunchedEffect
@@ -94,6 +97,11 @@ fun NavGraphBuilder.customerGraph(navController: NavHostController) {
         val viewModel: SeamstressViewModel = viewModel()
         val state by viewModel.formState.observeAsState(CustomerFormState())
         val toast = rememberToast()
+        val pickLauncher = rememberLauncherForActivityResult(
+            ActivityResultContracts.PickVisualMedia()
+        ) { uri ->
+            if (uri != null) viewModel.addCustomerPhotoFromUri(uri)
+        }
 
         LaunchedEffect(Unit) {
             viewModel.newCustomerId.collect { newCustomerId ->
@@ -115,8 +123,16 @@ fun NavGraphBuilder.customerGraph(navController: NavHostController) {
                 onNameChange = viewModel::onNameChange,
                 onPhoneChange = viewModel::onPhoneChange,
                 onBalanceChange = viewModel::onBalanceChange,
+                onPickPhoto = {
+                    pickLauncher.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    )
+                },
                 onSave = { viewModel.saveCustomer() },
-                onCancel = { navController.popBackStack() }
+                onCancel = {
+                    viewModel.discardPendingPhoto()
+                    navController.popBackStack()
+                }
             )
         }
     }
@@ -127,6 +143,11 @@ fun NavGraphBuilder.customerGraph(navController: NavHostController) {
         val state by viewModel.formState.observeAsState(CustomerFormState())
         val customer = remember(route.customerId) { viewModel.customerById(route.customerId) }.observeLoaded()
         val toast = rememberToast()
+        val pickLauncher = rememberLauncherForActivityResult(
+            ActivityResultContracts.PickVisualMedia()
+        ) { uri ->
+            if (uri != null) viewModel.addCustomerPhotoFromUri(uri)
+        }
 
         LaunchedEffect(customer.loaded, customer.value) {
             val loaded = customer.value
@@ -166,8 +187,16 @@ fun NavGraphBuilder.customerGraph(navController: NavHostController) {
                 onNameChange = viewModel::onNameChange,
                 onPhoneChange = viewModel::onPhoneChange,
                 onBalanceChange = viewModel::onBalanceChange,
+                onPickPhoto = {
+                    pickLauncher.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    )
+                },
                 onSave = { viewModel.saveCustomer(route.customerId) },
-                onCancel = { navController.popBackStack() },
+                onCancel = {
+                    viewModel.discardPendingPhoto()
+                    navController.popBackStack()
+                },
                 onDelete = customer.value?.let { loaded ->
                     { viewModel.deleteCustomer(loaded) }
                 }

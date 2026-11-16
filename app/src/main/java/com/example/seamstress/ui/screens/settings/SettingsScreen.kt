@@ -18,7 +18,8 @@ import com.example.seamstress.R
 @Composable
 fun SettingsScreen(
     onMetricsClick: () -> Unit,
-    onClassesClick: () -> Unit
+    onClassesClick: () -> Unit,
+    onStandardMetricsClick: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         SettingsItem(
@@ -29,6 +30,11 @@ fun SettingsScreen(
         SettingsItem(
             title = stringResource(R.string.classes_reference),
             onClick = onClassesClick
+        )
+        HorizontalDivider()
+        SettingsItem(
+            title = stringResource(R.string.standard_metrics_reference),
+            onClick = onStandardMetricsClick
         )
         HorizontalDivider()
     }

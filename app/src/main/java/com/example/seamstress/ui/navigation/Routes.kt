@@ -38,3 +38,12 @@ data object ClassReference : Route
 
 @Serializable
 data object CreateClass : Route
+
+@Serializable
+data object StandardMetricsReference : Route
+
+@Serializable
+data object CreateStandardSet : Route
+
+@Serializable
+data class UpdateStandardSet(val setId: Long) : Route

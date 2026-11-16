@@ -84,4 +84,18 @@
     <string name="title_add_measurement">Новый замер</string>
     <string name="title_card_measurement">Мерки</string>
     <string name="title_update_measurement">Редактирование замера</string>
+
+    <!-- Общие мерки: именные наборы -->
+    <string name="standard_metrics_reference">Общие мерки</string>
+    <string name="title_standard_metrics_reference">Общие мерки</string>
+    <string name="standard_sets_empty">Наборов общих мерок нет</string>
+    <string name="title_create_standard_set">Новый набор мерок</string>
+    <string name="title_update_standard_set">Редактирование набора</string>
+    <string name="standard_set_name">Название набора</string>
+    <string name="standard_set_skeleton">Каркас метрик</string>
+    <string name="standard_set_all_metrics">Все метрики справочника</string>
+    <string name="standard_set_values">Значения метрик</string>
+    <string name="standard_set_not_found">Набор не найден</string>
+    <string name="delete_standard_set_title">Удалить набор %1$s?</string>
+    <string name="delete_standard_set_message">Вы уверены, что хотите удалить набор %1$s?</string>
 </resources>

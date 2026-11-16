@@ -1,8 +1,9 @@
 # Seamstress — план работ
 
-Состояние на 2026-11-14. Проект в разработке: схему БД можно менять свободно,
-миграции не пишем, но ассет `app/src/main/assets/pre_seamstress` пересобираем при каждом
-изменении сущностей.
+Состояние на 2026-11-17. Этапы 1–4 закрыты. Схему БД менять можно свободно:
+миграции не пишем (`fallbackToDestructiveMigration`), но `exportSchema = true` —
+схемы в `app/schemas`, ассет `app/src/main/assets/pre_seamstress` пересобираем
+при каждом изменении сущностей (сейчас Room `version = 6`).
 
 ## Уже сделано
 
@@ -76,39 +77,44 @@
    создание метрики в справочнике, карточка замера на Compose с JOIN `metrics`.
    *Готово, когда:* замер хранит значения мерок, карточка показывает «краткое имя — значение».
 
-## Этап 2. Улучшения
+## Этап 2. Улучшения — закрыт 2026-11-17
 
-1. **Схема БД на вырост**
-   `@ForeignKey` с `ON DELETE CASCADE` (замер → клиент, taken → замер/метрика),
-   индексы по `customer_id`/`measured_id`/`metric_id`, деньги — `Long` в копейках вместо
-   `Float`, `exportSchema = true` + папка `app/schemas` в git, обновлённый ассет
-   (`wal_checkpoint(TRUNCATE)`, `journal_mode=DELETE`, `room_master_table`).
-   *Критерий:* `PRAGMA foreign_key_check` пуст, схема Room в репозитории.
+- [x] **Схема БД на вырост** (`7cd3389`)
+   FK `ON DELETE CASCADE` и индексы: `measurements.customer_id`, `taken_measurements`
+   (`measured_id`/`metric_id`/`customer_id`); у таблиц изделий — с этапа 4.
+   `exportSchema = true`, схемы в `app/schemas` (`5.json`, `6.json`), ассет пересобран.
+   Деньги — `Long` в целых рублях (пункт про копейки отменён). Сейчас Room `version = 6`.
+   *Критерий выполнен:* `PRAGMA foreign_key_check` пуст, схемы Room в репозитории.
 
-2. **Слой данных**
-   Room-запросы → `Flow` вместо ручных `MutableLiveData`; репозитории только `suspend`
-   с `Result`; отдельный ViewModel на экран вместо общего на четыре;
-   `UiState` (загрузка / пусто / данные / ошибка).
+- [x] **Слой данных** (`29819ff`)
+   Каркас метрик класса — Room `Flow` → `StateFlow` (`flatMapLatest`) в трёх ViewModel;
+   клиент по id — Room `LiveData` вместо ручной `MutableLiveData`. Репозитории — suspend,
+   ViewModel на каждый экран. «Загрузка / не найдено» — `observeLoaded`, пустота —
+   пустые состояния экранов (отдельный `UiState`-класс не вводился). Обёртка `Result`
+   не добавлена: UI ошибок её не потребляет. `formState` остаётся на `MutableLiveData` —
+   это состояние формы, не Room-запрос.
 
-3. **Навигация**
-   Убрать `newInstance()`; явный back stack list → card → add/update/замер;
-   после сохранения `popBackStack()`, после удаления `popUpTo(list, inclusive = true)`;
-   пустые состояния для «нет клиентов» и «нет замеров».
+- [x] **Навигация**
+   Back stack: список → карточка → форма/замер/изделие; после сохранения `popBackStack()`,
+   после удаления — `popUpTo`/replace. Пустые состояния: клиенты (`6cae32a`), замеры,
+   изделия, наборы, классы, мерки. `newInstance()` исчез вместе с фрагментами (этап 3).
 
-4. **UI/UX**
-   Формат денег (руб., 2 знака) и маска телефона; Material3 + `enableEdgeToEdge()`
-   с обработкой инсетов (targetSdk 37 требует); все строки и nav-лейблы в `strings.xml`;
-   `DiffUtil` в адаптерах; фото клиента через `PickVisualMedia` + копия в `filesDir`
-   вместо `img: Int`.
+- [x] **UI/UX** (`9271c46`, `460a15b`)
+   Маска телефона «+7 (998) 765-43-21», деньги «1 234 567 ₽» (`formatPhone`/`formatMoney`).
+   Edge-to-edge и инсеты — этап 3, шаг 6. Строки в `strings.xml`. Фото клиента —
+   `PickVisualMedia` + копия в `filesDir/customer_photos`, `Customers.img: String?` (путь),
+   общий компонент `PhotoImage`. `DiffUtil` отменён — адаптеров нет.
 
-5. **Приватность**
-   `allowBackup=false` или `dataExtractionRules`, исключающие БД: сейчас имена и телефоны
-   клиентов попадают в облачный бэкап.
+- [x] **Приватность** (`c3fdfb1`)
+   `dataExtractionRules` (API 31+) и `fullBackupContent` (26–30): БД, `dress_photos/` и
+   `customer_photos/` исключены из облачного бэкапа и переноса устройства.
 
-6. **Качество**
-   Тест на каскадное удаление с Room in-memory (`androidTest`), CI на `assembleDebug` +
-   `lintDebug`, lint-конфиг с `abortOnError`; затем уборка `ui/fragments/notused/`,
-   `domain/dress/*`, дубля `item_customer.xml` и jpeg в `drawable`.
+- [x] **Качество** (`c1eac2c`, `51c7609`)
+   `CascadeDeleteTest` (androidTest, 4 теста: клиент/изделие/замер/набор) — компилируется,
+   прогон требует устройства. CI `.github/workflows/android.yml`: `assembleDebug` +
+   `lintDebug`. lint `abortOnError = true`. Чистка: `ui/fragments/notused/` (7 фрагментов),
+   7 `fragment_*.xml`, мёртвые `domain/dress/{Dress,DressSources,DressRepo}.kt`, 6 jpeg,
+   `viewBinding` удалён.
 
 ## Этап 3. Миграция UI на Jetpack Compose
 
@@ -174,6 +180,7 @@
   ViewModel — через `viewModel()`, событие `customerDeleted` для перехода после удаления.
   **Остаток:** `viewBinding = true` и 7 `fragment_*.xml` держатся только мёртвым
   `ui/fragments/notused/` — удалять его без явной просьбы нельзя.
+  *(Снято при чистке этапа 2: `notused/`, layout'ы и `viewBinding` удалены.)*
 
 - [x] **Шаг 6. Свобода вёрстки**
   Снять `android:screenOrientation="portrait"`, включить `enableEdgeToEdge()` и обработать
@@ -199,7 +206,7 @@ Safe Args, ViewBinding, `Fragment`-обвязка (`_binding`, `onDestroyView`, 
 и клавиатура в формах, edge-to-edge. Смягчение — миграция по одному экрану и работающее
 приложение после каждого шага.
 
-## Этап 4. Изделия (Dress)
+## Этап 4. Изделия (Dress) — закрыт 2026-11-16
 
 Модель зафиксирована по итогам обсуждения 2026-11-16 (доска user flow
 `Qeh8kPXdTvayMTGsdD4I5s`, состав карточки — `EMWC2NorjgmYMKZ8NYPHSU` узел 2:3423).
@@ -227,7 +234,7 @@ standard_metric(id, set_id, metric_id, value REAL)       -- значения м�
 - Несколько изделий по одним меркам = несколько независимых копий одного замера.
 - `measurement` остаётся отдельной сущностью (замеры клиента), изделием не становится.
 
-### Шаг 1. Room v4
+### Шаг 1. Room v4 — готово (`7ce4b01`, `76c7ec2`)
 Шесть таблиц + DAO + репозитории + ViewModel (`DressViewModel`, `StandardSetViewModel`).
 Транзакции: создание изделия вместе с metrics/photos/comments; удаление изделия каскадом.
 Конвертация ассета `pre_seamstress`: каждый существующий `measurements` → `dress`
@@ -236,8 +243,10 @@ standard_metric(id, set_id, metric_id, value REAL)       -- значения м�
 и `DressSources.kt` (используются только мёртвым `ui/fragments/notused/` — трогать
 вместе с ним или оставить до чистки).
 *Готово, когда:* схема компилируется KSP, ассет содержит изделия по числу замеров.
+**Сделано:** сущности в `domain/dresses/` и `domain/standards/`, в ассете 6 изделий и
+20 `dress_metric`; мёртвые `Dress.kt`/`DressSources.kt`/`DressRepo.kt` удалены при чистке этапа 2.
 
-### Шаг 2. Общие мерки (справочник именных наборов)
+### Шаг 2. Общие мерки (справочник именных наборов) — готово (`76c7ec2`, мок `84054f9`)
 `StandardMetricsScreen` в настройках: список именных наборов `standard_set`
 («мужчина 54», «женщина 48»…). `create`/`edit` — форма набора: имя + значения метрик
 (метрики берутся из `MetricsReferenceScreen`, каркас — из класса или все). Удаление набора.
@@ -245,21 +254,37 @@ standard_metric(id, set_id, metric_id, value REAL)       -- значения м�
 На доске: Settings → StandardMetricsScreen (сплошная), StandardMetricsScreen → DressForm
 (пунктир, выбор набора), MetricsReferenceScreen → StandardMetricsScreen (пунктир, определения метрик).
 *Готово, когда:* набор создаётся/правится, значения копируются в форму изделия.
+**Сделано:** `StandardMetricsScreen` (список) + `StandardSetFormScreen` (создание/правка,
+каркас — класс или весь справочник, удаление с подтверждением); копирование набора в форму
+изделия подключено в шаге 3. Мок в ассете: «Мужчина 54» (12 метрик), «Женщина 48» (18).
 
-### Шаг 3. DressGraph и экраны
+### Шаг 3. DressGraph и экраны — готово (`2a640d1`)
 Маршруты (аргументы только Long): `DressCard(dressId)`, `DressForm(dressId?)` —
 create/edit одним экраном (как CustomerFormScreen). Состав карточки по описанию:
 название · фото-слайдер (загрузить/снять камерой/удалить) · связанные мерки · стоимость ·
 комментарии (добавить/удалить) · FAB «Редактировать». Дата создания — служебное поле,
 в форме не редактируется.
 *Готово, когда:* цикл клиент → изделие → мерки проходит на устройстве.
+**Сделано:** `DressCardScreen` (фото-слайдер `HorizontalPager`, загрузка `PickVisualMedia`,
+камера `TakePicture` + `FileProvider`, комментарии, цена) и `DressFormScreen` (три источника
+значений: вручную / замер клиента / именной набор); маршруты `DressCard`/`AddDress`/`UpdateDress`.
+Фото: оригиналы без сжатия, даунсемплинг до 1600px при показе, без лимита числа и кэша превью.
 
-### Шаг 4. Интеграция с карточкой клиента
+### Шаг 4. Интеграция с карточкой клиента — готово (`ca71b43`)
 Скролл изделий вместо скрытой заглушки `item_customer_btn_add_dress`: список
 `dress` по `customer_id`, FAB/строка «новое изделие» → `DressForm(null)`.
 Карточка клиента уже требует это по доске («новое изделие», «скролл изделий клиента»).
 *Готово, когда:* заглушка удалена, переходы соответствуют доске.
+**Сделано:** секция «Изделия» в карточке клиента (`LazyRow` плиток + «новое изделие»),
+переходы по доске; файлы фото изделий удаляются при удалении изделия и клиента.
 
 ### Открытые вопросы
-- Цена: отдельное поле изделия или участвует в `customers.balance`? Пока — просто `price`.
-- Фото: максимум/сжатие, нужен ли кэш превью. Отложено до шага 3.
+- Цена: отдельное поле изделия или участвует в `customers.balance`? Пока — просто `price`. **Открыт.**
+- Фото: максимум/сжатие, нужен ли кэш превью. **Закрыт в шаге 3** минимальным вариантом
+  (оригиналы без сжатия, даунсемплинг при показе, без лимита и кэша).
+
+## Осталось
+
+- Прогнать `connectedDebugAndroidTest` на устройстве/эмуляторе (в среде разработки adb нет).
+- Продуктовое решение: цена изделия — отдельное поле или участвует в `customers.balance`.
+- `AGENTS.md` устарел (ViewBinding, `notused/`, версия БД 3) — обновить под текущее состояние.

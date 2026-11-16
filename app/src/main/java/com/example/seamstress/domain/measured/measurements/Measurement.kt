@@ -2,9 +2,23 @@ package com.example.seamstress.domain.measured.measurements
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.example.seamstress.domain.customers.Customers
 
-@Entity(tableName = "measurements")
+@Entity(
+    tableName = "measurements",
+    foreignKeys = [
+        ForeignKey(
+            entity = Customers::class,
+            parentColumns = ["id"],
+            childColumns = ["customer_id"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [Index("customer_id")]
+)
 data class Measurement(
     @PrimaryKey(autoGenerate = true)
     val id: Long,

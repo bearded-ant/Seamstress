@@ -39,8 +39,8 @@ import com.example.seamstress.domain.standards.StandardSetDao
         StandardSet::class,
         StandardMetric::class
     ],
-    version = 4,
-    exportSchema = false
+    version = 5,
+    exportSchema = true
 )
 abstract class SeamstressDataBase : RoomDatabase() {
     abstract fun customersDao(): CustomersDao

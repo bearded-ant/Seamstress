@@ -9,12 +9,20 @@ import com.example.seamstress.domain.customers.CustomersDao
 import com.example.seamstress.domain.dress.DressClass
 import com.example.seamstress.domain.dress.DressClassDao
 import com.example.seamstress.domain.dress.DressClassMetric
+import com.example.seamstress.domain.dresses.Dress
+import com.example.seamstress.domain.dresses.DressComment
+import com.example.seamstress.domain.dresses.DressDao
+import com.example.seamstress.domain.dresses.DressMetric
+import com.example.seamstress.domain.dresses.DressPhoto
 import com.example.seamstress.domain.measured.measurements.Measurement
 import com.example.seamstress.domain.measured.measurements.MeasurementDao
 import com.example.seamstress.domain.measured.metric.Metric
 import com.example.seamstress.domain.measured.metric.MetricDao
 import com.example.seamstress.domain.measured.taken.TakenMeasurement
 import com.example.seamstress.domain.measured.taken.TakenMeasurementDao
+import com.example.seamstress.domain.standards.StandardMetric
+import com.example.seamstress.domain.standards.StandardSet
+import com.example.seamstress.domain.standards.StandardSetDao
 
 @Database(
     entities = [
@@ -23,9 +31,15 @@ import com.example.seamstress.domain.measured.taken.TakenMeasurementDao
         Measurement::class,
         TakenMeasurement::class,
         DressClass::class,
-        DressClassMetric::class
+        DressClassMetric::class,
+        Dress::class,
+        DressMetric::class,
+        DressPhoto::class,
+        DressComment::class,
+        StandardSet::class,
+        StandardMetric::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 abstract class SeamstressDataBase : RoomDatabase() {
@@ -34,6 +48,8 @@ abstract class SeamstressDataBase : RoomDatabase() {
     abstract fun metricDao(): MetricDao
     abstract fun measurementsDao(): MeasurementDao
     abstract fun takenMeasurementsDao(): TakenMeasurementDao
+    abstract fun dressDao(): DressDao
+    abstract fun standardSetDao(): StandardSetDao
 
     companion object {
         // Singleton prevents multiple instances of database opening at the

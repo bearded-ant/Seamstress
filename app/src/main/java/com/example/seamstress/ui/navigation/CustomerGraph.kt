@@ -1,5 +1,6 @@
 package com.example.seamstress.ui.navigation
 
+import android.content.ActivityNotFoundException
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -8,9 +9,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -27,6 +32,7 @@ import com.example.seamstress.viewmodel.CustomerFormState
 import com.example.seamstress.viewmodel.DressViewModel
 import com.example.seamstress.viewmodel.MeasurementsViewModel
 import com.example.seamstress.viewmodel.SeamstressViewModel
+import java.io.File
 
 fun NavGraphBuilder.customerGraph(navController: NavHostController) {
     composable<CustomersList> {
@@ -67,6 +73,23 @@ fun NavGraphBuilder.customerGraph(navController: NavHostController) {
         }
         val dresses by dressesLive.observeAsState(emptyList())
         val toast = rememberToast()
+        val context = LocalContext.current
+
+        var pendingCameraFile by remember { mutableStateOf<File?>(null) }
+        val cameraLauncher = rememberLauncherForActivityResult(
+            ActivityResultContracts.TakePicture()
+        ) { success ->
+            val file = pendingCameraFile
+            pendingCameraFile = null
+            if (file != null) {
+                if (success) viewModel.setCustomerPhotoFromFile(route.customerId, file) else file.delete()
+            }
+        }
+        val pickLauncher = rememberLauncherForActivityResult(
+            ActivityResultContracts.PickVisualMedia()
+        ) { uri ->
+            if (uri != null) viewModel.setCustomerPhotoFromUri(route.customerId, uri)
+        }
 
         LaunchedEffect(customer.loaded, customer.value) {
             if (customer.loaded && customer.value == null) {
@@ -88,7 +111,29 @@ fun NavGraphBuilder.customerGraph(navController: NavHostController) {
                 onAddMeasurement = { navController.navigate(AddMeasurement(route.customerId)) },
                 onMeasurementClick = { id -> navController.navigate(CardMeasurement(id)) },
                 onAddDress = { navController.navigate(AddDress(route.customerId)) },
-                onDressClick = { id -> navController.navigate(DressCard(id)) }
+                onDressClick = { id -> navController.navigate(DressCard(id)) },
+                onPickPhoto = {
+                    pickLauncher.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    )
+                },
+                onTakePhoto = {
+                    val file = viewModel.createCustomerCameraFile(route.customerId)
+                    pendingCameraFile = file
+                    val uri = FileProvider.getUriForFile(
+                        context,
+                        "${context.packageName}.fileprovider",
+                        file
+                    )
+                    try {
+                        cameraLauncher.launch(uri)
+                    } catch (e: ActivityNotFoundException) {
+                        pendingCameraFile = null
+                        file.delete()
+                        toast(R.string.customer_camera_unavailable)
+                    }
+                },
+                onDeletePhoto = { viewModel.deleteCustomerPhoto(route.customerId) }
             )
         }
     }

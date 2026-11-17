@@ -173,4 +173,51 @@ class SeamstressViewModel(application: Application) : AndroidViewModel(applicati
         pendingPhotoFile = null
         _formState.value = state().copy(imgPath = originalImgPath)
     }
+
+    /** Файл под снимок камерой для фото клиента; создаётся до запуска камеры. */
+    fun createCustomerCameraFile(customerId: Long): File {
+        val dir = File(getApplication<Application>().filesDir, CUSTOMER_PHOTO_DIR).apply { mkdirs() }
+        return File(dir, "customer_${customerId}_${System.currentTimeMillis()}.jpg")
+    }
+
+    /** Снимок камерой удался — файл уже на месте, пишем путь клиенту; иначе убираем пустой файл. */
+    fun setCustomerPhotoFromFile(customerId: Long, file: File) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (file.exists() && file.length() > 0) {
+                applyCustomerPhoto(customerId, file.absolutePath)
+            } else {
+                file.delete()
+            }
+        }
+    }
+
+    /** Фото клиента из галереи: копия потока в хранилище приложения, путь сразу пишется клиенту. */
+    fun setCustomerPhotoFromUri(customerId: Long, uri: Uri) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val file = createCustomerCameraFile(customerId)
+            val copied = runCatching {
+                getApplication<Application>().contentResolver.openInputStream(uri)?.use { input ->
+                    file.outputStream().use { output -> input.copyTo(output) }
+                } != null
+            }.getOrDefault(false)
+            if (copied && file.length() > 0) {
+                applyCustomerPhoto(customerId, file.absolutePath)
+            } else {
+                file.delete()
+            }
+        }
+    }
+
+    /** Удаление фото клиента: путь обнуляется, файл убирается. */
+    fun deleteCustomerPhoto(customerId: Long) {
+        viewModelScope.launch(Dispatchers.IO) { applyCustomerPhoto(customerId, null) }
+    }
+
+    /** Пишет клиенту новый путь фото; старый файл удаляется. */
+    private suspend fun applyCustomerPhoto(customerId: Long, newPath: String?) {
+        val customer = customerRepo.getCustomerById(customerId) ?: return
+        if (customer.img == newPath) return
+        customerRepo.updateCustomer(customer.copy(img = newPath))
+        customer.img?.let { old -> runCatching { File(old).delete() } }
+    }
 }

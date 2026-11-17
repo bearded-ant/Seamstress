@@ -29,6 +29,11 @@
     <string name="item_dress_list_photo">item_dress_list_photo</string>
     <string name="customer_photo">customer_photo</string>
     <string name="customer_photo_load">Загрузить фото</string>
+    <string name="customer_photo_menu_title">Фото клиента</string>
+    <string name="customer_photo_take">Снять новое</string>
+    <string name="customer_photo_pick">Выбрать из галереи</string>
+    <string name="customer_photo_delete">Удалить фото</string>
+    <string name="customer_camera_unavailable">Камера недоступна</string>
     <string name="save_btn">сохранить</string>
     <string name="cancel_btn">отменить</string>
     <string name="customer_name">имя клиента</string>

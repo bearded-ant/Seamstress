@@ -229,22 +229,29 @@ private fun CustomerHeader(
 
 @Composable
 private fun DressTile(dress: DressRow, onClick: () -> Unit) {
-    Card(modifier = Modifier.width(150.dp).height(150.dp).clickable(onClick = onClick)) {
-        Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-            Text(
-                text = dress.name,
-                style = MaterialTheme.typography.titleMedium,
-                maxLines = 2
+    Card(modifier = Modifier.width(150.dp).height(180.dp).clickable(onClick = onClick)) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            PhotoImage(
+                path = dress.photoPath,
+                modifier = Modifier.fillMaxWidth().height(90.dp)
             )
-            Spacer(modifier = Modifier.weight(1f))
-            Text(
-                text = dress.className.orEmpty(),
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = dress.createdAt,
-                style = MaterialTheme.typography.bodySmall
-            )
+            Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+                Text(
+                    text = dress.name,
+                    style = MaterialTheme.typography.titleSmall,
+                    maxLines = 2
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    text = dress.className.orEmpty(),
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 1
+                )
+                Text(
+                    text = dress.createdAt,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         }
     }
 }

@@ -49,5 +49,8 @@ data class DressRow(
     val customerId: Long,
     val price: Long?,
     @ColumnInfo(name = "created_at")
-    val createdAt: String
+    val createdAt: String,
+    /** Первое фото изделия для превью в списке; null — фото нет. */
+    @ColumnInfo(name = "photo_path")
+    val photoPath: String? = null
 )

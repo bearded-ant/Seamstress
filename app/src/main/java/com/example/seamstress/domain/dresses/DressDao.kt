@@ -13,7 +13,8 @@ interface DressDao {
 
     @Query(
         """
-        select d.id, d.name, d.class_id, c.name as class_name, d.customer_id, d.price, d.created_at
+        select d.id, d.name, d.class_id, c.name as class_name, d.customer_id, d.price, d.created_at,
+               (select p.path from dress_photo p where p.dress_id = d.id order by p.id limit 1) as photo_path
         from dress d
         left join dress_classes c on c.id = d.class_id
         where d.customer_id = :customerId
@@ -24,7 +25,8 @@ interface DressDao {
 
     @Query(
         """
-        select d.id, d.name, d.class_id, c.name as class_name, d.customer_id, d.price, d.created_at
+        select d.id, d.name, d.class_id, c.name as class_name, d.customer_id, d.price, d.created_at,
+               (select p.path from dress_photo p where p.dress_id = d.id order by p.id limit 1) as photo_path
         from dress d
         left join dress_classes c on c.id = d.class_id
         where d.id = :id

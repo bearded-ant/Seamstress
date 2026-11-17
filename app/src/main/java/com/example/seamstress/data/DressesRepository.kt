@@ -51,6 +51,12 @@ class DressesRepository(private val dressDao: DressDao) {
     suspend fun updateDressMetricValue(dressId: Long, metricId: Long, value: Float) =
         dressDao.updateDressMetricValue(dressId, metricId, value)
 
+    suspend fun addDressMetric(metric: DressMetric) = dressDao.addDressMetric(metric)
+
+    /** Мерки соседних изделий клиента — подсказка при снятии мерки с карточки. */
+    suspend fun getCustomerDressMetrics(customerId: Long, excludeDressId: Long): List<DressMetric> =
+        dressDao.getCustomerDressMetrics(customerId, excludeDressId)
+
     suspend fun insertDressPhoto(photo: DressPhoto): Long = dressDao.insertDressPhoto(photo)
 
     suspend fun deleteDressPhoto(photo: DressPhoto) = dressDao.deleteDressPhoto(photo)

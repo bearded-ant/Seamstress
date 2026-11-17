@@ -10,6 +10,10 @@ interface MetricDao {
     @Query("select * from metrics")
     fun getAllMetrics(): LiveData<List<Metric>>
 
+    /** Для карточки изделия: выбор новой мерки — разовое чтение, без подписки. */
+    @Query("select * from metrics order by id")
+    suspend fun getAllMetricsOnce(): List<Metric>
+
     @Query("select * from metrics where id = :id")
     suspend fun getMetricById(id: Long): Metric?
 

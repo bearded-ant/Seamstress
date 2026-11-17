@@ -130,6 +130,35 @@ interface DressDao {
     @Query("update dress_metric set value = :value where dress_id = :dressId and metric_id = :metricId")
     suspend fun updateDressMetricValue(dressId: Long, metricId: Long, value: Float)
 
+    /**
+     * Мерки всех изделий клиента, кроме указанного — «крайние» показания соседних изделий
+     * подсказываются при снятии мерки с карточки.
+     */
+    @Query(
+        """
+        select m.* from dress_metric m
+        join dress d on d.id = m.dress_id
+        where d.customer_id = :customerId and d.id != :excludeDressId
+        """
+    )
+    suspend fun getCustomerDressMetrics(customerId: Long, excludeDressId: Long): List<DressMetric>
+
+    /** Новая мерка изделия; если пара «изделие + метрика» уже есть — просто обновляется. */
+    @Transaction
+    suspend fun addDressMetric(metric: DressMetric) {
+        if (dressMetricExists(metric.dressId, metric.metricId) > 0) {
+            updateDressMetricValue(metric.dressId, metric.metricId, metric.value)
+        } else {
+            insertDressMetric(metric)
+        }
+    }
+
+    @Query("select count(*) from dress_metric where dress_id = :dressId and metric_id = :metricId")
+    suspend fun dressMetricExists(dressId: Long, metricId: Long): Int
+
+    @Insert
+    suspend fun insertDressMetric(metric: DressMetric): Long
+
     @Insert
     suspend fun insertDressPhoto(photo: DressPhoto): Long
 

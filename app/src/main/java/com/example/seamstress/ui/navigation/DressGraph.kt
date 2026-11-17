@@ -107,6 +107,14 @@ fun NavGraphBuilder.dressGraph(navController: NavHostController) {
                 onUpdateMetricValue = { row, value ->
                     viewModel.updateMetricValue(route.dressId, row.metricId, value)
                 },
+                loadClassMetrics = viewModel::classMetricsOnce,
+                loadAllMetrics = viewModel::allMetricsOnce,
+                loadNeighborMeasurements = { customerId ->
+                    viewModel.neighborMeasurements(customerId, route.dressId)
+                },
+                onAddMetric = { metricId, value ->
+                    viewModel.addMetric(route.dressId, metricId, value)
+                },
                 onAddComment = { text -> viewModel.addComment(route.dressId, text) },
                 onUpdateComment = { comment, text -> viewModel.updateComment(comment, text) },
                 onDeleteComment = viewModel::deleteComment,

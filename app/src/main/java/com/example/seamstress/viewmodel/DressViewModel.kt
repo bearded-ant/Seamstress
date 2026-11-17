@@ -20,6 +20,7 @@ import com.example.seamstress.domain.measured.measurements.MeasurementRow
 import com.example.seamstress.domain.measured.metric.Metric
 import com.example.seamstress.domain.measured.metric.MetricDao
 import com.example.seamstress.domain.measured.taken.TakenMeasurementDao
+import com.example.seamstress.ui.components.formatMeasure
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -177,6 +178,37 @@ class DressViewModel(application: Application) : AndroidViewModel(application) {
     fun updateMetricValue(dressId: Long, metricId: Long, value: Float) {
         viewModelScope.launch {
             dressesRepository.updateDressMetricValue(dressId, metricId, value)
+        }
+    }
+
+    /** Мерки класса в порядке снятия, разовое чтение — для «Снять мерку» с карточки. */
+    suspend fun classMetricsOnce(classId: Long): List<Metric> =
+        dressClassDao.getClassMetricsOnce(classId)
+
+    /** Все метрики справочника — из чего выбирать новую мерку изделия. */
+    suspend fun allMetricsOnce(): List<Metric> = metricDao.getAllMetricsOnce()
+
+    /**
+     * Измерительные данные соседних изделий клиента: для каждой мерки минимальное и
+     * максимальное значение по его уже снятым изделиям.
+     */
+    suspend fun neighborMeasurements(
+        customerId: Long,
+        excludeDressId: Long
+    ): List<Triple<Long, String, String>> =
+        dressesRepository.getCustomerDressMetrics(customerId, excludeDressId)
+            .groupBy { it.metricId }
+            .map { (metricId, rows) ->
+                val values = rows.map { it.value }
+                Triple(metricId, formatMeasure(values.min()), formatMeasure(values.max()))
+            }
+
+    /** Добавляет одну снятую мерку к изделию (существующая — обновляется). */
+    fun addMetric(dressId: Long, metricId: Long, value: Float) {
+        viewModelScope.launch {
+            dressesRepository.addDressMetric(
+                DressMetric(id = 0L, dressId = dressId, metricId = metricId, value = value)
+            )
         }
     }
 

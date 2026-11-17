@@ -38,6 +38,17 @@ interface DressClassDao {
     )
     fun getClassMetrics(classId: Long): Flow<List<Metric>>
 
+    /** То же разовым чтением — для «Снять мерку» с карточки изделия. */
+    @Query(
+        """
+        select m.* from metrics m
+        join dress_class_metrics cm on cm.metric_id = m.id
+        where cm.class_id = :classId
+        order by cm.position
+        """
+    )
+    suspend fun getClassMetricsOnce(classId: Long): List<Metric>
+
     @Insert
     suspend fun insertClass(dressClass: DressClass): Long
 

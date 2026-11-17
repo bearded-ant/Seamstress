@@ -124,6 +124,10 @@
     <string name="dress_camera_unavailable">Камера недоступна</string>
     <string name="dress_metrics">Мерки</string>
     <string name="dress_metric_value_hint">Значение мерки</string>
+    <string name="dress_metric_take">Снять мерку</string>
+    <string name="dress_metric_choose_other">другая мерка</string>
+    <string name="dress_metric_already_taken">уже снята</string>
+    <string name="dress_metric_hint_range">у клиента: %1$s…%2$s</string>
     <string name="dress_comments">Комментарии</string>
     <string name="dress_comments_empty">Комментариев нет</string>
     <string name="dress_comment_add">Добавить комментарий</string>

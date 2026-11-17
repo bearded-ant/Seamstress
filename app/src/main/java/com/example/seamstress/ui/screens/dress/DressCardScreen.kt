@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
@@ -32,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.seamstress.R
 import com.example.seamstress.domain.dresses.DressComment
@@ -59,11 +61,13 @@ fun DressCardScreen(
     onPickPhoto: () -> Unit,
     onTakePhoto: () -> Unit,
     onDeletePhoto: (DressPhoto) -> Unit,
+    onUpdateMetricValue: (DressMetricRow, Float) -> Unit,
     onAddComment: (String) -> Unit,
     onDeleteComment: (DressComment) -> Unit
 ) {
     var showCommentDialog by remember { mutableStateOf(false) }
     var viewerIndex by remember { mutableStateOf<Int?>(null) }
+    var editMetric by remember { mutableStateOf<DressMetricRow?>(null) }
 
     Scaffold(
         floatingActionButton = {
@@ -177,7 +181,10 @@ fun DressCardScreen(
                     } else {
                         metrics.forEach { row ->
                             Row(
-                                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { editMetric = row }
+                                    .padding(vertical = 8.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Column(modifier = Modifier.weight(1f)) {
@@ -246,6 +253,18 @@ fun DressCardScreen(
         )
     }
 
+    val metricToEdit = editMetric
+    if (metricToEdit != null) {
+        EditMetricDialog(
+            row = metricToEdit,
+            onDismiss = { editMetric = null },
+            onConfirm = { value ->
+                editMetric = null
+                onUpdateMetricValue(metricToEdit, value)
+            }
+        )
+    }
+
     val openedIndex = viewerIndex
     if (openedIndex != null && photos.isNotEmpty()) {
         PhotoViewerDialog(
@@ -254,6 +273,40 @@ fun DressCardScreen(
             onDismiss = { viewerIndex = null }
         )
     }
+}
+
+@Composable
+private fun EditMetricDialog(
+    row: DressMetricRow,
+    onDismiss: () -> Unit,
+    onConfirm: (Float) -> Unit
+) {
+    var text by remember(row.metricId) { mutableStateOf(formatMeasure(row.value)) }
+    val value = text.trim().replace(',', '.').toFloatOrNull()
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("${row.shortName} — ${row.metricName}") },
+        text = {
+            OutlinedTextField(
+                value = text,
+                onValueChange = { text = it.filter { ch -> ch.isDigit() || ch == '.' || ch == ',' } },
+                label = { Text(stringResource(R.string.dress_metric_value_hint)) },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { value?.let(onConfirm) },
+                enabled = value != null
+            ) { Text(stringResource(R.string.save_btn)) }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel_btn)) }
+        }
+    )
 }
 
 @Composable

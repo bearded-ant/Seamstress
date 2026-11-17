@@ -123,6 +123,10 @@ interface DressDao {
     @Query("delete from dress where id = :id")
     suspend fun deleteDressById(id: Long)
 
+    /** Горячая правка значения мерки изделия — без замены всего набора. */
+    @Query("update dress_metric set value = :value where dress_id = :dressId and metric_id = :metricId")
+    suspend fun updateDressMetricValue(dressId: Long, metricId: Long, value: Float)
+
     @Insert
     suspend fun insertDressPhoto(photo: DressPhoto): Long
 

@@ -173,6 +173,13 @@ class DressViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /** Горячая правка одной мерки изделия прямо с карточки. */
+    fun updateMetricValue(dressId: Long, metricId: Long, value: Float) {
+        viewModelScope.launch {
+            dressesRepository.updateDressMetricValue(dressId, metricId, value)
+        }
+    }
+
     fun addPhoto(dressId: Long, path: String) {
         viewModelScope.launch {
             dressesRepository.insertDressPhoto(DressPhoto(id = 0L, dressId = dressId, path = path))

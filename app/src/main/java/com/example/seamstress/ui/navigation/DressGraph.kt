@@ -104,6 +104,9 @@ fun NavGraphBuilder.dressGraph(navController: NavHostController) {
                     }
                 },
                 onDeletePhoto = viewModel::deletePhoto,
+                onUpdateMetricValue = { row, value ->
+                    viewModel.updateMetricValue(route.dressId, row.metricId, value)
+                },
                 onAddComment = { text -> viewModel.addComment(route.dressId, text) },
                 onDeleteComment = viewModel::deleteComment
             )

@@ -122,6 +122,7 @@
     <string name="dress_photo_delete">Удалить фото</string>
     <string name="dress_camera_unavailable">Камера недоступна</string>
     <string name="dress_metrics">Мерки</string>
+    <string name="dress_metric_value_hint">Значение мерки</string>
     <string name="dress_comments">Комментарии</string>
     <string name="dress_comments_empty">Комментариев нет</string>
     <string name="dress_comment_add">Добавить комментарий</string>

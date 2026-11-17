@@ -42,6 +42,9 @@ class DressesRepository(private val dressDao: DressDao) {
 
     suspend fun deleteDressById(id: Long) = dressDao.deleteDressById(id)
 
+    suspend fun updateDressMetricValue(dressId: Long, metricId: Long, value: Float) =
+        dressDao.updateDressMetricValue(dressId, metricId, value)
+
     suspend fun insertDressPhoto(photo: DressPhoto): Long = dressDao.insertDressPhoto(photo)
 
     suspend fun deleteDressPhoto(photo: DressPhoto) = dressDao.deleteDressPhoto(photo)

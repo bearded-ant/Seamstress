@@ -116,6 +116,7 @@
     <string name="dress_price_not_set">Стоимость не указана</string>
     <string name="error_dress_price_invalid">Стоимость — целое число от 0 до 1 000 000 000</string>
     <string name="dress_photos">Фото</string>
+    <string name="dress_edit_item">Редактировать изделие</string>
     <string name="dress_photos_empty">Фото нет</string>
     <string name="dress_photo_load">Загрузить</string>
     <string name="dress_photo_camera">Сделать фото</string>

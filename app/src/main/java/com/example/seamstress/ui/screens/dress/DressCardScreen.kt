@@ -16,7 +16,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -58,7 +57,7 @@ import com.example.seamstress.ui.components.formatMoney
 /**
  * Карточка изделия: название · фото-слайдер (загрузить/сделать фото/удалить, просмотр на весь экран) ·
  * связанные мерки (правка по тапу) · стоимость · комментарии (добавить/изменить/удалить,
- * перетаскивание и закрепление) · FAB «Редактировать».
+ * перетаскивание и закрепление) · карандаш «Редактировать изделие» в углу фото.
  * Дата создания — служебное поле, только показывается.
  */
 @Composable
@@ -84,15 +83,7 @@ fun DressCardScreen(
     var editMetric by remember { mutableStateOf<DressMetricRow?>(null) }
     var editComment by remember { mutableStateOf<DressComment?>(null) }
 
-    Scaffold(
-        floatingActionButton = {
-            if (dress != null) {
-                ExtendedFloatingActionButton(onClick = onEdit) {
-                    Text(stringResource(R.string.edit_measurement))
-                }
-            }
-        }
-    ) { innerPadding ->
+    Scaffold { innerPadding ->
         if (!loaded) {
             return@Scaffold
         }
@@ -132,8 +123,9 @@ fun DressCardScreen(
             }
 
             Card(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = stringResource(R.string.dress_photos), style = MaterialTheme.typography.titleMedium)
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(text = stringResource(R.string.dress_photos), style = MaterialTheme.typography.titleMedium)
                     if (photos.isNotEmpty()) {
                         val pagerState = rememberPagerState(pageCount = { photos.size })
                         HorizontalPager(
@@ -173,13 +165,23 @@ fun DressCardScreen(
                             modifier = Modifier.padding(top = 8.dp)
                         )
                     }
-                    Row(modifier = Modifier.padding(top = 8.dp)) {
-                        TextButton(onClick = onPickPhoto) {
-                            Text(stringResource(R.string.dress_photo_load))
+                        Row(modifier = Modifier.padding(top = 8.dp)) {
+                            TextButton(onClick = onPickPhoto) {
+                                Text(stringResource(R.string.dress_photo_load))
+                            }
+                            TextButton(onClick = onTakePhoto, modifier = Modifier.padding(start = 8.dp)) {
+                                Text(stringResource(R.string.dress_photo_camera))
+                            }
                         }
-                        TextButton(onClick = onTakePhoto, modifier = Modifier.padding(start = 8.dp)) {
-                            Text(stringResource(R.string.dress_photo_camera))
-                        }
+                    }
+                    IconButton(
+                        onClick = onEdit,
+                        modifier = Modifier.align(Alignment.TopEnd).padding(4.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_baseline_edit_24),
+                            contentDescription = stringResource(R.string.dress_edit_item)
+                        )
                     }
                 }
             }

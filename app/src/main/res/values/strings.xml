@@ -118,7 +118,7 @@
     <string name="dress_photos">Фото</string>
     <string name="dress_photos_empty">Фото нет</string>
     <string name="dress_photo_load">Загрузить</string>
-    <string name="dress_photo_camera">Снять камерой</string>
+    <string name="dress_photo_camera">Сделать фото</string>
     <string name="dress_photo_delete">Удалить фото</string>
     <string name="dress_camera_unavailable">Камера недоступна</string>
     <string name="dress_metrics">Мерки</string>

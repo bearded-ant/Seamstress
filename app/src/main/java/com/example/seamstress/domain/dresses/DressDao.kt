@@ -67,8 +67,11 @@ interface DressDao {
     )
     suspend fun getPhotosByCustomerId(customerId: Long): List<DressPhoto>
 
-    @Query("select * from dress_comment where dress_id = :dressId order by id")
+    @Query("select * from dress_comment where dress_id = :dressId order by pinned desc, position, id")
     fun getDressComments(dressId: Long): LiveData<List<DressComment>>
+
+    @Query("select * from dress_comment where dress_id = :dressId order by pinned desc, position, id")
+    suspend fun getDressCommentsOnce(dressId: Long): List<DressComment>
 
     @Insert
     suspend fun insertDress(dress: Dress): Long
@@ -138,6 +141,14 @@ interface DressDao {
 
     @Update
     suspend fun updateDressComment(comment: DressComment)
+
+    /** Перестановка комментариев: позиция — индекс в переданном порядке, заодно пишется закрепление. */
+    @Transaction
+    suspend fun reorderDressComments(comments: List<DressComment>) {
+        comments.forEachIndexed { index, comment ->
+            updateDressComment(comment.copy(position = index))
+        }
+    }
 
     @Delete
     suspend fun deleteDressComment(comment: DressComment)

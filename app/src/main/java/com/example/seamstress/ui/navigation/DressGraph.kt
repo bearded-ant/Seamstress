@@ -109,7 +109,9 @@ fun NavGraphBuilder.dressGraph(navController: NavHostController) {
                 },
                 onAddComment = { text -> viewModel.addComment(route.dressId, text) },
                 onUpdateComment = { comment, text -> viewModel.updateComment(comment, text) },
-                onDeleteComment = viewModel::deleteComment
+                onDeleteComment = viewModel::deleteComment,
+                onToggleCommentPin = viewModel::toggleCommentPin,
+                onReorderComments = viewModel::reorderComments
             )
         }
     }

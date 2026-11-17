@@ -1,6 +1,7 @@
 package com.example.seamstress.ui.screens.dress
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,15 +27,24 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.example.seamstress.R
 import com.example.seamstress.domain.dresses.DressComment
 import com.example.seamstress.domain.dresses.DressMetricRow
@@ -47,7 +57,8 @@ import com.example.seamstress.ui.components.formatMoney
 
 /**
  * Карточка изделия: название · фото-слайдер (загрузить/сделать фото/удалить, просмотр на весь экран) ·
- * связанные мерки · стоимость · комментарии (добавить/удалить) · FAB «Редактировать».
+ * связанные мерки (правка по тапу) · стоимость · комментарии (добавить/изменить/удалить,
+ * перетаскивание и закрепление) · FAB «Редактировать».
  * Дата создания — служебное поле, только показывается.
  */
 @Composable
@@ -64,7 +75,9 @@ fun DressCardScreen(
     onUpdateMetricValue: (DressMetricRow, Float) -> Unit,
     onAddComment: (String) -> Unit,
     onUpdateComment: (DressComment, String) -> Unit,
-    onDeleteComment: (DressComment) -> Unit
+    onDeleteComment: (DressComment) -> Unit,
+    onToggleCommentPin: (DressComment) -> Unit,
+    onReorderComments: (List<DressComment>) -> Unit
 ) {
     var showCommentDialog by remember { mutableStateOf(false) }
     var viewerIndex by remember { mutableStateOf<Int?>(null) }
@@ -220,27 +233,140 @@ fun DressCardScreen(
                             modifier = Modifier.padding(top = 8.dp)
                         )
                     } else {
-                        comments.forEach { comment ->
-                            Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
-                                Text(text = comment.text, style = MaterialTheme.typography.bodyMedium)
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Text(
-                                        text = comment.createdAt,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                    TextButton(onClick = { editComment = comment }) {
-                                        Text(stringResource(R.string.dress_comment_edit))
-                                    }
-                                    TextButton(onClick = { onDeleteComment(comment) }) {
-                                        Text(
-                                            text = stringResource(R.string.delete_btn),
-                                            color = MaterialTheme.colorScheme.error
-                                        )
+                        // Локальный порядок на время перетаскивания; в БД пишется по окончании жеста.
+                        val orderedComments = remember(comments) {
+                            mutableStateListOf<DressComment>().apply { addAll(comments) }
+                        }
+                        var draggingId by remember { mutableStateOf<Long?>(null) }
+                        var dragOffsetY by remember { mutableFloatStateOf(0f) }
+                        val itemBounds = remember { mutableStateMapOf<Long, Pair<Float, Float>>() }
+
+                        orderedComments.forEach { comment ->
+                            key(comment.id) {
+                                val dragging = draggingId == comment.id
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .zIndex(if (dragging) 1f else 0f)
+                                        .graphicsLayer {
+                                            translationY = if (dragging) dragOffsetY else 0f
+                                            scaleX = if (dragging) 1.03f else 1f
+                                            scaleY = if (dragging) 1.03f else 1f
+                                            shadowElevation = if (dragging) 12f else 0f
+                                        }
+                                        .onGloballyPositioned { coords ->
+                                            itemBounds[comment.id] =
+                                                coords.positionInParent().y to coords.size.height.toFloat()
+                                        }
+                                        .pointerInput(comment.id) {
+                                            detectDragGesturesAfterLongPress(
+                                                onDragStart = {
+                                                    draggingId = comment.id
+                                                    dragOffsetY = 0f
+                                                },
+                                                onDrag = { change, dragAmount ->
+                                                    change.consume()
+                                                    dragOffsetY += dragAmount.y
+                                                    val id = draggingId
+                                                    val b = if (id != null) itemBounds[id] else null
+                                                    if (id != null && b != null) {
+                                                        val center = b.first + b.second / 2f + dragOffsetY
+                                                        val currentIndex = orderedComments.indexOfFirst { it.id == id }
+                                                        if (currentIndex >= 0) {
+                                                            val pinnedCount = orderedComments.count { it.pinned }
+                                                            val isPinned = orderedComments[currentIndex].pinned
+                                                            var target = 0
+                                                            for (other in orderedComments) {
+                                                                if (other.id == id) continue
+                                                                val ob = itemBounds[other.id] ?: continue
+                                                                if (ob.first + ob.second / 2f < center) target++ else break
+                                                            }
+                                                            // Перетаскивание только внутри своей группы закрепления.
+                                                            target = if (isPinned) {
+                                                                target.coerceIn(0, pinnedCount - 1)
+                                                            } else {
+                                                                target.coerceIn(pinnedCount, orderedComments.size - 1)
+                                                            }
+                                                            if (target != currentIndex) {
+                                                                val oldTop = b.first
+                                                                val newTop = if (target > currentIndex) {
+                                                                    oldTop + orderedComments
+                                                                        .subList(currentIndex + 1, target + 1)
+                                                                        .sumOf { (itemBounds[it.id]?.second ?: 0f).toDouble() }
+                                                                        .toFloat()
+                                                                } else {
+                                                                    itemBounds[orderedComments[target].id]?.first ?: oldTop
+                                                                }
+                                                                if (target > currentIndex) {
+                                                                    for (k in currentIndex + 1..target) {
+                                                                        val oid = orderedComments[k].id
+                                                                        itemBounds[oid]?.let {
+                                                                            itemBounds[oid] = (it.first - b.second) to it.second
+                                                                        }
+                                                                    }
+                                                                } else {
+                                                                    for (k in target until currentIndex) {
+                                                                        val oid = orderedComments[k].id
+                                                                        itemBounds[oid]?.let {
+                                                                            itemBounds[oid] = (it.first + b.second) to it.second
+                                                                        }
+                                                                    }
+                                                                }
+                                                                itemBounds[id] = newTop to b.second
+                                                                val moved = orderedComments.removeAt(currentIndex)
+                                                                orderedComments.add(target, moved)
+                                                                dragOffsetY += oldTop - newTop
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                onDragEnd = {
+                                                    if (draggingId != null) {
+                                                        onReorderComments(orderedComments.toList())
+                                                    }
+                                                    draggingId = null
+                                                    dragOffsetY = 0f
+                                                },
+                                                onDragCancel = {
+                                                    draggingId = null
+                                                    dragOffsetY = 0f
+                                                }
+                                            )
+                                        }
+                                        .padding(vertical = 8.dp)
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        IconButton(onClick = { onToggleCommentPin(comment) }) {
+                                            Icon(
+                                                painter = painterResource(
+                                                    if (comment.pinned) R.drawable.ic_push_pin
+                                                    else R.drawable.ic_push_pin_outline
+                                                ),
+                                                contentDescription = stringResource(
+                                                    if (comment.pinned) R.string.dress_comment_unpin
+                                                    else R.string.dress_comment_pin
+                                                ),
+                                                tint = if (comment.pinned) MaterialTheme.colorScheme.primary
+                                                else MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Text(text = comment.text, style = MaterialTheme.typography.bodyMedium)
+                                            Text(text = comment.createdAt, style = MaterialTheme.typography.bodySmall)
+                                        }
+                                        TextButton(onClick = { editComment = comment }) {
+                                            Text(stringResource(R.string.dress_comment_edit))
+                                        }
+                                        TextButton(onClick = { onDeleteComment(comment) }) {
+                                            Text(
+                                                text = stringResource(R.string.delete_btn),
+                                                color = MaterialTheme.colorScheme.error
+                                            )
+                                        }
                                     }
                                 }
+                                HorizontalDivider()
                             }
-                            HorizontalDivider()
                         }
                     }
                 }

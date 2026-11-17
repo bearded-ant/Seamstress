@@ -26,5 +26,8 @@ data class DressComment(
     val dressId: Long,
     val text: String,
     @ColumnInfo(name = "created_at")
-    val createdAt: String
+    val createdAt: String,
+    /** Порядок внутри изделия: закреплённые показываются первыми, затем по position. */
+    val position: Int = 0,
+    val pinned: Boolean = false
 )

@@ -129,6 +129,8 @@
     <string name="dress_comment_edit">изменить</string>
     <string name="dress_comment_edit_title">Изменить комментарий</string>
     <string name="dress_comment_hint">Текст комментария</string>
+    <string name="dress_comment_pin">Закрепить комментарий</string>
+    <string name="dress_comment_unpin">Открепить комментарий</string>
     <string name="dress_from_measurement">Взять из замера клиента</string>
     <string name="dress_from_set">Общие мерки (именной набор)</string>
     <string name="dress_not_found">Изделие не найдено</string>

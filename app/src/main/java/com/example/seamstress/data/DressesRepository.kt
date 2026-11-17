@@ -30,6 +30,12 @@ class DressesRepository(private val dressDao: DressDao) {
     fun getDressComments(dressId: Long): LiveData<List<DressComment>> =
         dressDao.getDressComments(dressId)
 
+    suspend fun getDressCommentsOnce(dressId: Long): List<DressComment> =
+        dressDao.getDressCommentsOnce(dressId)
+
+    suspend fun reorderDressComments(comments: List<DressComment>) =
+        dressDao.reorderDressComments(comments)
+
     suspend fun insertDressWithData(
         dress: Dress,
         metrics: List<DressMetric>,

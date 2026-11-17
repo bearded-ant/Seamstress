@@ -129,8 +129,8 @@ class DressViewModel(application: Application) : AndroidViewModel(application) {
                 DressMetric(id = 0L, dressId = 0L, metricId = metricId, value = value)
             }
             val photoRows = photos.map { DressPhoto(id = 0L, dressId = 0L, path = it) }
-            val commentRows = comments.map {
-                DressComment(id = 0L, dressId = 0L, text = it, createdAt = createdAt)
+            val commentRows = comments.mapIndexed { index, text ->
+                DressComment(id = 0L, dressId = 0L, text = text, createdAt = createdAt, position = index)
             }
             _dressSaved.send(
                 dressesRepository.insertDressWithData(dress, metrics, photoRows, commentRows)
@@ -234,10 +234,39 @@ class DressViewModel(application: Application) : AndroidViewModel(application) {
     fun addComment(dressId: Long, text: String) {
         viewModelScope.launch {
             val createdAt = SimpleDateFormat(DATE_PATTERN, Locale.getDefault()).format(Date())
+            val position = (dressesRepository.getDressCommentsOnce(dressId).maxOfOrNull { it.position } ?: -1) + 1
             dressesRepository.insertDressComment(
-                DressComment(id = 0L, dressId = dressId, text = text, createdAt = createdAt)
+                DressComment(
+                    id = 0L,
+                    dressId = dressId,
+                    text = text,
+                    createdAt = createdAt,
+                    position = position
+                )
             )
         }
+    }
+
+    /** Закрепление/открепление: комментарий переезжает в конец закреплённых или начало обычных. */
+    fun toggleCommentPin(comment: DressComment) {
+        viewModelScope.launch {
+            val all = dressesRepository.getDressCommentsOnce(comment.dressId).toMutableList()
+            val index = all.indexOfFirst { it.id == comment.id }
+            if (index < 0) return@launch
+            val updated = all.removeAt(index).copy(pinned = !comment.pinned)
+            val insertIndex = if (updated.pinned) {
+                all.indexOfLast { it.pinned } + 1
+            } else {
+                all.indexOfFirst { !it.pinned }.let { if (it < 0) all.size else it }
+            }
+            all.add(insertIndex, updated)
+            dressesRepository.reorderDressComments(all)
+        }
+    }
+
+    /** Порядок после перетаскивания: позиции перенумеровываются одной транзакцией. */
+    fun reorderComments(comments: List<DressComment>) {
+        viewModelScope.launch { dressesRepository.reorderDressComments(comments) }
     }
 
     fun updateComment(comment: DressComment, text: String) {

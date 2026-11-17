@@ -63,11 +63,13 @@ fun DressCardScreen(
     onDeletePhoto: (DressPhoto) -> Unit,
     onUpdateMetricValue: (DressMetricRow, Float) -> Unit,
     onAddComment: (String) -> Unit,
+    onUpdateComment: (DressComment, String) -> Unit,
     onDeleteComment: (DressComment) -> Unit
 ) {
     var showCommentDialog by remember { mutableStateOf(false) }
     var viewerIndex by remember { mutableStateOf<Int?>(null) }
     var editMetric by remember { mutableStateOf<DressMetricRow?>(null) }
+    var editComment by remember { mutableStateOf<DressComment?>(null) }
 
     Scaffold(
         floatingActionButton = {
@@ -227,6 +229,9 @@ fun DressCardScreen(
                                         style = MaterialTheme.typography.bodySmall,
                                         modifier = Modifier.weight(1f)
                                     )
+                                    TextButton(onClick = { editComment = comment }) {
+                                        Text(stringResource(R.string.dress_comment_edit))
+                                    }
                                     TextButton(onClick = { onDeleteComment(comment) }) {
                                         Text(
                                             text = stringResource(R.string.delete_btn),
@@ -244,11 +249,25 @@ fun DressCardScreen(
     }
 
     if (showCommentDialog) {
-        AddCommentDialog(
+        CommentDialog(
+            title = stringResource(R.string.dress_comment_add),
             onDismiss = { showCommentDialog = false },
             onConfirm = { text ->
                 showCommentDialog = false
                 onAddComment(text)
+            }
+        )
+    }
+
+    val commentToEdit = editComment
+    if (commentToEdit != null) {
+        CommentDialog(
+            title = stringResource(R.string.dress_comment_edit_title),
+            initialText = commentToEdit.text,
+            onDismiss = { editComment = null },
+            onConfirm = { text ->
+                editComment = null
+                onUpdateComment(commentToEdit, text)
             }
         )
     }
@@ -310,15 +329,17 @@ private fun EditMetricDialog(
 }
 
 @Composable
-private fun AddCommentDialog(
+private fun CommentDialog(
+    title: String,
     onDismiss: () -> Unit,
-    onConfirm: (String) -> Unit
+    onConfirm: (String) -> Unit,
+    initialText: String = ""
 ) {
-    var text by remember { mutableStateOf("") }
+    var text by remember(initialText) { mutableStateOf(initialText) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.dress_comment_add)) },
+        title = { Text(title) },
         text = {
             OutlinedTextField(
                 value = text,

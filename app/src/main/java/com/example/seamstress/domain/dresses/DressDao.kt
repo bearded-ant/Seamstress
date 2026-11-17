@@ -136,6 +136,9 @@ interface DressDao {
     @Insert
     suspend fun insertDressComment(comment: DressComment): Long
 
+    @Update
+    suspend fun updateDressComment(comment: DressComment)
+
     @Delete
     suspend fun deleteDressComment(comment: DressComment)
 }

@@ -52,5 +52,7 @@ class DressesRepository(private val dressDao: DressDao) {
     suspend fun insertDressComment(comment: DressComment): Long =
         dressDao.insertDressComment(comment)
 
+    suspend fun updateDressComment(comment: DressComment) = dressDao.updateDressComment(comment)
+
     suspend fun deleteDressComment(comment: DressComment) = dressDao.deleteDressComment(comment)
 }

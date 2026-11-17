@@ -108,6 +108,7 @@ fun NavGraphBuilder.dressGraph(navController: NavHostController) {
                     viewModel.updateMetricValue(route.dressId, row.metricId, value)
                 },
                 onAddComment = { text -> viewModel.addComment(route.dressId, text) },
+                onUpdateComment = { comment, text -> viewModel.updateComment(comment, text) },
                 onDeleteComment = viewModel::deleteComment
             )
         }

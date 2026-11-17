@@ -126,6 +126,8 @@
     <string name="dress_comments">Комментарии</string>
     <string name="dress_comments_empty">Комментариев нет</string>
     <string name="dress_comment_add">Добавить комментарий</string>
+    <string name="dress_comment_edit">изменить</string>
+    <string name="dress_comment_edit_title">Изменить комментарий</string>
     <string name="dress_comment_hint">Текст комментария</string>
     <string name="dress_from_measurement">Взять из замера клиента</string>
     <string name="dress_from_set">Общие мерки (именной набор)</string>

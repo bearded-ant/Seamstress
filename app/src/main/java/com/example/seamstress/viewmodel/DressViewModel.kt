@@ -240,6 +240,10 @@ class DressViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun updateComment(comment: DressComment, text: String) {
+        viewModelScope.launch { dressesRepository.updateDressComment(comment.copy(text = text)) }
+    }
+
     fun deleteComment(comment: DressComment) {
         viewModelScope.launch { dressesRepository.deleteDressComment(comment) }
     }

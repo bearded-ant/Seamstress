@@ -19,9 +19,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -56,18 +56,7 @@ fun CustomerCardScreen(
     onTakePhoto: () -> Unit,
     onDeletePhoto: () -> Unit
 ) {
-    Scaffold(
-        floatingActionButton = {
-            if (customer != null) {
-                FloatingActionButton(onClick = onEdit) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_baseline_edit_24),
-                        contentDescription = stringResource(R.string.edit_customer)
-                    )
-                }
-            }
-        }
-    ) { innerPadding ->
+    Scaffold { innerPadding ->
         if (!loaded) {
             return@Scaffold
         }
@@ -88,6 +77,7 @@ fun CustomerCardScreen(
         ) {
             CustomerHeader(
                 customer = customer,
+                onEdit = onEdit,
                 onPickPhoto = onPickPhoto,
                 onTakePhoto = onTakePhoto,
                 onDeletePhoto = onDeletePhoto
@@ -135,6 +125,7 @@ fun CustomerCardScreen(
 @Composable
 private fun CustomerHeader(
     customer: Customers,
+    onEdit: () -> Unit,
     onPickPhoto: () -> Unit,
     onTakePhoto: () -> Unit,
     onDeletePhoto: () -> Unit
@@ -161,6 +152,15 @@ private fun CustomerHeader(
                         )
                     }
                 )
+                IconButton(
+                    onClick = onEdit,
+                    modifier = Modifier.align(Alignment.TopEnd)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_baseline_edit_24),
+                        contentDescription = stringResource(R.string.edit_customer)
+                    )
+                }
             }
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(

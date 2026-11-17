@@ -30,7 +30,6 @@ import com.example.seamstress.ui.screens.customer.CustomerFormScreen
 import com.example.seamstress.ui.screens.customer.CustomersListScreen
 import com.example.seamstress.viewmodel.CustomerFormState
 import com.example.seamstress.viewmodel.DressViewModel
-import com.example.seamstress.viewmodel.MeasurementsViewModel
 import com.example.seamstress.viewmodel.SeamstressViewModel
 import java.io.File
 
@@ -61,13 +60,8 @@ fun NavGraphBuilder.customerGraph(navController: NavHostController) {
     composable<CustomerCard> { entry ->
         val route = entry.toRoute<CustomerCard>()
         val viewModel: SeamstressViewModel = viewModel()
-        val measurementsViewModel: MeasurementsViewModel = viewModel()
         val dressViewModel: DressViewModel = viewModel()
         val customer = remember(route.customerId) { viewModel.customerById(route.customerId) }.observeLoaded()
-        val measurementsLive = remember(route.customerId) {
-            measurementsViewModel.measurementsByCustomer(route.customerId)
-        }
-        val measurements by measurementsLive.observeAsState(emptyList())
         val dressesLive = remember(route.customerId) {
             dressViewModel.dressesByCustomer(route.customerId)
         }
@@ -105,11 +99,8 @@ fun NavGraphBuilder.customerGraph(navController: NavHostController) {
             CustomerCardScreen(
                 customer = customer.value,
                 loaded = customer.loaded,
-                measurements = measurements,
                 dresses = dresses,
                 onEdit = { navController.navigate(UpdateCustomer(route.customerId)) },
-                onAddMeasurement = { navController.navigate(AddMeasurement(route.customerId)) },
-                onMeasurementClick = { id -> navController.navigate(CardMeasurement(id)) },
                 onAddDress = { navController.navigate(AddDress(route.customerId)) },
                 onDressClick = { id -> navController.navigate(DressCard(id)) },
                 onPickPhoto = {

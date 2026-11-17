@@ -40,7 +40,6 @@ import androidx.compose.ui.unit.dp
 import com.example.seamstress.R
 import com.example.seamstress.domain.customers.Customers
 import com.example.seamstress.domain.dresses.DressRow
-import com.example.seamstress.domain.measured.measurements.MeasurementRow
 import com.example.seamstress.ui.components.PhotoImage
 import com.example.seamstress.ui.components.formatMoney
 import com.example.seamstress.ui.components.formatPhone
@@ -49,11 +48,8 @@ import com.example.seamstress.ui.components.formatPhone
 fun CustomerCardScreen(
     customer: Customers?,
     loaded: Boolean,
-    measurements: List<MeasurementRow>,
     dresses: List<DressRow>,
     onEdit: () -> Unit,
-    onAddMeasurement: () -> Unit,
-    onMeasurementClick: (Long) -> Unit,
     onAddDress: () -> Unit,
     onDressClick: (Long) -> Unit,
     onPickPhoto: () -> Unit,
@@ -92,33 +88,10 @@ fun CustomerCardScreen(
         ) {
             CustomerHeader(
                 customer = customer,
-                onAddMeasurement = onAddMeasurement,
                 onPickPhoto = onPickPhoto,
                 onTakePhoto = onTakePhoto,
                 onDeletePhoto = onDeletePhoto
             )
-
-            HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
-
-            if (measurements.isEmpty()) {
-                Text(
-                    text = stringResource(R.string.taken_measurements_empty),
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(16.dp)
-                )
-            } else {
-                LazyRow(
-                    contentPadding = PaddingValues(8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(measurements, key = { it.id }) { measurement ->
-                        MeasurementTile(
-                            measurement = measurement,
-                            onClick = { onMeasurementClick(measurement.id) }
-                        )
-                    }
-                }
-            }
 
             HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
 
@@ -162,7 +135,6 @@ fun CustomerCardScreen(
 @Composable
 private fun CustomerHeader(
     customer: Customers,
-    onAddMeasurement: () -> Unit,
     onPickPhoto: () -> Unit,
     onTakePhoto: () -> Unit,
     onDeletePhoto: () -> Unit
@@ -205,11 +177,6 @@ private fun CustomerHeader(
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(top = 12.dp)
                 )
-                Row(modifier = Modifier.padding(top = 8.dp)) {
-                    TextButton(onClick = onAddMeasurement) {
-                        Text(stringResource(R.string.take_measurements))
-                    }
-                }
             }
         }
     }
@@ -257,27 +224,6 @@ private fun CustomerHeader(
                 }
             }
         )
-    }
-}
-
-@Composable
-private fun MeasurementTile(measurement: MeasurementRow, onClick: () -> Unit) {
-    Card(modifier = Modifier.width(150.dp).height(150.dp).clickable(onClick = onClick)) {
-        Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-            Text(
-                text = measurement.dateCreation,
-                style = MaterialTheme.typography.titleMedium
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            Text(
-                text = measurement.className,
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = measurement.name,
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
     }
 }
 

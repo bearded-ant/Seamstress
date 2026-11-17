@@ -1,5 +1,6 @@
 package com.example.seamstress.ui.screens.dress
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,6 +39,7 @@ import com.example.seamstress.domain.dresses.DressMetricRow
 import com.example.seamstress.domain.dresses.DressPhoto
 import com.example.seamstress.domain.dresses.DressRow
 import com.example.seamstress.ui.components.PhotoImage
+import com.example.seamstress.ui.components.PhotoViewerDialog
 import com.example.seamstress.ui.components.formatMeasure
 import com.example.seamstress.ui.components.formatMoney
 
@@ -61,6 +63,7 @@ fun DressCardScreen(
     onDeleteComment: (DressComment) -> Unit
 ) {
     var showCommentDialog by remember { mutableStateOf(false) }
+    var viewerIndex by remember { mutableStateOf<Int?>(null) }
 
     Scaffold(
         floatingActionButton = {
@@ -123,7 +126,9 @@ fun DressCardScreen(
                             Box(modifier = Modifier.fillMaxSize()) {
                                 PhotoImage(
                                     path = photo.path,
-                                    modifier = Modifier.fillMaxSize()
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .clickable { viewerIndex = page }
                                 )
                                 IconButton(
                                     onClick = { onDeletePhoto(photo) },
@@ -238,6 +243,15 @@ fun DressCardScreen(
                 showCommentDialog = false
                 onAddComment(text)
             }
+        )
+    }
+
+    val openedIndex = viewerIndex
+    if (openedIndex != null && photos.isNotEmpty()) {
+        PhotoViewerDialog(
+            paths = photos.map { it.path },
+            initialIndex = openedIndex,
+            onDismiss = { viewerIndex = null }
         )
     }
 }
